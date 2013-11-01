@@ -1,0 +1,2 @@
+= Getting started =
+simple switch example
