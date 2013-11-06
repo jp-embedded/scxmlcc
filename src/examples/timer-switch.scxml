@@ -1,0 +1,10 @@
+<scxml initial="off" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=830 h=760  -->
+ <state id="off"><!--   node-size-and-position x=60 y=40 w=75 h=75  -->
+  <transition event="button" target="on"><!--   edge-path [on]  x=140 y=170 pointx=0 pointy=20 offsetx=0 offsety=5  --></transition>
+ </state>
+ <state id="on"><!--   node-size-and-position x=60 y=240 w=75 h=75  -->
+  <transition event="timer"><!--   edge-path [on]  pointx=0 pointy=15 offsetx=0 offsety=3  --></transition>
+  <transition target="off"></transition>
+  <transition event="button" target="off"><!--   edge-path [off]  x=60 y=180 pointx=0 pointy=19 offsetx=-3 offsety=9  --></transition>
+ </state>
+</scxml>
