@@ -16,8 +16,48 @@
  *************************************************************************/
 
 #include "timer-switch.h"
+#include <iostream>
+
+using namespace std;
+
+typedef sc_timer_switch sc;
+
+struct sc::user_model 
+{
+	int timer;
+};
+
+template<> void sc::state_actions<sc::state_on>::enter(sc::data_model &m)
+{
+	cout << "on" << endl;	
+}
+
+template<> void sc::state_actions<sc::state_off>::enter(sc::data_model &m)
+{
+	cout << "off" << endl;	
+	m.user->timer = 0;
+}
+
+template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_on, sc::state_off>::condition(sc::data_model &m)
+{
+	return m.user->timer > 5;
+}
+
+template<> void sc::transition_actions<&sc::state::event_timer, sc::state_on>::enter(sc::data_model &m){
+	++m.user->timer;
+}
 
 int main(int argc, char *argv[])
 {
+	sc::user_model_p m(new sc::user_model);
+	sc sc0(m);
+
+	sc0.dispatch(&sc::state::event_button);
+	sc0.dispatch(&sc::state::event_timer);
+	sc0.dispatch(&sc::state::event_timer);
+	sc0.dispatch(&sc::state::event_timer);
+	sc0.dispatch(&sc::state::event_timer);
+	sc0.dispatch(&sc::state::event_timer);
+	sc0.dispatch(&sc::state::event_timer);
 }
 

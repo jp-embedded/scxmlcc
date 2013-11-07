@@ -35,9 +35,7 @@ void cpp_output::gen_transition_base()
 	out << tab << "enum transition_type { external, internal };" << endl; 
 	out << endl;
 	
-	//todo transitions should have event/uid as parameter too, to distinguish between two equal transitions with diffrent events
-	
-	out << tab << "template<class S, class D = no_state> class transition_actions" << endl;
+	out << tab << "template<event E, class S, class D = no_state> class transition_actions" << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "protected:" << endl;
 	out << tab << tab << "void enter(data_model&) {} // default enter action" << endl;
@@ -47,16 +45,16 @@ void cpp_output::gen_transition_base()
 
 	// external transition
 	out << tab << "// external transition" << endl;
-	out << tab << "template<class S, class D = no_state, transition_type T = external> class transition : public transition_actions<S, D>" << endl;
+	out << tab << "template<event E, class S, class D = no_state, transition_type T = external> class transition : public transition_actions<E, S, D>" << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "public:" << endl;
 	// exit/enter is called here without parameter, which forces the action to always exit/enter at least current state
 	out << tab << tab << "D* operator ()(S *s, D &d, data_model &m)" << endl;
 	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<S, D>::condition(m)) return 0;" << endl;
+       	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(m)) return 0;" << endl;
        	out << tab << tab << tab << "s->exit(m, typeid(S));" << endl;
        	out << tab << tab << tab << "s->template exit<D>(m);" << endl;
-       	out << tab << tab << tab << "transition_actions<S, D>::enter(m);" << endl;
+       	out << tab << tab << tab << "transition_actions<E, S, D>::enter(m);" << endl;
        	out << tab << tab << tab << "d.template enter<S>(m);" << endl;
        	out << tab << tab << tab << "return &d;" << endl;
        	out << tab << tab << "}" << endl;
@@ -65,15 +63,15 @@ void cpp_output::gen_transition_base()
 	
 	// todo veryfy how these work at down transition
 	out << tab << "// internal transition" << endl;
-	out << tab << "template<class S, class D> class transition<S, D, internal> : public transition_actions<S, D>" << endl;
+	out << tab << "template<event E, class S, class D> class transition<E, S, D, internal> : public transition_actions<E, S, D>" << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "public:" << endl;
 	out << tab << tab << "D* operator ()(S *s, D &d, data_model &m)" << endl; 
 	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<S, D>::condition(m)) return 0;" << endl;
+       	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(m)) return 0;" << endl;
        	out << tab << tab << tab << "s->exit(m, typeid(S));" << endl;
        	out << tab << tab << tab << "s->template exit<D>(m, (D*)0);" << endl;
-       	out << tab << tab << tab << "transition_actions<S, D>::enter(m);" << endl;
+       	out << tab << tab << tab << "transition_actions<E, S, D>::enter(m);" << endl;
        	out << tab << tab << tab << "d.template enter<S>(m, (S*)0);" << endl;
        	out << tab << tab << tab << "return &d;" << endl;
        	out << tab << tab << "}" << endl;
@@ -82,13 +80,13 @@ void cpp_output::gen_transition_base()
 	
 	// transition without target
 	out << tab << "// transition with no target" << endl;
-	out << tab << "template<class S> class transition<S, no_state> : public transition_actions<S, no_state>" << endl;
+	out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "public:" << endl;
 	out << tab << tab << "S* operator ()(S *s, data_model &m)" << endl;
        	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<S, no_state>::condition(m)) return 0;" << endl;
-       	out << tab << tab << tab << "transition_actions<S, no_state>::enter(m);" << endl;
+       	out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(m)) return 0;" << endl;
+       	out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(m);" << endl;
        	out << tab << tab << tab << "return s;" << endl;
        	out << tab << tab << "}" << endl;
 	out << tab << "};" << endl;
@@ -170,6 +168,9 @@ void cpp_output::gen_state_base()
 
 	out << tab << "};" << endl;
 	out << endl;
+
+	out << tab << "typedef " << state_t() << "* (" << state_t() << "::*event)(" << classname() << "&);" << endl;
+	out << endl;
 }
 
 void cpp_output::gen_state(const scxml_parser::state &state)
@@ -185,7 +186,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	if(state.initial) {
 		string target = "sc.m_state_" + *state.initial;
 		string target_classname = "state_" + *state.initial;
-		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { return transition<" << state_classname << ", " << target_classname << ", internal>()(this, " << target << ", sc.model); }" << endl;
+		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { return transition<&state::initial, " << state_classname << ", " << target_classname << ", internal>()(this, " << target << ", sc.model); }" << endl;
 	}
 
 	//events
@@ -206,11 +207,11 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 		}
 		if(target.size()) {
 			// normal transition
-			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<" << state_classname << ", " << target_classname << ">()(this, " << target << ", sc.model); }" << endl;
+			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc.model); }" << endl;
 		}
 		else {
 			// transition without target
-			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<" << state_classname << ">()(this, sc.model); }" << endl;
+			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ">()(this, sc.model); }" << endl;
 		}
 	}
 
@@ -232,10 +233,6 @@ void cpp_output::gen_sc()
 	gen_state_actions_base();
 	gen_state_composite_base();
 	gen_transition_base();
-
-	//------
-	out << tab << "typedef " << state_t() << "* (" << state_t() << "::*event)(" << classname() << "&);" << endl;
-	out << endl;
 
 	// dispatch
 	out << tab << "void dispatch(event e) {" << endl;
