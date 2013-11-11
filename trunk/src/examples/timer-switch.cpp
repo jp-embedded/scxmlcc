@@ -16,6 +16,7 @@
  *************************************************************************/
 
 #include "timer-switch.h"
+#include "termio.h"
 #include <iostream>
 
 using namespace std;
@@ -40,24 +41,41 @@ template<> void sc::state_actions<sc::state_off>::enter(sc::data_model &m)
 
 template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_on, sc::state_off>::condition(sc::data_model &m)
 {
-	return m.user->timer > 5;
+	return m.user->timer >= 5;
 }
 
-template<> void sc::transition_actions<&sc::state::event_timer, sc::state_on>::enter(sc::data_model &m){
+template<> void sc::transition_actions<&sc::state::event_timer, sc::state_on>::enter(sc::data_model &m)
+{
 	++m.user->timer;
 }
 
 int main(int argc, char *argv[])
 {
+	// set unbuffered input and disable echo
+	termio t;
+	t.echo(false);
+	t.canonical(false);
+
+	cout << "input:  b = button event" << endl;
+      	cout << "        t = timer event" << endl;
+	cout << "        q = quit" << endl;
+
 	sc::user_model_p m(new sc::user_model);
 	sc sc0(m);
 
-	sc0.dispatch(&sc::state::event_button);
-	sc0.dispatch(&sc::state::event_timer);
-	sc0.dispatch(&sc::state::event_timer);
-	sc0.dispatch(&sc::state::event_timer);
-	sc0.dispatch(&sc::state::event_timer);
-	sc0.dispatch(&sc::state::event_timer);
-	sc0.dispatch(&sc::state::event_timer);
+	while(true) {
+		char c;	
+		cin >> c;
+
+		sc::event e;
+		switch (c) {
+			case 'b': e = &sc::state::event_button; break;
+			case 't': e = &sc::state::event_timer;  break;
+			case 'q': return 0;
+			default: continue;
+		}
+		sc0.dispatch(e);
+	}
+	return 0;
 }
 
