@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 	cout << "        q = quit" << endl;
 
 	sc::user_model_p m(new sc::user_model);
-	sc sc0(m);
+	sc sc(m);
 
 	while(true) {
 		char c;	
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 			case 'q': return 0;
 			default: continue;
 		}
-		sc0.dispatch(e);
+		sc.dispatch(e);
 	}
 	return 0;
 }

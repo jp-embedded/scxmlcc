@@ -24,6 +24,8 @@
 
 using namespace std;
 
+//todo set private/public/protected 
+
 string cpp_output::classname()		{ return "sc_" + sc.sc().name; }
 string cpp_output::state_t()		{ return "state"; }
 string cpp_output::state_composite_t()	{ return "composite"; }
@@ -234,11 +236,11 @@ void cpp_output::gen_sc()
 	gen_state_composite_base();
 	gen_transition_base();
 
-	// dispatch
-	out << tab << "void dispatch(event e) {" << endl;
-	out << tab << tab << state_t() << " *next_state = (cur_state->*e)(*this);" << endl;
+	// new_state
+	out << tab << "void new_state(state *next_state)" << endl;
 	// todo optimize this away if no unconditional or no event queued.
 	// todo unconditional is called on every event, so it might be cheaper to put it in the event queue
+	out << tab << "{" << endl;
 	out << tab << tab << "while (next_state) {" << endl;
 	out << tab << tab << tab << "cur_state = next_state;" << endl;
 	out << tab << tab << tab << "if ((next_state = cur_state->initial(*this)));" << endl;
@@ -247,13 +249,16 @@ void cpp_output::gen_sc()
 	out << tab << tab << tab << "else break;" << endl;
 	out << tab << tab << "}" << endl;
 	out << tab << "}" << endl;
+
+	// dispatch
+	out << tab << "void dispatch(event e) { new_state((cur_state->*e)(*this)); }" << endl;
 	out << endl;
 
 	// constructor
 	out << tab << classname() << "(user_model_p user = user_model_p()) : cur_state(&m_state_" << sc.sc().initial << ") {" << endl;
 	out << tab << tab << "model.user = user;" << endl;
 	out << tab << tab << "m_state_" << sc.sc().initial << ".enter<" << state_t() << ">(model);" << endl;
-	out << tab << tab << "dispatch(&" << state_t() << "::initial);" << endl;
+	out << tab << tab << "new_state(cur_state);" << endl;
 	out << tab << "}" << endl;
 	out << endl;
 	
