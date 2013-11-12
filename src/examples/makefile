@@ -17,9 +17,9 @@
 
 CPPFLAGS := -Wall -O2 -MD -MP
 
-APPS := timer-switch hello_world
+APPS := timer_switch hello_world
 
-timer-switch.objs := timer-switch.o
+timer_switch.objs := timer_switch.o
 hello_world.objs := hello_world.o
 
 all: $(APPS)

@@ -15,7 +15,7 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#include "timer-switch.h"
+#include "timer_switch.h"
 #include "termio.h"
 #include <iostream>
 
