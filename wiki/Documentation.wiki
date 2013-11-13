@@ -1,4 +1,6 @@
  ==== [https://code.google.com/p/scxmlcc/ Home] | [Documentation] | [Download] | [ReleaseNotes Release Notes] | [Contribute] ====
 
+#sidebar DocumentationToc
+
 = Getting started =
 simple switch example
