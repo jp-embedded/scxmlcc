@@ -2,6 +2,8 @@
  ==== [https://code.google.com/p/scxmlcc/ Home] | [Documentation] | [Download] | [ReleaseNotes Release Notes] | [Contribute] ====
 
 = Getting started =
-== Building scxmlcc ==
+== Optaining And Building scxmlcc ==
+scxmlcc is available as compressed releases or directly using SVN. The latest and previous releases is always available [Download].
+To optain scxmlCC using SVN
 == Hello World ==
 == Timer Switch ==
