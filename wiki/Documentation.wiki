@@ -1,4 +1,3 @@
-#sidebar DocumentationToc
  ==== [https://code.google.com/p/scxmlcc/ Home] | [Documentation] | [Download] | [ReleaseNotes Release Notes] | [Contribute] ====
 
 = Getting started =
