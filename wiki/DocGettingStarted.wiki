@@ -10,5 +10,16 @@ sudo apt-get install libboost-all-dev
 scxmlcc is available as compressed releases or directly using SVN. The latest and previous releases is always available at [Download].
 
 To optain scxmlCC using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
+
+To build scxmlcc, simlpy execute make:
+{{{
+cd src
+make
+}}}
+If you also want to build the examples:
+{{{
+cd examples
+make
+}}}
 == Hello World ==
 == Timer Switch ==
