@@ -2,4 +2,6 @@
  ==== [https://code.google.com/p/scxmlcc/ Home] | [Documentation] | [Download] | [ReleaseNotes Release Notes] | [Contribute] ====
 
 = Getting started =
-simple switch example
+== Building scxmlcc ==
+== Hello World ==
+== Timer Switch ==
