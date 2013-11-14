@@ -2,8 +2,15 @@
  ==== [https://code.google.com/p/scxmlcc/ Home] | [Documentation] | [Download] | [ReleaseNotes Release Notes] | [Contribute] ====
 
 = Getting started =
+== Prerequisites ==
+To build scxmlcc, the boost library must be installed.
+
+Install boost with e.g. apt-get:
+{{{
+sudo apt-get install libboost-all-dev
+}}}
 == Optaining And Building scxmlcc ==
 scxmlcc is available as compressed releases or directly using SVN. The latest and previous releases is always available at [Download].
- To optain scxmlCC using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
+To optain scxmlCC using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
 == Hello World ==
 == Timer Switch ==
