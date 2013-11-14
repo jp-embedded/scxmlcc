@@ -3,7 +3,7 @@
 
 = Getting started =
 == Optaining And Building scxmlcc ==
-scxmlcc is available as compressed releases or directly using SVN. The latest and previous releases is always available [Download].
-To optain scxmlCC using SVN
+scxmlcc is available as compressed releases or directly using SVN. The latest and previous releases is always available at [Download].
+ To optain scxmlCC using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
 == Hello World ==
 == Timer Switch ==
