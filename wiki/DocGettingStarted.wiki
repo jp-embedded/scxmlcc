@@ -11,7 +11,7 @@ scxmlcc is available as compressed releases or directly using SVN. The latest an
 
 To optain scxmlCC using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
 
-To build scxmlcc, simlpy execute make:
+To build scxmlcc, simply execute make:
 {{{
 cd src
 make
