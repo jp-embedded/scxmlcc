@@ -1,10 +1,12 @@
 = Getting started =
 == Prerequisites ==
-To build scxmlcc, the boost library must be installed.
+To build scxmlcc, you will need:
+ * The boost library
+ * Basic build tools
 
-Install boost with e.g. apt-get:
+On Ubuntu, install these with e.g. apt-get:
 {{{
-sudo apt-get install libboost-all-dev
+sudo apt-get install build-essettial libboost-all-dev
 }}}
 == Optaining And Building scxmlcc ==
 scxmlcc is available as compressed releases or directly using SVN. The latest and previous releases is always available at [Download].
