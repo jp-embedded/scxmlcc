@@ -24,4 +24,5 @@ cd examples
 make
 }}}
 == Hello World ==
+http://scxmlcc.googlecode.com/svn/wiki/img/hello.png
 == Timer Switch ==
