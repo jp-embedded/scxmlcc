@@ -25,4 +25,12 @@ make
 }}}
 == Hello World ==
 http://scxmlcc.googlecode.com/svn/wiki/img/hello.png
+{{{
+<scxml initial="hello" version="0.9" xmlns="http://www.w3.org/2005/07/scxml">
+ <state id="hello">
+  <transition target="world"></transition>
+ </state>
+ <state id="world"></state>
+</scxml>
+}}}
 == Timer Switch ==
