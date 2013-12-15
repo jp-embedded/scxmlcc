@@ -83,3 +83,32 @@ Note that, as stated on the [https://code.google.com/p/scxmlcc/ Home] page, no e
 This example implements a simple timer switch:
 
 http://scxmlcc.googlecode.com/svn/wiki/img/timer_switch.png
+
+The idea is that the switch can be turned on or off by sending a button event to the state machine. In the on state the state machine also returns to the off state after a timeout. 
+In the on state, a timer event counts up a timer value. The unconditional event from on to off then have a condition, so it will be executed when this timer value is >= 5. Finaly, the off state will reset the timer value to 0.
+
+The dottet timer transition means that it is a transition without target. This means that the enter/exit actions won't be executed on timer events, as opposed to if the transition had target.
+
+These actions are implemented in timer_switch.cpp as:
+{{{
+template<> void sc::state_actions<sc::state_on>::enter(sc::data_model &m)
+{
+	cout << "on" << endl;	
+}
+
+template<> void sc::state_actions<sc::state_off>::enter(sc::data_model &m)
+{
+	cout << "off" << endl;	
+	m.user->timer = 0;
+}
+
+template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_on, sc::state_off>::condition(sc::data_model &m)
+{
+	return m.user->timer >= 5;
+}
+
+template<> void sc::transition_actions<&sc::state::event_timer, sc::state_on>::enter(sc::data_model &m)
+{
+	++m.user->timer;
+}
+}}}
