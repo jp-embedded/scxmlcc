@@ -23,7 +23,8 @@ If you also want to build the examples:
 cd examples
 make
 }}}
-== Hello World ==
+== The Examples ==
+=== Hello World ===
 http://scxmlcc.googlecode.com/svn/wiki/img/hello.png
 {{{
 <scxml initial="hello" version="0.9" xmlns="http://www.w3.org/2005/07/scxml">
@@ -33,4 +34,4 @@ http://scxmlcc.googlecode.com/svn/wiki/img/hello.png
  <state id="world"></state>
 </scxml>
 }}}
-== Timer Switch ==
+=== Timer Switch ===
