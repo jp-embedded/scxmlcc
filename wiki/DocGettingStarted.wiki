@@ -24,12 +24,13 @@ cd examples
 make
 }}}
 == The Examples ==
+This sections describes the examples which can be found at src/examples.
 === Hello World ===
 This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [https://code.google.com/p/scxmlgui/ scxmlgui], just two states connected with an unconditional transition. 
 
 http://scxmlcc.googlecode.com/svn/wiki/img/hello.png
 
-Scxmlgui stores this as the folowing scxml:
+scxmlgui stores this as the following scxml:
 
 {{{
 <scxml initial="hello" version="0.9" xmlns="http://www.w3.org/2005/07/scxml">
@@ -38,5 +39,10 @@ Scxmlgui stores this as the folowing scxml:
  </state>
  <state id="world"></state>
 </scxml>
+}}}
+
+This statechart can be compiled to an .h file using scxmlcc:
+{{{
+scxmlcc hello_world.scxml
 }}}
 === Timer Switch ===
