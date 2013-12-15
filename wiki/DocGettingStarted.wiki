@@ -80,3 +80,6 @@ world
 }}}
 Note that, as stated on the [https://code.google.com/p/scxmlcc/ Home] page, no external libraries is nedded, and zero code is generated for the non specialized actions making it an efficient implementation.
 === Timer Switch ===
+This example implements a simple timer switch:
+
+http://scxmlcc.googlecode.com/svn/wiki/img/timer_switch.png
