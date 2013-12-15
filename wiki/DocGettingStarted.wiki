@@ -25,9 +25,12 @@ make
 }}}
 == The Examples ==
 === Hello World ===
-This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [https://code.google.com/p/scxmlgui/ scxmlgui], just two states connected with an unconditional transition. Scxmlgui stores this as the folowing scxml:
+This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [https://code.google.com/p/scxmlgui/ scxmlgui], just two states connected with an unconditional transition. 
 
 http://scxmlcc.googlecode.com/svn/wiki/img/hello.png
+
+Scxmlgui stores this as the folowing scxml:
+
 {{{
 <scxml initial="hello" version="0.9" xmlns="http://www.w3.org/2005/07/scxml">
  <state id="hello">
