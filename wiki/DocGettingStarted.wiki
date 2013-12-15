@@ -25,6 +25,7 @@ make
 }}}
 == The Examples ==
 === Hello World ===
+This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [https://code.google.com/p/scxmlgui/ scxmlgui]
 http://scxmlcc.googlecode.com/svn/wiki/img/hello.png
 {{{
 <scxml initial="hello" version="0.9" xmlns="http://www.w3.org/2005/07/scxml">
