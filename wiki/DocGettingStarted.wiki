@@ -73,4 +73,9 @@ int main(int argc, char *argv[])
 	return 0;
 }
 }}}
+As expected, this will output the hello world words:
+{{{
+hello
+world
+}}}
 === Timer Switch ===
