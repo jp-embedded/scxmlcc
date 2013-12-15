@@ -89,7 +89,7 @@ In the on state, a timer event counts up a timer value. The unconditional event 
 
 The dottet timer transition means that it is a transition without target. This means that the enter/exit actions won't be executed on timer events, as opposed to if the transition had target.
 
-These actions are implemented in timer_switch.cpp as:
+These actions implement this in timer_switch.cpp as:
 {{{
 template<> void sc::state_actions<sc::state_on>::enter(sc::data_model &m)
 {
