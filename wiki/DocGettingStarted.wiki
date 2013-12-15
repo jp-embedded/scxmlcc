@@ -43,12 +43,34 @@ scxmlgui stores this as the following scxml:
 
 This statechart can be compiled to an .h file using scxmlcc:
 {{{
-scxmlcc hello_world.scxml
+scxmlcc -o hello_world.h hello_world.scxml
 }}}
 
-This will generate hello_world.h which contains a sc_hello_world class implementing the statechart. For the detalis about this construct, see [Implementation].
+This will generate hello_world.h which contains a sc_hello_world class implementing the statechart. For further detalis about this construct, see [Implementation].
 
 Custom actions can be added to this statechart by specializing members in the sc_hello_world class. For example, consider the hello_world.cpp example which specializes the enter action on both states and instantiates the state machine:
 {{{
+#include "hello_world.h"
+#include <iostream>
+
+using namespace std;
+
+typedef sc_hello_world sc;
+
+template<> void sc::state_actions<sc::state_hello>::enter(sc::data_model &m)
+{
+	cout << "hello" << endl;	
+}
+
+template<> void sc::state_actions<sc::state_world>::enter(sc::data_model &m)
+{
+	cout << "world" << endl;	
+}
+
+int main(int argc, char *argv[])
+{
+	sc sc0;
+	return 0;
+}
 }}}
 === Timer Switch ===
