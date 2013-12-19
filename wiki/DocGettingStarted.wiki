@@ -121,7 +121,7 @@ struct sc::user_model
 };
 }}}
 
-The state machine stores this struct in a auto pointer, defined as user_model_p. Thus the model is automatically destructed and deleted, when the state machine is destructed. The custom data model can be constructed and passed to the state machine's constructor as:
+The state machine stores this struct in an auto pointer, defined as user_model_p. Thus the model is automatically destructed and deleted, when the state machine is destructed. The custom data model can be constructed and passed to the state machine's constructor as:
 {{{
 sc::user_model_p m(new sc::user_model);
 sc sc(m);
