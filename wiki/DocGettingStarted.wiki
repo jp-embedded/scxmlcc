@@ -87,7 +87,7 @@ http://scxmlcc.googlecode.com/svn/wiki/img/timer_switch.png
 The idea is that the switch can be turned on or off by sending a button event to the state machine. In the on state the state machine also returns to the off state after a timeout. 
 In the on state, a timer event counts up a timer value. The unconditional event from on to off then have a condition, so it will be executed when this timer value is >= 5. Finaly, the off state will reset the timer value to 0.
 
-The dottet timer transition means that it is a transition without target. This means that the enter/exit actions won't be executed on timer events, as opposed to if the transition had target.
+The dotted timer transition means that it is a transition without target. This means that the on state's enter/exit actions won't be executed on timer events, as opposed to if the transition had target.
 
 These actions implement this in timer_switch.cpp as:
 {{{
