@@ -113,7 +113,7 @@ template<> void sc::transition_actions<&sc::state::event_timer, sc::state_on>::e
 }
 }}}
 
-For this to work, a data model must be defined, containing the timer variable. The generated class has a user_model struct forward declaration, so a custom data model can be defined. This is done by defining user_model:
+For this to work, a data model must be defined containing the timer variable. The generated class has a user_model struct forward declaration, so a custom data model can be defined. This is done by defining user_model:
 {{{
 struct sc::user_model 
 {
