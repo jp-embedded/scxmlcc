@@ -37,6 +37,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 		}
 
 		// if initial state is not set, use first state in document order
+		// todo: does this apply for children also?
 		if(m_scxml.initial.empty()) {
 			if(m_scxml.states.size()) {
 				m_scxml.initial = (*m_scxml.states.begin())->id;
