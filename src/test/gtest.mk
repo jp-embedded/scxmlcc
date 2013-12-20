@@ -24,7 +24,8 @@ gtest-all.o: $(GTEST)/.unzip
 	$(CXX) -isystem $(GTEST)/include/ -I $(GTEST) -pthread -c $(GTEST)/src/gtest-all.cc
 
 $(GTEST)/.unzip: $(GTEST).zip
-	unzip -q $^
+	unzip -q -o $^
+	touch $@
 
 gtest.clean:
 	rm -rf $(GTEST) gtest-all.o libgtest.a
