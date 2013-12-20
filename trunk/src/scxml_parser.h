@@ -38,24 +38,23 @@ class scxml_parser
 			boost::optional<std::string> event;
 			list<action> actions;
 		};
+		typedef list<transition> transition_list;
 
 		struct state {
 			std::string id;
 			boost::shared_ptr<state> parent;
 			boost::optional<std::string> initial, type;
-			list<transition> transitions;
+			transition_list transitions;
 			list<action> entry_actions;
 			list<action> exit_actions;
 		};
+		typedef list<state> state_list;
 
 		struct scxml {
 			std::string name;
 			std::string initial;
-			list<state> states;
+			state_list states;
 		};
-
-		typedef list<state> state_list;
-		typedef list<transition> transition_list;
 
 		scxml_parser(const char *name, const boost::property_tree::ptree &pt);
 
