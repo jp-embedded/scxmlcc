@@ -25,7 +25,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 {
 	try {
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
-		m_scxml.initial = xmlattr.get<string>("initial");
+		m_scxml.initial = xmlattr.get<string>("initial", "");
 		m_scxml.name = xmlattr.get<string>("name", m_scxml.name);
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
@@ -34,6 +34,17 @@ void scxml_parser::parse_scxml(const ptree &pt)
 			else if (it->first == "state") parse_state(it->second, boost::shared_ptr<state>());
 			else if (it->first == "history") parse_state(it->second, boost::shared_ptr<state>());
 			else cerr << "warning: unknown item '" << it->first << "' in <scxml>" << endl;
+		}
+
+		// if initial state is not set, use first state in document order
+		if(m_scxml.initial.empty()) {
+			if(m_scxml.states.size()) {
+				m_scxml.initial = (*m_scxml.states.begin())->id;
+			}
+			else {
+				cerr << "error: could not set initial state" << endl;
+				exit(1);
+			}
 		}
 	}
 	catch (ptree_error e) {
