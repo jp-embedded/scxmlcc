@@ -16,6 +16,7 @@
 #*************************************************************************
 
 CPPFLAGS := -Wall -O2 -MD -MP
+CPPFLAGS += -isystem gtest-1.7.0/include -pthread
 
 test.objs := test.o
 
@@ -27,8 +28,10 @@ clean: gtest.clean
 	rm -f $(patsubst %.txml,%.scxml,$(wildcard *.txml))
 	rm -f $(test.objs) $(test.objs:.o=.d)
 
-test: $(test.objs) libgtest.a
-	$(CXX) -o $@ $^
+$(test.objs): libgtest.a
+
+test: $(test.objs)
+	$(CXX) -o $@ $^ libgtest.a
 
 -include $(test.objs:.o=.d)
 
