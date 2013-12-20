@@ -15,30 +15,17 @@
 #** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #*************************************************************************
 
-CPPFLAGS := -Wall -O2 -MD -MP
+GTEST:=gtest-1.7.0
 
-test.objs := test.o
+libgtest.a: gtest-all.o
+	ar -rv $@ $^
 
-all: test
+gtest-all.o: $(GTEST)/.unzip
+	$(CXX) -isystem $(GTEST)/include/ -I $(GTEST) -pthread -c $(GTEST)/src/gtest-all.cc
 
-clean: gtest.clean
-	rm -f test
-	rm -f $(patsubst %.txml,%.h,$(wildcard *.txml))
-	rm -f $(patsubst %.txml,%.scxml,$(wildcard *.txml))
-	rm -f $(test.objs) $(test.objs:.o=.d)
+$(GTEST)/.unzip: $(GTEST).zip
+	unzip -q $^
 
-test: $(test.objs) libgtest.a
-	$(CXX) -o $@ $^
-
--include $(test.objs:.o=.d)
-
-include scxml.mk
-include gtest.mk
-
-%.scxml: %.txml
-	xsltproc cpp.xsl $^ > $@
-
-# Initial depedency files must be generated to be able to auto generate .h from .scxml
-%.d: %.cpp
-	$(CXX) -MM -MG $^ > $@
+gtest.clean:
+	rm -rf $(GTEST) gtest-all.o libgtest.a
 
