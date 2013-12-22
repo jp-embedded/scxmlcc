@@ -31,7 +31,7 @@ clean: gtest.clean
 $(test.objs): libgtest.a
 
 test: $(test.objs)
-	$(CXX) -o $@ $^ libgtest.a
+	$(CXX) -o $@ $^ libgtest.a -lpthread
 
 -include $(test.objs:.o=.d)
 
