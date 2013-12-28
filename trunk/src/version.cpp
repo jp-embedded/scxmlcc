@@ -15,6 +15,8 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+//todo fix this in releases
+
 #ifndef VER
 #define VER "unknown"
 #endif
