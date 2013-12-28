@@ -78,7 +78,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 
 		// if initial state is not set, use first state in document order
 		if(parent && !parent->initial) {
-			*parent->initial = st->id;
+			parent->initial.reset(st->id);
 		}
 	}
 	catch (ptree_error e) {
