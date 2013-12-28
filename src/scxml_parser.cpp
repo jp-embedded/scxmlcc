@@ -37,7 +37,6 @@ void scxml_parser::parse_scxml(const ptree &pt)
 		}
 
 		// if initial state is not set, use first state in document order
-		// todo: does this apply for children also?
 		if(m_scxml.initial.empty()) {
 			if(m_scxml.states.size()) {
 				m_scxml.initial = (*m_scxml.states.begin())->id;
@@ -75,6 +74,11 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
 			else if (it->first == "onexit") state_i->get()->exit_actions = parse_entry(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
+		}
+
+		// if initial state is not set, use first state in document order
+		if(parent && !parent->initial) {
+			*parent->initial = st->id;
 		}
 	}
 	catch (ptree_error e) {
