@@ -15,7 +15,7 @@
 #** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #*************************************************************************
 
-URL := "$HeadURL: https://jp-embedded.com/svn/platform/trunk/src/fsm/makefile $"
+URL := "$HeadURL$"
 URL_TRUNK := $(findstring trunk,$(URL))
 URL_TAG := $(firstword $(subst /, ,$(word 3,$(subst tags, ,$(URL)))))
 VER := $(URL_TRUNK)$(URL_TAG)
