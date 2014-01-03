@@ -278,14 +278,14 @@ void cpp_output::trim()
 {
 	const scxml_parser::state_list &states = sc.sc().states;
 
-	// replace '.' with '_' in event names
-	// todo: see '3.12.1 event descriptors how to handle this
-	set<string> event_set;
+	// replace '-' with '_' in event names
+	// replace '.' with '_' in event names todo: see '3.12.1 event descriptors how to handle event tokens
 	for (scxml_parser::state_list::const_iterator s = states.begin(); s != states.end(); ++s) {
 		for (scxml_parser::transition_list::const_iterator i = s->get()->transitions.begin(); i != s->get()->transitions.end(); ++i) {
 			if(i->get()->event) {
 				if(i->get()->event->find('.') != string::npos) cerr << "warning: event tokens not supported" << endl;
 				replace(i->get()->event->begin(), i->get()->event->end(), '.', '_');
+				replace(i->get()->event->begin(), i->get()->event->end(), '-', '_');
 			}
 		}
 	}
