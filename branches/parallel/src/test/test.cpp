@@ -10,7 +10,7 @@ TEST(w3c, 355)
 
 TEST(w3c, 576)
 {
-	sc_test355 sc;
+	sc_test576 sc;
 	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
 }
 
