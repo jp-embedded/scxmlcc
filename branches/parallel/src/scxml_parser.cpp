@@ -113,7 +113,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
 			else if (it->first == "state") parse_state(it->second, st);
 			else if (it->first == "history") parse_state(it->second, st);
-			else if (it->first == "parallel") parse_state(it->second, st);
+			else if (it->first == "parallel") parse_parallel(it->second, st);
 			else if (it->first == "transition") state_i->get()->transitions.push_back(parse_transition(it->second));
 			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
 			else if (it->first == "onexit") state_i->get()->exit_actions = parse_entry(it->second);
