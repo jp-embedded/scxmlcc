@@ -185,9 +185,9 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	out << tab << "class " << state_classname << " : public " << state_composite_t() << "<" << state_classname << ", " << parent << '>' << endl;
 	out << tab << "{" << endl;
 
-	if(state.initial) {
-		string target = "sc.m_state_" + *state.initial;
-		string target_classname = "state_" + *state.initial;
+	if(state.initial.size()) {
+		string target = "sc.m_state_" + state.initial.front();
+		string target_classname = "state_" + state.initial.front();
 		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { return transition<&state::initial, " << state_classname << ", " << target_classname << ", internal>()(this, " << target << ", sc.model); }" << endl;
 	}
 
@@ -255,9 +255,9 @@ void cpp_output::gen_sc()
 	out << endl;
 
 	// constructor
-	out << tab << classname() << "(user_model_p user = user_model_p()) : cur_state(&m_state_" << sc.sc().initial << ") {" << endl;
+	out << tab << classname() << "(user_model_p user = user_model_p()) : cur_state(&m_state_" << sc.sc().initial.front() << ") {" << endl;
 	out << tab << tab << "model.user = user;" << endl;
-	out << tab << tab << "m_state_" << sc.sc().initial << ".enter<" << state_t() << ">(model);" << endl;
+	out << tab << tab << "m_state_" << sc.sc().initial.front() << ".enter<" << state_t() << ">(model);" << endl;
 	out << tab << tab << "new_state(cur_state);" << endl;
 	out << tab << "}" << endl;
 	out << endl;
