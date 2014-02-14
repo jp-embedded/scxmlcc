@@ -165,6 +165,11 @@ void cpp_output::gen_state_base()
 	out << tab << tab << "template<class T> void enter(data_model&, ...) {}" << endl;
 	out << tab << tab << "template<class T> void exit(data_model&, ...) {}" << endl;
 	out << tab << tab << "virtual void exit(data_model&, const std::type_info&) {}" << endl;
+	if(sc.using_parallel) {
+ 		out << tab << tab << "template<class S> " << state_t() << "* enter_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) { return this; }" << endl;
+ 		out << tab << tab << "virtual void exit_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) {}" << endl;
+ 		out << tab << tab << "virtual bool parallel_parent(const std::type_info&) { return false; }" << endl;
+	}
 
 	out << tab << tab << "virtual ~" << state_t() << "() {}" << endl;
 
