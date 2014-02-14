@@ -28,7 +28,7 @@ class scxml_parser
 {
 	public:
 		template <class T> class plist : public std::vector<boost::shared_ptr<T> > {};
-		template <class T> class list : public std::vector<T> {};
+		typedef std::vector<std::string> slist;
 
 		struct action {
 			std::string expr;
@@ -45,7 +45,7 @@ class scxml_parser
 			std::string id;
 			boost::shared_ptr<state> parent;
 			boost::optional<std::string> type;
-			list<std::string> initial;
+			slist initial;
 			transition_list transitions;
 			plist<action> entry_actions;
 			plist<action> exit_actions;
@@ -54,7 +54,7 @@ class scxml_parser
 
 		struct scxml {
 			std::string name;
-			list<std::string> initial;
+			slist initial;
 			state_list states;
 		};
 

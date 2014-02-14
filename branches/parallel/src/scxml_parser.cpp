@@ -17,6 +17,8 @@
 
 #include "scxml_parser.h"
 #include <boost/smart_ptr/make_shared.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 using namespace boost::property_tree;
 using namespace std;
@@ -24,9 +26,10 @@ using namespace std;
 void scxml_parser::parse_scxml(const ptree &pt)
 {
 	try {
+		using namespace boost::algorithm;
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 		boost::optional<string> initial(xmlattr.get_optional<string>("initial"));
-		if(initial) m_scxml.initial.push_back(*initial);
+		if(initial) split(m_scxml.initial, *initial, is_any_of(" "), token_compress_on);
 		m_scxml.name = xmlattr.get<string>("name", m_scxml.name);
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
@@ -80,7 +83,7 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 
 		// if initial state is not set, use first state in document order
 		// if parent is parallel put all states in initial
-		if(parent && (parent->initial.empty() || *parent->type == "parallel")) {
+		if(parent && (parent->initial.empty() || (parent->type && *parent->type == "parallel"))) {
 			parent->initial.push_back(st->id);
 		}
 	}
@@ -93,12 +96,13 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &parent)
 {
 	try {
+		using namespace boost::algorithm;
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 		boost::shared_ptr<state> st = boost::make_shared<state>();
 		st->id = xmlattr.get<string>("id");
 		if(parent) st->parent = parent;
 		boost::optional<string> initial(xmlattr.get_optional<string>("initial"));
-		if(initial) st->initial.push_back(*initial);
+		if(initial) split(st->initial, *initial, is_any_of(" "), token_compress_on);
 		st->type = xmlattr.get_optional<string>("type");
 		m_scxml.states.push_back(st);
 		state_list::iterator state_i = --m_scxml.states.end();
@@ -117,7 +121,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 
 		// if initial state is not set, use first state in document order
 		// if parent is parallel put all states in initial
-		if(parent && (parent->initial.empty() || *parent->type == "parallel")) {
+		if(parent && (parent->initial.empty() || (parent->type && *parent->type == "parallel"))) {
 			parent->initial.push_back(st->id);
 		}
 	}
