@@ -30,6 +30,8 @@ class scxml_parser
 		template <class T> class plist : public std::vector<boost::shared_ptr<T> > {};
 		typedef std::vector<std::string> slist;
 
+		bool using_parallel;
+
 		struct action {
 			std::string expr;
 		};

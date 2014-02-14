@@ -61,6 +61,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state> &parent)
 {
 	try {
+		using_parallel = true;
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 		boost::shared_ptr<state> st = boost::make_shared<state>();
 		st->id = xmlattr.get<string>("id");
@@ -222,7 +223,7 @@ void scxml_parser::parse(const ptree &pt)
 	}
 }
 
-scxml_parser::scxml_parser(const char *name, const ptree &pt)
+scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false)
 {
 	m_scxml.name = name;
 	parse(pt);
