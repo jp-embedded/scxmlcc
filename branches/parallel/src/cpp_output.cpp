@@ -126,6 +126,11 @@ void cpp_output::gen_state_composite_base()
 	out << endl;
 }
 
+void cpp_output::gen_state_parallel_base()
+{
+	//todo get number of children
+}
+
 void cpp_output::gen_model_base()
 {
 	out << tab << "struct user_model;" << endl;
@@ -176,6 +181,13 @@ void cpp_output::gen_state_base()
 	out << tab << "};" << endl;
 	out << endl;
 
+	if(sc.using_parallel) {
+		out << tab << "typedef std::vector<" << state_t() << "*> cur_state_l;" << endl;
+		out << tab << "cur_state_l cur_state;" << endl;
+	}
+	else {
+		out << tab << state_t() << " *cur_state;" << endl;
+	}
 	out << tab << "typedef " << state_t() << "* (" << state_t() << "::*event)(" << classname() << "&);" << endl;
 	out << endl;
 }
@@ -239,8 +251,9 @@ void cpp_output::gen_sc()
 	gen_state_base();
 	gen_state_actions_base();
 	gen_state_composite_base();
+	gen_state_parallel_base();
 	gen_transition_base();
-
+/* todo 
 	// new_state
 	out << tab << "void new_state(state *next_state)" << endl;
 	// todo optimize this away if no unconditional or no event queued.
@@ -254,25 +267,29 @@ void cpp_output::gen_sc()
 	out << tab << tab << tab << "else break;" << endl;
 	out << tab << tab << "}" << endl;
 	out << tab << "}" << endl;
-
+*/
 	// dispatch
-	out << tab << "void dispatch(event e) { new_state((cur_state->*e)(*this)); }" << endl;
+	out << tab << "void dispatch(event e)" << endl;
+	out << tab << "{" << endl;
+	//todo
+	out << tab << "}" << endl;
 	out << endl;
 
 	// constructor
-	out << tab << classname() << "(user_model_p user = user_model_p()) : cur_state(&m_state_" << sc.sc().initial.front() << ") {" << endl;
+	out << tab << classname() << "(user_model_p user = user_model_p())" << endl;
+	out << tab << "{" << endl;
+	//todo push_back
 	out << tab << tab << "model.user = user;" << endl;
-	out << tab << tab << "m_state_" << sc.sc().initial.front() << ".enter<" << state_t() << ">(model);" << endl;
-	out << tab << tab << "new_state(cur_state);" << endl;
+	//todo dispatch
 	out << tab << "}" << endl;
 	out << endl;
+
 	
 	// states
 	for (scxml_parser::state_list::const_iterator s = states.begin(); s != states.end(); ++s) {
 		gen_state(*s->get());
 	}
 
-	out << tab << state_t() << " *cur_state;" << endl;
 	out << tab << "std::queue<event> event_queue;" << endl;
 
 	out << "};" << endl;

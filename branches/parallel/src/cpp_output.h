@@ -42,6 +42,7 @@ class cpp_output {
 	void gen_model_base();
 	void gen_state_base();
 	void gen_state_composite_base();
+	void gen_state_parallel_base();
 	void gen_state_actions_base();
 	void gen_transition_base();
 	void gen_state(const scxml_parser::state &state);
