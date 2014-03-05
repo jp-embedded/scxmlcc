@@ -23,6 +23,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <string>
 #include <list>
+#include <set>
 
 class scxml_parser
 {
@@ -31,6 +32,7 @@ class scxml_parser
 		typedef std::vector<std::string> slist;
 
 		bool using_parallel;
+		std::set<int> parallel_sizes;
 
 		struct action {
 			std::string expr;

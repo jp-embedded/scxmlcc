@@ -128,7 +128,23 @@ void cpp_output::gen_state_composite_base()
 
 void cpp_output::gen_state_parallel_base()
 {
-	//todo get number of children
+	if (!sc.using_parallel) return;
+	if(sc.parallel_sizes.size() == 0) {
+		//todo make composite, if children < 2
+		cerr << "error: parallel state with < 2 states is currently not supported" << endl;
+		exit(1);
+	}
+
+	const int min_c = *sc.parallel_sizes.begin();
+	const int max_c = *sc.parallel_sizes.rbegin();
+	if(min_c < 2) {
+		//todo make composite, if children < 2
+		cerr << "error: parallel state with < 2 states is currently not supported" << endl;
+		exit(1);
+	}
+
+	
+	//todo
 }
 
 void cpp_output::gen_model_base()

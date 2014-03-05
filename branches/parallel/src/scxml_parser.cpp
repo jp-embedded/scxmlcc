@@ -87,6 +87,8 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 		if(parent && (parent->initial.empty() || (parent->type && *parent->type == "parallel"))) {
 			parent->initial.push_back(st->id);
 		}
+
+		parallel_sizes.insert(st->initial.size());
 	}
 	catch (ptree_error e) {
 		cerr << "error: state: " << e.what() << endl;
