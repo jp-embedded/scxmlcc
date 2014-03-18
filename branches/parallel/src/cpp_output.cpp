@@ -154,8 +154,13 @@ void cpp_output::gen_state_parallel_base()
 			out << ", class C" << c;
 			if ((children == max_c) && (c >= min_c)) out << " = no_class";
 		}
-		// todo add specialization
-		out << "> class parallel : public composite<C, P>" << endl;
+		out << "> class parallel";
+		if(children < max_c) {
+			out << " <C, P";
+			for (int c = 0; c < children; ++c) out << ", C" << c;
+			out << '>';
+		}
+		out << " : public composite<C, P>" << endl;
 		out << tab << '{' << endl;
 		out << tab << tab << "public:" << endl;
 		for(int c = 0; c < children; ++c) {
