@@ -152,8 +152,9 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << "template<class C, class P";
 		for(int c = 0; c < children; ++c) {
 			out << ", class C" << c;
-			if (children < max_c) out << " = no_class";
+			if ((children == max_c) && (c > min_c)) out << " = no_class";
 		}
+		// todo add specialization
 		out << "> class parallel : public composite<C, P>" << endl;
 		out << tab << '{' << endl;
 		out << tab << tab << "public:" << endl;
