@@ -129,6 +129,7 @@ void cpp_output::gen_state_composite_base()
 void cpp_output::gen_state_parallel_base()
 {
 	if (!sc.using_parallel) return;
+
 	if(sc.parallel_sizes.size() == 0) {
 		//todo make composite, if children < 2
 		cerr << "error: parallel state with < 2 states is currently not supported" << endl;
@@ -143,8 +144,38 @@ void cpp_output::gen_state_parallel_base()
 		exit(1);
 	}
 
-	
-	//todo
+	//todo combine with no_class
+	if(min_c < max_c) out << tab << "class no_class {};" << endl;
+
+	for (set<int>::reverse_iterator i = sc.parallel_sizes.rbegin(); i != sc.parallel_sizes.rend(); ++i) {
+		const int children = *i;
+		out << tab << "template<class C, class P";
+		for(int c = 0; c < children; ++c) {
+			out << ", class C" << c;
+			if (children < max_c) out << " = no_class";
+		}
+		out << "> class parallel : public composite<C, P>" << endl;
+		out << tab << '{' << endl;
+		out << tab << tab << "public:" << endl;
+		for(int c = 0; c < children; ++c) {
+			out << tab << tab << "template<class S> " << state_t() << "* enter_parallel(" << classname() << "&sc, C" << c << "*, C*) { return this; }" << endl;
+			out << tab << tab << "template<class S> " << state_t() << "* enter_parallel(" << classname() << "&sc, C" << c << " *d, " << state_t() << "*)" << endl;
+			out << tab << tab << '{' << endl;
+			out << tab << tab << tab << "// parallel state entered with C" << c << " or child of as target" << endl;
+			out << tab << tab << tab << "P::template enter_parallel<S>(sc, d, (S*)0);" << endl;
+			for(int n = 0; n < children; ++n) {
+				if (n == c) continue;
+				out << tab << tab << tab << "sc.cur_state.push_back(d->init_child(sc, (C" << n << "*)0));" << endl;
+			}
+			out << tab << tab << tab << "return this;" << endl;
+			out << tab << tab << "};" << endl;
+			out << tab << tab << endl;
+
+			//todo to continue
+		}
+		out << tab << "};" << endl;
+		out << endl;
+	}
 }
 
 void cpp_output::gen_model_base()
