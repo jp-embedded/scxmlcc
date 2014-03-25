@@ -184,6 +184,11 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << tab << "template<class S> " << state_t() << "* enter_parallel(" << classname() << " &sc, C *d, " << state_t() << "*)" << endl;
 		out << tab << tab << '{' << endl;
 		out << tab << tab << tab << "// parallel state entered with parallel as target" << endl;
+		out << tab << tab << tab << "P::template enter_parallel<S>(sc, d, (S*)0);" << endl;
+		for(int n = 0; n < children - 1; ++n) {
+			out << tab << tab << tab << "sc.cur_state.push_back(d->init_child(sc, (C" << n << "*)0));" << endl;
+		}
+		out << tab << tab << tab << "return d->init_child(sc, (C" << children - 1 << "*)0);" << endl;
 		out << tab << tab << "};" << endl;
 
 		out << tab << "};" << endl;
