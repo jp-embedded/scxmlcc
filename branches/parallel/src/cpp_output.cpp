@@ -190,6 +190,29 @@ void cpp_output::gen_state_parallel_base()
 		}
 		out << tab << tab << tab << "return d->init_child(sc, (C" << children - 1 << "*)0);" << endl;
 		out << tab << tab << "};" << endl;
+		out << endl;
+
+		// handle transition with all children given
+		out << tab << tab << "template<class S";
+		for(int c = 1; c < children; ++c) out << ", class D" << c;
+		out << "> " << state_t() << "* enter_parallel(" << classname() << " &sc, C*, C*";
+		for(int c = 1; c < children; ++c) out << ", D" << c << "&";
+		out << ") { return this; }" << endl;
+		out << tab << tab << "template<class S";
+		for(int c = 1; c < children; ++c) out << ", class D" << c;
+		out << "> " << state_t() << "* enter_parallel(" << classname() << " &sc, C *d, " << state_t() << '*';
+		for(int c = 1; c < children; ++c) out << ", D" << c << " &d" << c;
+		out << ")" << endl;
+	        out << tab << tab << '{' << endl;
+		out << tab << tab << tab << "P::template enter_parallel<S>(sc, d, (S*)0);" << endl;
+		for(int c = 1; c < children; ++c) out << tab << tab << tab << 'd' << c << ".template enter<C>(sc.model, (C*)0), sc.cur_state.push_back(&d" << c << ");" << endl;
+
+		// todo call init_child where Cn is not a child of Dn or *d
+		// if (false) sc.cur_state.push_back(d->init_child(sc, (C0*)0));
+		// if (false) sc.cur_state.push_back(d->init_child(sc, (C1*)0));
+		
+	        out << tab << tab << tab << "return this;" << endl;
+	        out << tab << tab << '}' << endl;
 
 		out << tab << "};" << endl;
 		out << endl;
