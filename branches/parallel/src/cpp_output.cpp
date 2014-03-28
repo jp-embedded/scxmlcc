@@ -193,6 +193,7 @@ void cpp_output::gen_state_parallel_base()
 		out << endl;
 
 		// handle transition with all children given
+		// todo, only add if needed
 		out << tab << tab << "template<class S";
 		for(int c = 1; c < children; ++c) out << ", class D" << c;
 		out << "> " << state_t() << "* enter_parallel(" << classname() << " &sc, C*, C*";
