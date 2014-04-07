@@ -18,7 +18,7 @@
 URL := "$HeadURL$"
 URL_TRUNK := $(findstring trunk,$(URL))
 URL_TAG := $(firstword $(subst /, ,$(word 3,$(subst tags, ,$(URL)))))
-VER := $(URL_TRUNK)$(URL_TAG)
+VER := $(or $(URL_TRUNK), $(URL_TAG), unknown)
 
 OBJS := main.o cpp_output.o scxml_parser.o version.o
 CPPFLAGS := -Wall -O2 -MD -MP -DVER="$(VER)"
