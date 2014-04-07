@@ -198,7 +198,10 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 	const ptree &xmlattr = pt.get_child("<xmlattr>");
 	boost::shared_ptr<transition> tr = boost::make_shared<transition>();
 	try {
-		tr->target = xmlattr.get_optional<string>("target");
+		using namespace boost::algorithm;
+		//tr->target = xmlattr.get_optional<string>("target");
+		boost::optional<string> target(xmlattr.get_optional<string>("target"));
+		if(target) split(tr->target, *target, is_any_of(" "), token_compress_on);
 		tr->event = xmlattr.get_optional<string>("event");
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {

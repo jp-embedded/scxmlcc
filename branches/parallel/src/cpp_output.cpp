@@ -323,9 +323,9 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 		string target_classname = state_classname;
 		string event;
 
-		if(t->get()->target) {
-			target = "sc.m_state_" + *t->get()->target;
-			target_classname = "state_" + *t->get()->target;
+		if(t->get()->target.size()) {
+			target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
+			target_classname = "state_" + t->get()->target.front(); //todo handle multiple targets
 		}
 		if(t->get()->event) {
 			event = "event_" + *t->get()->event;

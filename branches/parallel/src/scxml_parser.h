@@ -39,7 +39,7 @@ class scxml_parser
 		};
 
 		struct transition {
-			boost::optional<std::string> target;
+			slist target;
 			boost::optional<std::string> event;
 			plist<action> actions;
 		};
