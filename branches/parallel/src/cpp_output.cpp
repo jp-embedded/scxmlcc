@@ -51,14 +51,16 @@ void cpp_output::gen_transition_base()
 	out << tab << "{" << endl;
 	out << tab << tab << "public:" << endl;
 	// exit/enter is called here without parameter, which forces the action to always exit/enter at least current state
-	out << tab << tab << "D* operator ()(S *s, D &d, data_model &m)" << endl;
+	out << tab << tab << "state* operator ()(S *s, D &d, " << classname() << " &sc)" << endl;
 	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(m)) return 0;" << endl;
-       	out << tab << tab << tab << "s->exit(m, typeid(S));" << endl;
-       	out << tab << tab << tab << "s->template exit<D>(m);" << endl;
-       	out << tab << tab << tab << "transition_actions<E, S, D>::enter(m);" << endl;
-       	out << tab << tab << tab << "d.template enter<S>(m);" << endl;
-       	out << tab << tab << tab << "return &d;" << endl;
+       	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
+	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
+       	out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
+       	out << tab << tab << tab << "s->template exit<D>(sc.model);" << endl;
+       	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
+       	out << tab << tab << tab << "d.template enter<S>(sc.model);" << endl;
+       	if(sc.using_parallel) out << tab << tab << tab << "return d.template enter_parallel<S>(sc, &d, s);" << endl;
+	else out << tab << tab << tab << "return &d;" << endl;
        	out << tab << tab << "}" << endl;
 	out << tab << "};" << endl;
 	out << endl;
@@ -68,14 +70,16 @@ void cpp_output::gen_transition_base()
 	out << tab << "template<event E, class S, class D> class transition<E, S, D, internal> : public transition_actions<E, S, D>" << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "public:" << endl;
-	out << tab << tab << "D* operator ()(S *s, D &d, data_model &m)" << endl; 
+	out << tab << tab << "state* operator ()(S *s, D &d, " << classname() << " &sc)" << endl; 
 	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(m)) return 0;" << endl;
-       	out << tab << tab << tab << "s->exit(m, typeid(S));" << endl;
-       	out << tab << tab << tab << "s->template exit<D>(m, (D*)0);" << endl;
-       	out << tab << tab << tab << "transition_actions<E, S, D>::enter(m);" << endl;
-       	out << tab << tab << tab << "d.template enter<S>(m, (S*)0);" << endl;
-       	out << tab << tab << tab << "return &d;" << endl;
+       	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
+	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
+       	out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
+       	out << tab << tab << tab << "s->template exit<D>(sc.model, (D*)0);" << endl;
+       	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
+       	out << tab << tab << tab << "d.template enter<S>(sc.model, (S*)0);" << endl;
+       	if(sc.using_parallel) out << tab << tab << tab << "return d.template enter_parallel<S>(sc, &d, s);" << endl;
+	else out << tab << tab << tab << "return &d;" << endl;
        	out << tab << tab << "}" << endl;
 	out << tab << "};" << endl;
 	out << endl;
@@ -214,6 +218,22 @@ void cpp_output::gen_state_parallel_base()
 		
 	        out << tab << tab << tab << "return this;" << endl;
 	        out << tab << tab << '}' << endl;
+		out << endl;
+
+		out << tab << tab << "bool parallel_parent(const std::type_info& pti) { return typeid(C) == pti; }" << endl;
+		out << tab << tab << "void exit_parallel(" << classname() << " &sc, C*, C*) {}" << endl;
+		out << tab << tab << "void exit_parallel(" << classname() << " &sc, C *s, state *d)" << endl;
+		out << tab << tab << '{' << endl;
+		out << tab << tab << tab << "// parallel state exited from C or child" << endl;
+		out << tab << tab << tab << "for(" << classname() << "::cur_state_l::iterator i = sc.cur_state.begin(); (i != sc.cur_state.end()) && *i; ++i) {" << endl;
+		out << tab << tab << tab << tab << "if(this == *i) continue;" << endl;
+		out << tab << tab << tab << tab << "if(!(*i)->parallel_parent(typeid(C))) continue;" << endl;
+		out << tab << tab << tab << tab << "(*i)->exit(sc.model, typeid(C));" << endl;
+		out << tab << tab << tab << tab << "*i = 0;" << endl;
+		out << tab << tab << tab << '}' << endl;
+		out << tab << tab << tab << "P::exit_parallel(sc, s, d);" << endl;
+		out << tab << tab << '}' << endl;
+
 
 		out << tab << "};" << endl;
 		out << endl;
@@ -294,7 +314,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	if(state.initial.size()) {
 		string target = "sc.m_state_" + state.initial.front();
 		string target_classname = "state_" + state.initial.front();
-		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { return transition<&state::initial, " << state_classname << ", " << target_classname << ", internal>()(this, " << target << ", sc.model); }" << endl;
+		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { return transition<&state::initial, " << state_classname << ", " << target_classname << ", internal>()(this, " << target << ", sc); }" << endl;
 	}
 
 	//events
@@ -315,11 +335,11 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 		}
 		if(target.size()) {
 			// normal transition
-			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc.model); }" << endl;
+			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc); }" << endl;
 		}
 		else {
 			// transition without target
-			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ">()(this, sc.model); }" << endl;
+			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ">()(this, sc); }" << endl;
 		}
 	}
 
