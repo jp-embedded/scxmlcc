@@ -36,8 +36,11 @@ void cpp_output::gen_transition_base()
 	out << tab << "class no_state {};" << endl; 
 	out << tab << "enum transition_type { external, internal };" << endl; 
 	out << endl;
-	
-	out << tab << "template<event E, class S, class D = no_state> class transition_actions" << endl;
+
+	const int max_targets = sc.parallel_target_sizes.size() ? *sc.parallel_target_sizes.rbegin() : 1;
+	out << tab << "template<event E, class S";
+	for(int i = 0; i < max_targets; ++i) out << ", class D" << i << " = no_state";
+	out << "> class transition_actions" << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "protected:" << endl;
 	out << tab << tab << "void enter(data_model&) {} // default enter action" << endl;
@@ -97,6 +100,41 @@ void cpp_output::gen_transition_base()
        	out << tab << tab << "}" << endl;
 	out << tab << "};" << endl;
 	out << endl;
+
+	for (set<int>::const_iterator i = sc.parallel_target_sizes.begin(); i != sc.parallel_target_sizes.end(); ++i) {
+		const int sz = *i;
+
+		out << tab << "template<event E, class S";
+		for(int i = 0; i < sz; ++i) out << ", class D" << i;
+		out << ", transition_type T = external> class transition" << sz << ';' << endl;
+		
+		out << tab << "template<event E, class S";
+		for(int i = 0; i < sz; ++i) out << ", class D" << i;
+		out << "> class transition" << sz << "<E, S";
+		for(int i = 0; i < sz; ++i) out << ", D" << i;
+		out << ", internal> : public transition_actions<E, S, D0, D1>" << endl;
+
+		out << tab << '{' << endl;
+		out << tab << tab << "public:" << endl;
+
+		//todo: for now, all targets must have same parallel parent
+		out << tab << tab << "state* operator ()(S *s";
+		for(int i = 0; i < sz; ++i) out << ", D" << i << " &d" << i;
+		out << ", sc_test576 &sc)" << endl;
+
+		out << tab << tab << '{' << endl;
+
+		out << tab << tab << tab << "if(!transition_actions<E, S";
+		for(int i = 0; i < sz; ++i) out << ", D" << i;
+		out << ">::condition(sc.model)) return 0;" << endl;
+
+		//todo
+
+		out << tab << tab << '}' << endl;
+		out << tab << "};" << endl;
+		
+		out << endl;
+	}
 }
 
 void cpp_output::gen_state_actions_base()

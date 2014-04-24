@@ -33,6 +33,7 @@ class scxml_parser
 
 		bool using_parallel;
 		std::set<int> parallel_sizes;
+		std::set<int> parallel_target_sizes;
 
 		struct action {
 			std::string expr;

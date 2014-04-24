@@ -30,6 +30,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 		boost::optional<string> initial(xmlattr.get_optional<string>("initial"));
 		if(initial) split(m_scxml.initial, *initial, is_any_of(" "), token_compress_on);
+		if(m_scxml.initial.size() > 1) parallel_target_sizes.insert(m_scxml.initial.size());
 		m_scxml.name = xmlattr.get<string>("name", m_scxml.name);
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
@@ -106,6 +107,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 		if(parent) st->parent = parent;
 		boost::optional<string> initial(xmlattr.get_optional<string>("initial"));
 		if(initial) split(st->initial, *initial, is_any_of(" "), token_compress_on);
+		if(st->initial.size() > 1) parallel_target_sizes.insert(st->initial.size());
 		st->type = xmlattr.get_optional<string>("type");
 		m_scxml.states.push_back(st);
 		state_list::iterator state_i = --m_scxml.states.end();
@@ -199,9 +201,9 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 	boost::shared_ptr<transition> tr = boost::make_shared<transition>();
 	try {
 		using namespace boost::algorithm;
-		//tr->target = xmlattr.get_optional<string>("target");
 		boost::optional<string> target(xmlattr.get_optional<string>("target"));
 		if(target) split(tr->target, *target, is_any_of(" "), token_compress_on);
+		if(tr->target.size() > 1) parallel_target_sizes.insert(tr->target.size());
 		tr->event = xmlattr.get_optional<string>("event");
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
