@@ -479,7 +479,7 @@ void cpp_output::gen_sc()
 
 	// constructor
 	out << tab << classname() << "(user_model_p user = user_model_p())";
-	if(!sc.using_parallel) out << " : cur_state(m_scxml)";
+	if(!sc.using_parallel) out << " : cur_state(&m_scxml)";
 	out << endl;
 
 	out << tab << "{" << endl;
