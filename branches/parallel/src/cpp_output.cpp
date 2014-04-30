@@ -461,7 +461,7 @@ void cpp_output::gen_sc()
 		out << tab << '{' << endl;
 		out << tab << tab << "state *next_state;" << endl;
 		out << tab << tab << "if ((next_state = (cur_state->*e)(*this))) cur_state = next_state;" << endl;
-		out << tab << tab << "return next_state;";
+		out << tab << tab << "return next_state;" << endl;
 		out << tab << '}' << endl;
 	}
 	out << endl;
