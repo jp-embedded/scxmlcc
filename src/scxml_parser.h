@@ -23,36 +23,43 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <string>
 #include <list>
+#include <set>
 
 class scxml_parser
 {
 	public:
-		template <class T> class list : public std::vector<boost::shared_ptr<T> > {};
+		template <class T> class plist : public std::vector<boost::shared_ptr<T> > {};
+		typedef std::vector<std::string> slist;
+
+		bool using_parallel;
+		std::set<int> parallel_sizes;
+		std::set<int> parallel_target_sizes;
 
 		struct action {
 			std::string expr;
 		};
 
 		struct transition {
-			boost::optional<std::string> target;
+			slist target;
 			boost::optional<std::string> event;
-			list<action> actions;
+			plist<action> actions;
 		};
-		typedef list<transition> transition_list;
+		typedef plist<transition> transition_list;
 
 		struct state {
 			std::string id;
 			boost::shared_ptr<state> parent;
-			boost::optional<std::string> initial, type;
+			boost::optional<std::string> type;
+			slist initial;
 			transition_list transitions;
-			list<action> entry_actions;
-			list<action> exit_actions;
+			plist<action> entry_actions;
+			plist<action> exit_actions;
 		};
-		typedef list<state> state_list;
+		typedef plist<state> state_list;
 
 		struct scxml {
 			std::string name;
-			std::string initial;
+			slist initial;
 			state_list states;
 		};
 
@@ -66,10 +73,11 @@ class scxml_parser
 		void parse_scxml(const boost::property_tree::ptree &pt);
 		void parse(const boost::property_tree::ptree &pt);
 		void parse_state(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
+		void parse_parallel(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
 		boost::shared_ptr<transition> parse_transition(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_script(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_log(const boost::property_tree::ptree &pt);
-		list<action> parse_entry(const boost::property_tree::ptree &pt);
+		plist<action> parse_entry(const boost::property_tree::ptree &pt);
 
 };
 
