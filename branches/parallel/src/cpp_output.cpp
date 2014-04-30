@@ -93,10 +93,10 @@ void cpp_output::gen_transition_base()
 	out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "public:" << endl;
-	out << tab << tab << "S* operator ()(S *s, data_model &m)" << endl;
+	out << tab << tab << "S* operator ()(S *s, " << classname() << " &sc)" << endl;
        	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(m)) return 0;" << endl;
-       	out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(m);" << endl;
+       	out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return 0;" << endl;
+       	out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
        	out << tab << tab << tab << "return s;" << endl;
        	out << tab << tab << "}" << endl;
 	out << tab << "};" << endl;
