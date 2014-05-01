@@ -42,7 +42,7 @@ void scxmlcc(const options &opt)
 	replace_if(sc_name.begin(), sc_name.end(), c_pred, '_');
 	scxml_parser sc(sc_name.c_str(), pt);
 	ofstream ofs(opt.output.c_str());
-	cpp_output out(ofs, sc);
+	cpp_output out(ofs, sc, opt);
 	out.gen();
 }
 
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 		("help,h",				"This help message")
 		("input,i",	value<string>(),	"Input file.")
 		("output,o",	value<string>(),	"Output file.")
-		("optimize,O",				"Optimize away unused functionality. NOT yet supported")
+		("debug,d",				"Enable debug output")
 		("version,v",				"Version information");
 	positional_options_description pdesc;
 	pdesc.add("input", -1);
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
 	if(vm.count("input")) opt.input = vm["input"].as<string>();
 	if(vm.count("output")) opt.output = vm["output"].as<string>();
-	if(vm.count("optimize")) opt.optimize = vm["optimize"].as<bool>();
+	if(vm.count("debug")) opt.debug = true;
 
 	if(!opt.input.empty() && opt.output.empty()) {
 		opt.output = opt.input;
