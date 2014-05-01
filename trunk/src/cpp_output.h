@@ -20,6 +20,7 @@
 
 //todo store scxml in internal format. to be able to parse other input formats
 #include "scxml_parser.h"
+#include "options.h"
 
 #include <ostream>
 
@@ -27,10 +28,11 @@ class cpp_output {
 
 	std::ostream &out;
 	const scxml_parser &sc;
+	const options &opt;
 	std::string tab;
 
 	public:
-	cpp_output(std::ostream &ofs, const scxml_parser &sc) : out(ofs), sc(sc), tab("\t") {};
+	cpp_output(std::ostream &ofs, const scxml_parser &sc, const options &op) : out(ofs), sc(sc), opt(op), tab("\t") {};
 
 	void gen();
 

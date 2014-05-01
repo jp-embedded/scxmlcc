@@ -58,6 +58,7 @@ void cpp_output::gen_transition_base()
 	out << tab << tab << "state* operator ()(S *s, D &d, " << classname() << " &sc)" << endl;
 	out << tab << tab << "{" << endl;
        	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
+	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
 	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
        	out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
        	out << tab << tab << tab << "s->template exit<D>(sc.model);" << endl;
@@ -77,6 +78,7 @@ void cpp_output::gen_transition_base()
 	out << tab << tab << "state* operator ()(S *s, D &d, " << classname() << " &sc)" << endl; 
 	out << tab << tab << "{" << endl;
        	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
+	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
 	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
        	out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
        	out << tab << tab << tab << "s->template exit<D>(sc.model, (D*)0);" << endl;
@@ -96,6 +98,7 @@ void cpp_output::gen_transition_base()
 	out << tab << tab << "S* operator ()(S *s, " << classname() << " &sc)" << endl;
        	out << tab << tab << "{" << endl;
        	out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return 0;" << endl;
+	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << std::endl;" << endl;
        	out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
        	out << tab << tab << tab << "return s;" << endl;
        	out << tab << tab << "}" << endl;
@@ -128,6 +131,15 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << tab << "if(!transition_actions<E, S";
 		for(int i = 0; i < sz; ++i) out << ", D" << i;
 		out << ">::condition(sc.model)) return 0;" << endl;
+
+		if(opt.debug) {
+			out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \"";
+			for(int i = 0; i < sz; ++i) {
+				if(i) out << " << \", \"";
+		       		out << " << typeid(D" << i << ").name()";
+			}
+			out << " << std::endl;" << endl;
+		}
 
 		out << tab << tab << tab << "s->exit_parallel(sc, s, &d0);" << endl;
 		out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
@@ -172,10 +184,21 @@ void cpp_output::gen_state_composite_base()
 	out << tab << tab << "public:" << endl;
 	out << tab << tab << "// LCA calculation" << endl;
 	out << tab << tab << "template<class T> void enter(data_model&, " << state_composite_t() << "*) {}" << endl;
-	out << tab << tab << "template<class T> void enter(data_model &m, ...) {  P::template enter<T>(m, (T*)0); state_actions<C>::enter(m); }" << endl;
+
+	out << tab << tab << "template<class T> void enter(data_model &m, ...) { P::template enter<T>(m, (T*)0);";
+	if(opt.debug) out << " std::clog << \"" << classname() << ": enter \" << typeid(C).name() << std::endl;";
+       	out << " state_actions<C>::enter(m); }" << endl;
+
 	out << tab << tab << "template<class T> void exit(data_model&, " << state_composite_t() << "*) {}" << endl;
-	out << tab << tab << "template<class T> void exit(data_model &m, ...) {  state_actions<C>::exit(m); P::template exit<T>(m, (T*)0); }" << endl;
-	out << tab << tab << "virtual void exit(data_model &m, const std::type_info &sti) {  if(typeid(C) == sti) return; state_actions<C>::exit(m); P::exit(m, sti); }" << endl;
+
+	out << tab << tab << "template<class T> void exit(data_model &m, ...) {";
+	if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << typeid(C).name() << std::endl;";
+	out << " state_actions<C>::exit(m); P::template exit<T>(m, (T*)0); }" << endl;
+
+	out << tab << tab << "virtual void exit(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
+	if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << typeid(C).name() << std::endl;";
+       	out << " state_actions<C>::exit(m); P::exit(m, sti); }" << endl;
+
 	out << tab << "};" << endl;
 	out << endl;
 }
@@ -542,9 +565,11 @@ void cpp_output::gen()
 	out << "#ifndef __SC_" << boost::to_upper_copy(sc.sc().name) << endl;
 	out << "#define __SC_" << boost::to_upper_copy(sc.sc().name) << endl;
 	out << endl;
+
 	out << "#include <typeinfo>" << endl;
 	out << "#include <queue>" << endl;
 	out << "#include <memory>" << endl;
+	if(opt.debug) out << "#include <iostream>" << endl;
 	out << endl;
 
 	trim();

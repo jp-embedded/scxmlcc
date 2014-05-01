@@ -24,9 +24,9 @@ struct options
 {
 	boost::filesystem::path input;
 	boost::filesystem::path output;
-	bool optimize;
+	bool debug;
 
-	options() : optimize(false) {}
+	options() : debug(false) {}
 
 };
 
