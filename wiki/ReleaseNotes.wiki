@@ -7,4 +7,8 @@
   * {{{<initial>}}} support
 
 == 0.1 ==
-Initial release
+  * Hierarchical states
+  * Internal, external, targetless, eventless and conditional transitions
+  * Custom data model
+  * Custom enter/exit state actions
+  * Custom transition actions and conditons
