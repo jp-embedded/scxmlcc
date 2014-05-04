@@ -39,6 +39,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 			else if (it->first == "state") parse_state(it->second, boost::shared_ptr<state>());
 			else if (it->first == "history") parse_state(it->second, boost::shared_ptr<state>());
 			else if (it->first == "parallel") parse_parallel(it->second, boost::shared_ptr<state>());
+			else if (it->first == "initial") m_scxml.initial = parse_initial(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <scxml>" << endl;
 		}
 
@@ -80,6 +81,7 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 			else if (it->first == "transition") state_i->get()->transitions.push_back(parse_transition(it->second));
 			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
 			else if (it->first == "onexit") state_i->get()->exit_actions = parse_entry(it->second);
+			else if (it->first == "initial") state_i->get()->initial = parse_initial(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <parallel>" << endl;
 		}
 
@@ -95,6 +97,27 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 		cerr << "error: state: " << e.what() << endl;
 		exit(1);
 	}
+}
+
+scxml_parser::slist scxml_parser::parse_initial(const ptree &pt)
+{
+	// todo initial transitian may have actions
+	scxml_parser::slist initial;
+
+	try {
+
+		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
+			if (it->first == "<xmlcomment>") ; // ignore comments
+			else if (it->first == "transition") initial = parse_transition(it->second)->target;
+		}
+
+	}
+	catch (ptree_error e) {
+		cerr << "error: initial: " << e.what() << endl;
+		exit(1);
+	}
+
+	return initial;
 }
 
 void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &parent)
@@ -121,6 +144,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			else if (it->first == "transition") state_i->get()->transitions.push_back(parse_transition(it->second));
 			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
 			else if (it->first == "onexit") state_i->get()->exit_actions = parse_entry(it->second);
+			else if (it->first == "initial") state_i->get()->initial = parse_initial(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
 		}
 
