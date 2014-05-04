@@ -74,6 +74,7 @@ class scxml_parser
 		void parse(const boost::property_tree::ptree &pt);
 		void parse_state(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
 		void parse_parallel(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
+		slist parse_initial(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<transition> parse_transition(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_script(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_log(const boost::property_tree::ptree &pt);
