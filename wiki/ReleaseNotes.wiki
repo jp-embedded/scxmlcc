@@ -1,0 +1,10 @@
+#summary One-sentence summary of this page.
+
+= Release Notes =
+
+== 0.2 ==
+- Partial parallel state support
+- '<initial>' support
+
+== 0.1 ==
+Initial release
