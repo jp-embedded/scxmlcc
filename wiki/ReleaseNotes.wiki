@@ -2,11 +2,17 @@
 
 = Release Notes =
 
+== 0.2.1 ==
+Released 2014-05-05
+  * Add a missing file under ./test
+
 == 0.2 ==
+Released 2014-05-04
   * Partial parallel state support
   * {{{<initial>}}} support
 
 == 0.1 ==
+Released 2013-11-04
   * Hierarchical states
   * Internal, external, targetless, eventless and conditional transitions
   * Custom data model
