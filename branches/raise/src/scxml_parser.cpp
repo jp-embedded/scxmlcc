@@ -109,6 +109,7 @@ scxml_parser::slist scxml_parser::parse_initial(const ptree &pt)
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "transition") initial = parse_transition(it->second)->target;
+			else cerr << "warning: unknown item '" << it->first << "' in <initial>" << endl;
 		}
 
 	}
@@ -168,6 +169,7 @@ scxml_parser::plist<scxml_parser::action> scxml_parser::parse_entry(const ptree 
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "script") l_ac.push_back(parse_script(it->second));
 			else if (it->first == "log") l_ac.push_back(parse_log(it->second));
+			else if (it->first == "raise") l_ac.push_back(parse_raise(it->second));
 			else cerr << "warning: unknown item '" << it->first << "' in <onentry> or <onexit>" << endl;
 		}
 	}
@@ -178,6 +180,30 @@ scxml_parser::plist<scxml_parser::action> scxml_parser::parse_entry(const ptree 
 	return l_ac;
 }
 
+boost::shared_ptr<scxml_parser::action> scxml_parser::parse_raise(const ptree &pt)
+{
+	boost::shared_ptr<action> ac = boost::make_shared<action>();
+	try {
+		const ptree &xmlattr = pt.get_child("<xmlattr>");
+
+		const string event = xmlattr.get<string>("event");
+
+		ac->type = "raise";
+		ac->attr["event"] = event;
+
+		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
+			if (it->first == "<xmlcomment>") ; // ignore comments
+			else if (it->first == "<xmlattr>") ; // ignore, parsed above
+			else cerr << "warning: unknown item '" << it->first << "' in <raise>" << endl;
+		}
+	}
+	catch (ptree_error e) {
+		cerr << "error: raise: " << e.what() << endl;
+		exit(1);
+	}
+	return ac;
+}
+
 boost::shared_ptr<scxml_parser::action> scxml_parser::parse_log(const ptree &pt)
 {
 	boost::shared_ptr<action> ac = boost::make_shared<action>();
@@ -186,7 +212,10 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_log(const ptree &pt)
 
 		const string label = xmlattr.get<string>("label");
 		const string expr = xmlattr.get<string>("expr");
-		ac->expr = "std::clog << \"[" + label + "] \" << " + expr + " << std::endl;";
+
+		ac->type = "log";
+		ac->attr["label"] = label;
+		ac->attr["expr"] = expr;
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
@@ -205,7 +234,8 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_script(const ptree &
 {
 	boost::shared_ptr<action> ac = boost::make_shared<action>();
 	try {
-		ac->expr = pt.get_value<string>();
+		ac->type = "script";
+		ac->attr["expr"] = pt.get_value<string>();
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
@@ -235,6 +265,7 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
 			else if (it->first == "script") tr->actions.push_back(parse_script(it->second));
 			else if (it->first == "log") tr->actions.push_back(parse_log(it->second));
+			else if (it->first == "raise") tr->actions.push_back(parse_raise(it->second));
 			else cerr << "warning: unknown item '" << it->first << "' in <transition>" << endl;
 		}
 	}

@@ -24,6 +24,7 @@
 #include <string>
 #include <list>
 #include <set>
+#include <map>
 
 class scxml_parser
 {
@@ -36,7 +37,8 @@ class scxml_parser
 		std::set<int> parallel_target_sizes;
 
 		struct action {
-			std::string expr;
+			std::string type;
+			std::map<std::string, std::string> attr;
 		};
 
 		struct transition {
@@ -78,6 +80,7 @@ class scxml_parser
 		boost::shared_ptr<transition> parse_transition(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_script(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_log(const boost::property_tree::ptree &pt);
+		boost::shared_ptr<action> parse_raise(const boost::property_tree::ptree &pt);
 		plist<action> parse_entry(const boost::property_tree::ptree &pt);
 
 };
