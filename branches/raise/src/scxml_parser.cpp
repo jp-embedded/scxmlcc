@@ -201,6 +201,8 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_raise(const ptree &p
 		cerr << "error: raise: " << e.what() << endl;
 		exit(1);
 	}
+
+	using_event_queue = true;
 	return ac;
 }
 
@@ -285,7 +287,7 @@ void scxml_parser::parse(const ptree &pt)
 	}
 }
 
-scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false)
+scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_event_queue(false)
 {
 	m_scxml.name = name;
 	parse(pt);

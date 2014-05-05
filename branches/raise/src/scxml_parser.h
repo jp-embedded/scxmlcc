@@ -33,6 +33,7 @@ class scxml_parser
 		typedef std::vector<std::string> slist;
 
 		bool using_parallel;
+		bool using_event_queue;
 		std::set<int> parallel_sizes;
 		std::set<int> parallel_target_sizes;
 
