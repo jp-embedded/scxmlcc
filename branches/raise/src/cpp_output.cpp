@@ -539,6 +539,60 @@ void cpp_output::gen_sc()
 	out << endl;
 }
 
+void cpp_output::gen_action_part_log(scxml_parser::action &a)
+{
+}
+
+void cpp_output::gen_action_part_raise(scxml_parser::action &a)
+{
+	const string ev = a.attr["event"];
+
+	out << tab << "// " << a.type << " event=" << ev << endl;
+	// todo event_queue is not known here
+	// todo make queue_event() method
+	out << tab << "event_queue.push_back(event_" << ev << ");" << endl;
+}
+
+void cpp_output::gen_action_part(scxml_parser::action &a)
+{
+	if(a.type == "raise") gen_action_part_raise(a);
+	else cerr << "warning: unknown action type '" << a.type << "'" << endl;
+}
+
+void cpp_output::gen_actions()
+{
+	const scxml_parser::state_list &states = sc.sc().states;
+	for (scxml_parser::state_list::const_iterator s = states.begin(); s != states.end(); ++s) {
+
+		// entry actions
+		if(s->get()->entry_actions.size()) {
+			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::enter(" << classname() << "::data_model &m)" << endl;
+			out << '{' << endl;
+			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->entry_actions.begin(); i != s->get()->entry_actions.end(); ++i) {
+				gen_action_part(*i->get());
+			}
+			out << '}' << endl;
+			out << endl;
+		}
+
+		if(s->get()->exit_actions.size()) {
+			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::exit(" << classname() << "::data_model &m)" << endl;
+			out << '{' << endl;
+			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->exit_actions.begin(); i != s->get()->exit_actions.end(); ++i) {
+				// todo
+			}
+			out << '}' << endl;
+			out << endl;
+		}
+
+		// transition actions
+		for (scxml_parser::transition_list::const_iterator i = s->get()->transitions.begin(); i != s->get()->transitions.end(); ++i) {
+			// todo
+		}
+		//out << endl;
+	}
+}
+
 void cpp_output::trim()
 {
 	const scxml_parser::state_list &states = sc.sc().states;
@@ -579,6 +633,7 @@ void cpp_output::gen()
 
 	trim();
 	gen_sc();
+	gen_actions();
 
 	// end of include guard
  	out << "#endif" << endl;
