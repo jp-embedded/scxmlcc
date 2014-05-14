@@ -314,12 +314,19 @@ void cpp_output::gen_state_parallel_base()
 	}
 }
 
-void cpp_output::gen_model_base()
+void cpp_output::gen_model_decl()
 {
+	out << tab << "struct data_model;" << endl;
 	out << tab << "struct user_model;" << endl;
 	out << tab << "typedef std::auto_ptr<user_model> user_model_p;" << endl;
+	out << endl;
+}
+
+void cpp_output::gen_model_base()
+{
 	out << tab << "struct data_model" << endl;
 	out << tab << "{" << endl;
+	out << tab << tab << "std::queue<event> event_queue;" << endl;
 	out << tab << tab << "user_model_p user;" << endl;
 	out << tab << "} model;" << endl;
 	out << endl;
@@ -458,8 +465,9 @@ void cpp_output::gen_sc()
 	out << tab << "public:" << endl;
 	out << endl;
 
-	gen_model_base();
+	gen_model_decl();
 	gen_state_base();
+	gen_model_base();
 	gen_state_actions_base();
 	gen_state_composite_base();
 	gen_state_parallel_base();
@@ -494,7 +502,7 @@ void cpp_output::gen_sc()
 	out << tab << tab << "while (cont) {" << endl;
 	out << tab << tab << tab << "if ((cont = dispatch_event(&state::initial)));" << endl;
 	out << tab << tab << tab << "else if ((cont = dispatch_event(&state::unconditional)));" << endl;
-	out << tab << tab << tab << "else if (event_queue.size()) cont = dispatch_event(event_queue.front()), event_queue.pop();" << endl;
+	out << tab << tab << tab << "else if (model.event_queue.size()) cont = dispatch_event(model.event_queue.front()), model.event_queue.pop(), cont |= model.event_queue.size();" << endl;
 	out << tab << tab << tab << "else break;" << endl;
 	out << tab << tab << "}" << endl;
 	out << tab << "}" << endl;
@@ -533,8 +541,6 @@ void cpp_output::gen_sc()
 		gen_state(*s->get());
 	}
 
-	out << tab << "std::queue<event> event_queue;" << endl;
-
 	out << "};" << endl;
 	out << endl;
 }
@@ -548,15 +554,16 @@ void cpp_output::gen_action_part_raise(scxml_parser::action &a)
 	const string ev = a.attr["event"];
 
 	out << tab << "// " << a.type << " event=" << ev << endl;
-	// todo event_queue is not known here
-	// todo make queue_event() method
-	out << tab << "event_queue.push_back(event_" << ev << ");" << endl;
+	out << tab << "m.event_queue.push(&" << classname() << "::state::event_" << ev << ");" << endl;
 }
 
 void cpp_output::gen_action_part(scxml_parser::action &a)
 {
 	if(a.type == "raise") gen_action_part_raise(a);
-	else cerr << "warning: unknown action type '" << a.type << "'" << endl;
+	else {
+		out << tab << "// warning: unknown action type '" << a.type << "'" << endl;
+		cerr << "warning: unknown action type '" << a.type << "'" << endl;
+	}
 }
 
 void cpp_output::gen_actions()
@@ -586,8 +593,15 @@ void cpp_output::gen_actions()
 		}
 
 		// transition actions
-		for (scxml_parser::transition_list::const_iterator i = s->get()->transitions.begin(); i != s->get()->transitions.end(); ++i) {
-			// todo
+		for (scxml_parser::transition_list::const_iterator ti = s->get()->transitions.begin(); ti != s->get()->transitions.end(); ++ti) {
+			if(ti->get()->actions.size()) {
+				/* todo
+			out << "template<> void " << classname() << "::transition_actions<" << classname() << "::state_" << ">::enter(" << classname() << "::data_model &m)" << endl;
+			out << '{' << endl;
+			out << '}' << endl;
+			out << endl;
+			*/
+			}
 		}
 		//out << endl;
 	}
@@ -598,6 +612,7 @@ void cpp_output::trim()
 	const scxml_parser::state_list &states = sc.sc().states;
 
 	// replace '-' with '_' in event names
+	// replace '-' with '_' in actions
 	// replace '*' with 'A' in event names, todo: not currently supported
 	// replace '.' with '_' in event names todo: see '3.12.1 event descriptors how to handle event tokens
 	for (scxml_parser::state_list::const_iterator s = states.begin(); s != states.end(); ++s) {
@@ -608,6 +623,27 @@ void cpp_output::trim()
 				replace(i->get()->event->begin(), i->get()->event->end(), '.', '_');
 				replace(i->get()->event->begin(), i->get()->event->end(), '-', '_');
 				replace(i->get()->event->begin(), i->get()->event->end(), '*', 'A');
+
+				// transition actions
+				for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = i->get()->actions.begin(); ai != i->get()->actions.end(); ++ai) {
+					for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
+						replace(attri->second.begin(), attri->second.end(), '-', '_');
+					}
+				}
+			}
+		}
+
+		// entry actions
+		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = s->get()->entry_actions.begin(); ai != s->get()->entry_actions.end(); ++ai) {
+			for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
+				replace(attri->second.begin(), attri->second.end(), '-', '_');
+			}
+		}
+
+		// exit actions
+		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = s->get()->exit_actions.begin(); ai != s->get()->exit_actions.end(); ++ai) {
+			for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
+				replace(attri->second.begin(), attri->second.end(), '-', '_');
 			}
 		}
 	}
