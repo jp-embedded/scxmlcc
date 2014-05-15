@@ -53,7 +53,7 @@ class scxml_parser
 			std::string id;
 			boost::shared_ptr<state> parent;
 			boost::optional<std::string> type;
-			slist initial;
+			transition initial;
 			transition_list transitions;
 			plist<action> entry_actions;
 			plist<action> exit_actions;
@@ -62,7 +62,7 @@ class scxml_parser
 
 		struct scxml {
 			std::string name;
-			slist initial;
+			transition initial;
 			state_list states;
 		};
 
@@ -77,7 +77,7 @@ class scxml_parser
 		void parse(const boost::property_tree::ptree &pt);
 		void parse_state(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
 		void parse_parallel(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
-		slist parse_initial(const boost::property_tree::ptree &pt);
+		transition parse_initial(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<transition> parse_transition(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_script(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_log(const boost::property_tree::ptree &pt);

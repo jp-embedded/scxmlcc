@@ -420,9 +420,10 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	out << tab << "{" << endl;
 
-	if(state.initial.size()) {
-		string target = "sc.m_state_" + state.initial.front();
-		string target_classname = "state_" + state.initial.front();
+	//todo there may be multiple targets
+	if(state.initial.target.size()) {
+		string target = "sc.m_state_" + state.initial.target.front();
+		string target_classname = "state_" + state.initial.target.front();
 		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { return transition<&state::initial, " << state_classname << ", " << target_classname << ", internal>()(this, " << target << ", sc); }" << endl;
 	}
 
@@ -524,13 +525,13 @@ void cpp_output::gen_sc()
 	out << tab << "class scxml : public composite<scxml, state>" << endl;
 	out << tab << "{" << endl;
 
-	const int sz = sc.sc().initial.size();
+	const int sz = sc.sc().initial.target.size();
 	out << tab << tab << state_t() << "* initial(" << classname() << "&sc) { return transition";
 	if(sz > 1) out << sz;
 	out << "<&state::initial, scxml";
-	for(int i = 0; i < sz; ++i) out << ", state_" << sc.sc().initial[i];
+	for(int i = 0; i < sz; ++i) out << ", state_" << sc.sc().initial.target[i];
 	out << ", internal>()(this";
-	for(int i = 0; i < sz; ++i) out << ", sc.m_state_" << sc.sc().initial[i];
+	for(int i = 0; i < sz; ++i) out << ", sc.m_state_" << sc.sc().initial.target[i];
 	out << ", sc); }" << endl;
 
 	out << tab << "} m_scxml;" << endl;
