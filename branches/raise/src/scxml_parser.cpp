@@ -102,6 +102,7 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 scxml_parser::transition scxml_parser::parse_initial(const ptree &pt)
 {
 	scxml_parser::transition initial;
+	initial.event = "initial";
 
 	try {
 

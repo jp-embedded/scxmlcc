@@ -548,6 +548,7 @@ void cpp_output::gen_sc()
 
 void cpp_output::gen_action_part_log(scxml_parser::action &a)
 {
+	// todo
 }
 
 void cpp_output::gen_action_part_raise(scxml_parser::action &a)
@@ -583,6 +584,7 @@ void cpp_output::gen_actions()
 			out << endl;
 		}
 
+		// exit actions
 		if(s->get()->exit_actions.size()) {
 			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::exit(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
@@ -590,6 +592,15 @@ void cpp_output::gen_actions()
 				// todo
 			}
 			out << '}' << endl;
+			out << endl;
+		}
+
+		// initial actions
+		if(s->get()->initial.actions.size()) {
+			//todo
+			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->initial.actions.begin(); i != s->get()->initial.actions.end(); ++i) {
+				// todo
+			}
 			out << endl;
 		}
 
