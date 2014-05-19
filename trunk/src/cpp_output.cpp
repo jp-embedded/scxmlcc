@@ -548,7 +548,13 @@ void cpp_output::gen_sc()
 
 void cpp_output::gen_action_part_log(scxml_parser::action &a)
 {
-	// todo
+	const string label = a.attr["label"];
+	const string expr = a.attr["expr"];
+
+	out << tab << "// " << a.type << " label=" << label << " exrp=" << expr << endl;
+	out << tab << "std::clog";
+	if(label.size()) out << " << \"[" << label << "] \""; 
+	out << " << \"" << expr << "\" << std::endl;" << endl;
 }
 
 void cpp_output::gen_action_part_raise(scxml_parser::action &a)
@@ -562,6 +568,7 @@ void cpp_output::gen_action_part_raise(scxml_parser::action &a)
 void cpp_output::gen_action_part(scxml_parser::action &a)
 {
 	if(a.type == "raise") gen_action_part_raise(a);
+	else if(a.type == "log") gen_action_part_log(a);
 	else {
 		out << tab << "// warning: unknown action type '" << a.type << "'" << endl;
 		cerr << "warning: unknown action type '" << a.type << "'" << endl;
