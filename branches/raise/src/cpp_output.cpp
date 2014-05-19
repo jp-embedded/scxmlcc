@@ -589,7 +589,7 @@ void cpp_output::gen_actions()
 			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::exit(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->exit_actions.begin(); i != s->get()->exit_actions.end(); ++i) {
-				// todo
+				gen_action_part(*i->get());
 			}
 			out << '}' << endl;
 			out << endl;
@@ -597,13 +597,14 @@ void cpp_output::gen_actions()
 
 		// initial actions
 		if(s->get()->initial.actions.size()) {
-			out << "template<> void " << classname() << "::transition_actions<" << classname() << "::state::initial, " << classname() << "::state_" << s->get()->id;
-			//todo
-			out << ", " << classname() << "::state_" << s->get()->initial.target.front();
+			out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::initial, " << classname() << "::state_" << s->get()->id;
+			for(scxml_parser::slist::const_iterator ai = s->get()->initial.target.begin(); ai != s->get()->initial.target.end(); ++ai) {
+				out << ", " << classname() << "::state_" << *ai;
+			}
 		       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->initial.actions.begin(); i != s->get()->initial.actions.end(); ++i) {
-				// todo
+				gen_action_part(*i->get());
 			}
 			out << '}' << endl;
 			out << endl;
@@ -612,12 +613,17 @@ void cpp_output::gen_actions()
 		// transition actions
 		for (scxml_parser::transition_list::const_iterator ti = s->get()->transitions.begin(); ti != s->get()->transitions.end(); ++ti) {
 			if(ti->get()->actions.size()) {
-				/* todo
-			out << "template<> void " << classname() << "::transition_actions<" << classname() << "::state_" << ">::enter(" << classname() << "::data_model &m)" << endl;
-			out << '{' << endl;
-			out << '}' << endl;
-			out << endl;
-			*/
+				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::event_" << ti->get()->event << ", " << classname() << "::state_" << s->get()->id;
+				for(scxml_parser::slist::const_iterator ai = ti->get()->target.begin(); ai != ti->get()->target.end(); ++ai) {
+					out << ", " << classname() << "::state_" << *ai;
+				}
+			       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
+				out << '{' << endl;
+				for (scxml_parser::plist<scxml_parser::action>::const_iterator i = ti->get()->actions.begin(); i != ti->get()->actions.end(); ++i) {
+					gen_action_part(*i->get());
+				}
+				out << '}' << endl;
+				out << endl;
 			}
 		}
 		//out << endl;
