@@ -597,10 +597,15 @@ void cpp_output::gen_actions()
 
 		// initial actions
 		if(s->get()->initial.actions.size()) {
+			out << "template<> void " << classname() << "::transition_actions<" << classname() << "::state::initial, " << classname() << "::state_" << s->get()->id;
 			//todo
+			out << ", " << classname() << "::state_" << s->get()->initial.target.front();
+		       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
+			out << '{' << endl;
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->initial.actions.begin(); i != s->get()->initial.actions.end(); ++i) {
 				// todo
 			}
+			out << '}' << endl;
 			out << endl;
 		}
 
