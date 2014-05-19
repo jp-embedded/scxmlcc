@@ -212,11 +212,11 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_log(const ptree &pt)
 	try {
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 
-		const string label = xmlattr.get<string>("label");
+		boost::optional<string> label(xmlattr.get_optional<string>("label"));
 		const string expr = xmlattr.get<string>("expr");
 
 		ac->type = "log";
-		ac->attr["label"] = label;
+		if(label) ac->attr["label"] = *label;
 		ac->attr["expr"] = expr;
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
