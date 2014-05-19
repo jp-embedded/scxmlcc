@@ -229,6 +229,8 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_log(const ptree &pt)
 		cerr << "error: log: " << e.what() << endl;
 		exit(1);
 	}
+
+	using_log = true;
 	return ac;
 }
 
@@ -287,7 +289,7 @@ void scxml_parser::parse(const ptree &pt)
 	}
 }
 
-scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_event_queue(false)
+scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_event_queue(false), using_log(false)
 {
 	m_scxml.name = name;
 	parse(pt);

@@ -34,6 +34,7 @@ class scxml_parser
 
 		bool using_parallel;
 		bool using_event_queue;
+		bool using_log;
 		std::set<int> parallel_sizes;
 		std::set<int> parallel_target_sizes;
 

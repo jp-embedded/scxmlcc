@@ -694,7 +694,7 @@ void cpp_output::gen()
 	out << "#include <typeinfo>" << endl;
 	out << "#include <queue>" << endl;
 	out << "#include <memory>" << endl;
-	if(opt.debug) out << "#include <iostream>" << endl;
+	if(opt.debug || sc.using_log) out << "#include <iostream>" << endl;
 	out << endl;
 
 	trim();
