@@ -1,6 +1,9 @@
 #summary One-sentence summary of this page.
 
 = Release Notes =
+== trunk ==
+Not released
+  * {{{<raise>}}} support
 
 == 0.2.1 ==
 Released 2014-05-05
