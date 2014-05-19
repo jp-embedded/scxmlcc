@@ -613,7 +613,7 @@ void cpp_output::gen_actions()
 		// transition actions
 		for (scxml_parser::transition_list::const_iterator ti = s->get()->transitions.begin(); ti != s->get()->transitions.end(); ++ti) {
 			if(ti->get()->actions.size()) {
-				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::event_" << ti->get()->event << ", " << classname() << "::state_" << s->get()->id;
+				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::event_" << *ti->get()->event << ", " << classname() << "::state_" << s->get()->id;
 				for(scxml_parser::slist::const_iterator ai = ti->get()->target.begin(); ai != ti->get()->target.end(); ++ai) {
 					out << ", " << classname() << "::state_" << *ai;
 				}
