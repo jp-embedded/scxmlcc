@@ -314,12 +314,19 @@ void cpp_output::gen_state_parallel_base()
 	}
 }
 
-void cpp_output::gen_model_base()
+void cpp_output::gen_model_decl()
 {
+	out << tab << "struct data_model;" << endl;
 	out << tab << "struct user_model;" << endl;
 	out << tab << "typedef std::auto_ptr<user_model> user_model_p;" << endl;
+	out << endl;
+}
+
+void cpp_output::gen_model_base()
+{
 	out << tab << "struct data_model" << endl;
 	out << tab << "{" << endl;
+	out << tab << tab << "std::queue<event> event_queue;" << endl;
 	out << tab << tab << "user_model_p user;" << endl;
 	out << tab << "} model;" << endl;
 	out << endl;
@@ -413,9 +420,10 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	out << tab << "{" << endl;
 
-	if(state.initial.size()) {
-		string target = "sc.m_state_" + state.initial.front();
-		string target_classname = "state_" + state.initial.front();
+	//todo there may be multiple targets
+	if(state.initial.target.size()) {
+		string target = "sc.m_state_" + state.initial.target.front();
+		string target_classname = "state_" + state.initial.target.front();
 		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { return transition<&state::initial, " << state_classname << ", " << target_classname << ", internal>()(this, " << target << ", sc); }" << endl;
 	}
 
@@ -458,8 +466,9 @@ void cpp_output::gen_sc()
 	out << tab << "public:" << endl;
 	out << endl;
 
-	gen_model_base();
+	gen_model_decl();
 	gen_state_base();
+	gen_model_base();
 	gen_state_actions_base();
 	gen_state_composite_base();
 	gen_state_parallel_base();
@@ -494,7 +503,7 @@ void cpp_output::gen_sc()
 	out << tab << tab << "while (cont) {" << endl;
 	out << tab << tab << tab << "if ((cont = dispatch_event(&state::initial)));" << endl;
 	out << tab << tab << tab << "else if ((cont = dispatch_event(&state::unconditional)));" << endl;
-	out << tab << tab << tab << "else if (event_queue.size()) cont = dispatch_event(event_queue.front()), event_queue.pop();" << endl;
+	out << tab << tab << tab << "else if (model.event_queue.size()) cont = dispatch_event(model.event_queue.front()), model.event_queue.pop(), cont |= model.event_queue.size();" << endl;
 	out << tab << tab << tab << "else break;" << endl;
 	out << tab << tab << "}" << endl;
 	out << tab << "}" << endl;
@@ -516,13 +525,13 @@ void cpp_output::gen_sc()
 	out << tab << "class scxml : public composite<scxml, state>" << endl;
 	out << tab << "{" << endl;
 
-	const int sz = sc.sc().initial.size();
+	const int sz = sc.sc().initial.target.size();
 	out << tab << tab << state_t() << "* initial(" << classname() << "&sc) { return transition";
 	if(sz > 1) out << sz;
 	out << "<&state::initial, scxml";
-	for(int i = 0; i < sz; ++i) out << ", state_" << sc.sc().initial[i];
+	for(int i = 0; i < sz; ++i) out << ", state_" << sc.sc().initial.target[i];
 	out << ", internal>()(this";
-	for(int i = 0; i < sz; ++i) out << ", sc.m_state_" << sc.sc().initial[i];
+	for(int i = 0; i < sz; ++i) out << ", sc.m_state_" << sc.sc().initial.target[i];
 	out << ", sc); }" << endl;
 
 	out << tab << "} m_scxml;" << endl;
@@ -533,10 +542,92 @@ void cpp_output::gen_sc()
 		gen_state(*s->get());
 	}
 
-	out << tab << "std::queue<event> event_queue;" << endl;
-
 	out << "};" << endl;
 	out << endl;
+}
+
+void cpp_output::gen_action_part_log(scxml_parser::action &a)
+{
+	// todo
+}
+
+void cpp_output::gen_action_part_raise(scxml_parser::action &a)
+{
+	const string ev = a.attr["event"];
+
+	out << tab << "// " << a.type << " event=" << ev << endl;
+	out << tab << "m.event_queue.push(&" << classname() << "::state::event_" << ev << ");" << endl;
+}
+
+void cpp_output::gen_action_part(scxml_parser::action &a)
+{
+	if(a.type == "raise") gen_action_part_raise(a);
+	else {
+		out << tab << "// warning: unknown action type '" << a.type << "'" << endl;
+		cerr << "warning: unknown action type '" << a.type << "'" << endl;
+	}
+}
+
+void cpp_output::gen_actions()
+{
+	const scxml_parser::state_list &states = sc.sc().states;
+	for (scxml_parser::state_list::const_iterator s = states.begin(); s != states.end(); ++s) {
+
+		// entry actions
+		if(s->get()->entry_actions.size()) {
+			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::enter(" << classname() << "::data_model &m)" << endl;
+			out << '{' << endl;
+			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->entry_actions.begin(); i != s->get()->entry_actions.end(); ++i) {
+				gen_action_part(*i->get());
+			}
+			out << '}' << endl;
+			out << endl;
+		}
+
+		// exit actions
+		if(s->get()->exit_actions.size()) {
+			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::exit(" << classname() << "::data_model &m)" << endl;
+			out << '{' << endl;
+			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->exit_actions.begin(); i != s->get()->exit_actions.end(); ++i) {
+				gen_action_part(*i->get());
+			}
+			out << '}' << endl;
+			out << endl;
+		}
+
+		// initial actions
+		if(s->get()->initial.actions.size()) {
+			out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::initial, " << classname() << "::state_" << s->get()->id;
+			for(scxml_parser::slist::const_iterator ai = s->get()->initial.target.begin(); ai != s->get()->initial.target.end(); ++ai) {
+				out << ", " << classname() << "::state_" << *ai;
+			}
+		       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
+			out << '{' << endl;
+			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->initial.actions.begin(); i != s->get()->initial.actions.end(); ++i) {
+				gen_action_part(*i->get());
+			}
+			out << '}' << endl;
+			out << endl;
+		}
+
+		// transition actions
+		for (scxml_parser::transition_list::const_iterator ti = s->get()->transitions.begin(); ti != s->get()->transitions.end(); ++ti) {
+			if(ti->get()->actions.size()) {
+				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::event_" << *ti->get()->event << ", " << classname() << "::state_" << s->get()->id;
+				for(scxml_parser::slist::const_iterator ai = ti->get()->target.begin(); ai != ti->get()->target.end(); ++ai) {
+					out << ", " << classname() << "::state_" << *ai;
+				}
+			       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
+				out << '{' << endl;
+				for (scxml_parser::plist<scxml_parser::action>::const_iterator i = ti->get()->actions.begin(); i != ti->get()->actions.end(); ++i) {
+					gen_action_part(*i->get());
+				}
+				out << '}' << endl;
+				out << endl;
+			}
+		}
+		//out << endl;
+	}
 }
 
 void cpp_output::trim()
@@ -544,6 +635,7 @@ void cpp_output::trim()
 	const scxml_parser::state_list &states = sc.sc().states;
 
 	// replace '-' with '_' in event names
+	// replace '-' with '_' in actions
 	// replace '*' with 'A' in event names, todo: not currently supported
 	// replace '.' with '_' in event names todo: see '3.12.1 event descriptors how to handle event tokens
 	for (scxml_parser::state_list::const_iterator s = states.begin(); s != states.end(); ++s) {
@@ -554,6 +646,27 @@ void cpp_output::trim()
 				replace(i->get()->event->begin(), i->get()->event->end(), '.', '_');
 				replace(i->get()->event->begin(), i->get()->event->end(), '-', '_');
 				replace(i->get()->event->begin(), i->get()->event->end(), '*', 'A');
+
+				// transition actions
+				for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = i->get()->actions.begin(); ai != i->get()->actions.end(); ++ai) {
+					for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
+						replace(attri->second.begin(), attri->second.end(), '-', '_');
+					}
+				}
+			}
+		}
+
+		// entry actions
+		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = s->get()->entry_actions.begin(); ai != s->get()->entry_actions.end(); ++ai) {
+			for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
+				replace(attri->second.begin(), attri->second.end(), '-', '_');
+			}
+		}
+
+		// exit actions
+		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = s->get()->exit_actions.begin(); ai != s->get()->exit_actions.end(); ++ai) {
+			for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
+				replace(attri->second.begin(), attri->second.end(), '-', '_');
 			}
 		}
 	}
@@ -579,6 +692,7 @@ void cpp_output::gen()
 
 	trim();
 	gen_sc();
+	gen_actions();
 
 	// end of include guard
  	out << "#endif" << endl;
