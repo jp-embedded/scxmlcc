@@ -36,9 +36,6 @@
 
 <xsl:template match="conf:pass">
  <state xmlns="http://www.w3.org/2005/07/scxml" id="pass">
-   <onentry>
-     <log label="result" expr="'pass'"/>
-   </onentry>
  </state>
 </xsl:template>
 
@@ -49,9 +46,6 @@
 
 <xsl:template match="conf:fail">
  <state xmlns="http://www.w3.org/2005/07/scxml" id="fail">
-   <onentry>
-    <log label="result" expr="'fail'"/>
-   </onentry>
 </state>
 </xsl:template>
 
