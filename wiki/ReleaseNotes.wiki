@@ -3,6 +3,7 @@
 = Release Notes =
 == trunk ==
 Not released
+  * {{{<log>}}} support
   * {{{<raise>}}} support
 
 == 0.2.1 ==
