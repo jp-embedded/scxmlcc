@@ -12,7 +12,6 @@ TEST(w3c, 355)
 TEST(w3c, 576)
 {
 	sc_test576 sc;
-	sc.dispatch(&sc_test576::state::event_In_s11p112);
 	EXPECT_EQ(1, sc.cur_state.size());
 	EXPECT_EQ(&sc.m_state_pass, sc.cur_state.front());
 }
