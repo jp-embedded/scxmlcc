@@ -17,10 +17,11 @@
 
 CPPFLAGS := -Wall -O2 -MD -MP
 
-APPS := timer_switch hello_world
+APPS := timer_switch hello_world vending_machine/vending_machine
 
 timer_switch.objs := timer_switch.o
 hello_world.objs := hello_world.o
+vending_machine/vending_machine.objs := $(patsubst %.cpp,%.o,$(wildcard vending_machine/*.cpp))
 
 all: $(APPS)
 clean: $(APPS:=.clean)
