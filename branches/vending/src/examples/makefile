@@ -29,7 +29,7 @@ clean: $(APPS:=.clean)
 
 define TARGET
 $1: $($1.objs)
-	$(CXX) -o $1 $($1.objs)
+	$(CXX) -o $$@ $$^
 
 $1.clean:
 	rm -f $1 $($1.objs) $($1.objs:.o=.d)
