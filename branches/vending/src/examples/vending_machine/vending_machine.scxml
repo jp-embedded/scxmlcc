@@ -1,0 +1,15 @@
+<scxml name="vending_machine" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=935 h=747  -->
+ <state id="active" initial="coin_count"><!--   node-size-and-position x=310 y=150 w=340 h=450  -->
+  <transition event="cancel" target="give_change"></transition>
+  <state id="coin_count"><!--   node-size-and-position x=130 y=120 w=75 h=75  -->
+   <transition target="dispennse"></transition>
+  </state>
+  <final id="dispennse"><!--   node-size-and-position x=130 y=270 w=75 h=75  --></final>
+ </state>
+ <state id="give_change"><!--   node-size-and-position x=79 y=450 w=75 h=75  -->
+  <transition target="idle"></transition>
+ </state>
+ <state id="idle"><!--   node-size-and-position x=132 y=245 w=75 h=75  -->
+  <transition event="select" target="active"></transition>
+ </state>
+</scxml>
