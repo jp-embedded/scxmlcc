@@ -15,6 +15,7 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+#include "vending_machine.h"
 #include "dispenser.h"
 #include "coin_refund.h"
 

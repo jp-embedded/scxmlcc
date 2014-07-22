@@ -40,7 +40,8 @@ $(foreach app,$(APPS),$(eval $(call TARGET,$(app))))
 
 include scxml.mk
 
-# Initial depedency files must be generated to be able to auto generate .h from .scxml
-%.d: %.cpp
-	$(CXX) -MM -MG $^ > $@
+#todo auto generate these
+vending_machine/main.cpp: vending_machine/vending_machine.h
+timer_switch.cpp: timer_switch.h
+hello_world.cpp: hello_world.h
 
