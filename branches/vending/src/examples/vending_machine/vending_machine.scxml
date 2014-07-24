@@ -11,8 +11,9 @@
    <transition target="collect_coins"></transition>
   </state>
   <state id="collect_coins"><!--   node-size-and-position x=60 y=170 w=75 h=75  -->
-   <transition></transition>
+   <transition event="N"><!--   edge-path [collect_coins]  x=-20 y=50 pointx=0 pointy=-10 offsetx=0 offsety=3  --></transition>
    <transition target="dispense"></transition>
+   <transition event="D"><!--   edge-path [collect_coins]  pointx=0 pointy=5 offsetx=0 offsety=3  --></transition>
   </state>
   <final id="dispense"><!--   node-size-and-position x=60 y=310 w=75 h=75  --></final>
  </state>
