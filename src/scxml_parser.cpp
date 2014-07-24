@@ -49,13 +49,13 @@ void scxml_parser::parse_scxml(const ptree &pt)
 				m_scxml.initial.target.push_back((*m_scxml.states.begin())->id);
 			}
 			else {
-				cerr << "error: could not set initial state" << endl;
+				cerr << "error: " << __FUNCTION__ << ": could not set initial state" << endl;
 				exit(1);
 			}
 		}
 	}
 	catch (ptree_error e) {
-		cerr << "error: scxml: " << e.what() << endl;
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
 }
@@ -94,7 +94,7 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 		parallel_sizes.insert(st->initial.target.size());
 	}
 	catch (ptree_error e) {
-		cerr << "error: state: " << e.what() << endl;
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
 }
@@ -114,7 +114,7 @@ scxml_parser::transition scxml_parser::parse_initial(const ptree &pt)
 
 	}
 	catch (ptree_error e) {
-		cerr << "error: initial: " << e.what() << endl;
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
 
@@ -156,7 +156,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 		}
 	}
 	catch (ptree_error e) {
-		cerr << "error: state: " << e.what() << endl;
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
 }
@@ -174,7 +174,7 @@ scxml_parser::plist<scxml_parser::action> scxml_parser::parse_entry(const ptree 
 		}
 	}
 	catch (ptree_error e) {
-		cerr << "error: onentry/onexit: " << e.what() << endl;
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
 	return l_ac;
@@ -198,7 +198,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_raise(const ptree &p
 		}
 	}
 	catch (ptree_error e) {
-		cerr << "error: raise: " << e.what() << endl;
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
 
@@ -226,7 +226,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_log(const ptree &pt)
 		}
 	}
 	catch (ptree_error e) {
-		cerr << "error: log: " << e.what() << endl;
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
 
@@ -247,7 +247,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_script(const ptree &
 		}
 	}
 	catch (ptree_error e) {
-		cerr << "error: action: " << e.what() << endl;
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
 	return ac;
@@ -274,7 +274,7 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 		}
 	}
 	catch (ptree_error e) {
-		cerr << "error: transition: " << e.what() << endl;
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
 	return tr;
