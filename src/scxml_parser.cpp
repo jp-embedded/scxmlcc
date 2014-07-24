@@ -38,6 +38,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
 			else if (it->first == "state") parse_state(it->second, boost::shared_ptr<state>());
 			else if (it->first == "history") parse_state(it->second, boost::shared_ptr<state>());
+			else if (it->first == "final") parse_state(it->second, boost::shared_ptr<state>());
 			else if (it->first == "parallel") parse_parallel(it->second, boost::shared_ptr<state>());
 			else if (it->first == "initial") m_scxml.initial = parse_initial(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <scxml>" << endl;
@@ -141,6 +142,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
 			else if (it->first == "state") parse_state(it->second, st);
 			else if (it->first == "history") parse_state(it->second, st);
+			else if (it->first == "final") parse_state(it->second, boost::shared_ptr<state>());
 			else if (it->first == "parallel") parse_parallel(it->second, st);
 			else if (it->first == "transition") state_i->get()->transitions.push_back(parse_transition(it->second));
 			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
@@ -255,14 +257,16 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_script(const ptree &
 
 boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const ptree &pt)
 {
-	const ptree &xmlattr = pt.get_child("<xmlattr>");
 	boost::shared_ptr<transition> tr = boost::make_shared<transition>();
 	try {
-		using namespace boost::algorithm;
-		boost::optional<string> target(xmlattr.get_optional<string>("target"));
-		if(target) split(tr->target, *target, is_any_of(" "), token_compress_on);
-		if(tr->target.size() > 1) parallel_target_sizes.insert(tr->target.size());
-		tr->event = xmlattr.get_optional<string>("event");
+		boost::optional<const ptree &> xmlattr(pt.get_child_optional("<xmlattr>"));
+		if (xmlattr) {
+			using namespace boost::algorithm;
+			boost::optional<string> target(xmlattr->get_optional<string>("target"));
+			if(target) split(tr->target, *target, is_any_of(" "), token_compress_on);
+			if(tr->target.size() > 1) parallel_target_sizes.insert(tr->target.size());
+			tr->event = xmlattr->get_optional<string>("event");
+		}
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
