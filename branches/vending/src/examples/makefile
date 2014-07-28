@@ -26,6 +26,7 @@ vending_machine/vending_machine.objs := $(patsubst %.cpp,%.o,$(wildcard vending_
 all: $(APPS)
 clean: $(APPS:=.clean)
 	rm -f $(patsubst %.scxml,%.h,$(wildcard *.scxml))
+	rm -f $(patsubst %.scxml,%.h,$(wildcard */*.scxml))
 
 define TARGET
 $1: $($1.objs)
