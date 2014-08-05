@@ -76,11 +76,11 @@ template<class P0 = null_t> class functor
 	std::auto_ptr<functor_impl<P0> > impl;
 };
 
-template<class P0 = null_t> class signal : public std::vector<std::auto_ptr<functor_impl<P0> > >
+template<class P0 = null_t> class signal : public std::vector<functor<P0> > 
 {
 	public:
-	virtual void operator()() { for (typename impl::iterator i = impl::begin(); i != impl::end(); ++i) (**i)(); }
+	virtual void operator()() { for (typename impl::iterator i = impl::begin(); i != impl::end(); ++i) (*i)(); }
 	
 	private:
-	typedef std::vector<std::auto_ptr<functor_impl<P0> > > impl;
+	typedef std::vector<functor<P0> > impl;
 };
