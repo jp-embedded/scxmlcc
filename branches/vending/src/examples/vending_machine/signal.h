@@ -64,10 +64,38 @@ template<> class functor_impl<null_t>
 	virtual ~functor_impl() {}
 };
 
+// hander for functors and function pointers
+template <class FN, class P0> class functor_handler : public functor_impl<P0>
+{
+	public:
+	functor_handler(const FN& fn) : fun(fn) {}
+
+	void operator()() { fun(); }
+	void operator()(P0 p0) { fun(p0); }
+	
+	private:
+	FN fun;
+};
+
+// handler for membur function
+template <class O, class PMFN, class P0> class memfun_handler : public functor_impl<P0>
+{
+	public: 
+	memfun_handler(const O& o, PMFN pm) : obj(o), pmfn(pm) {}
+
+	void operator()() { return ((*obj).*pmfn)(); }
+	void operator()(P0 p0) { return ((*obj).*pmfn)(p0); }
+
+	private:
+	O obj;
+	PMFN pmfn;
+};
+
 template<class P0 = null_t> class functor
 {
 	public:
-	template <class F> functor(const F& f) : impl(new functor_handler<functor, F>(f) {};
+	template <class FN> functor(const FN& fn) : impl(new functor_handler<FN, P0>(fn)) {};
+	template <class O, class MFN> functor(const O& o, MFN mfn) : impl(new memfun_handler<O, MFN, P0>(o, mfn)) {};
 
 	void operator()() { return (*impl)(); }
 	void operator()(P0 p0) { return (*impl)(p0); }
