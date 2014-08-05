@@ -20,34 +20,6 @@
 
 #include <iostream>
 
-/*
-   todo test
-
-#include "signal.h"
-
-class test
-{
-	public:
-	void a() { std::cout << 'a' << std::endl; }
-};
-
-int main()
-{
-	signal<> s;
-	//functor<> f;
-//	s.push_back(f);
-//	s.push_back(f);
-
-	functor<> f2(&test::a);
-	f2();
-
-	s();
-	return 0;
-}
-
-   */
-
-
 struct null_t {};
 
 template<class P0 = null_t> class functor_impl
