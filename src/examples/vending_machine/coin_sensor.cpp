@@ -15,3 +15,14 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+#include "coin_sensor.h"
+#include <iostream>
+
+void coin_sensor::simulate_input(const char c)
+{
+	switch (c) {
+		case 'n': std::cout << __PRETTY_FUNCTION__ << ": nickel" << std::endl; sig_nickel(); break;
+		case 'd': std::cout << __PRETTY_FUNCTION__ << ": dime" << std::endl; sig_dime(); break;
+	}
+}
+

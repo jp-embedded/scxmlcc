@@ -15,3 +15,17 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+#include "signal.h"
+
+class keypad
+{
+	public:
+
+	void simulate_input(const char c);
+
+	// signals
+	signal<> sig_coke;
+	signal<> sig_light;
+	signal<> sig_zero;
+};
+

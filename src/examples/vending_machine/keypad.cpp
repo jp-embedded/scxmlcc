@@ -15,3 +15,15 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+#include "keypad.h"
+#include <iostream>
+
+void keypad::simulate_input(const char c)
+{
+	switch (c) {
+		case '1': std::cout << __PRETTY_FUNCTION__ << ": coke" << std::endl; sig_coke(); break;
+		case '2': std::cout << __PRETTY_FUNCTION__ << ": light" << std::endl; sig_light(); break;
+		case '3': std::cout << __PRETTY_FUNCTION__ << ": zero" << std::endl; sig_zero(); break;
+	}
+}
+

@@ -26,6 +26,6 @@ class input
 	input();
 	void run();
 
-	//signals
+	// signals
 	signal<char> sig_key;
 };
