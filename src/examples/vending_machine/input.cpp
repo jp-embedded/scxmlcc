@@ -15,18 +15,23 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#include "vending_machine.h"
-#include "dispenser.h"
-#include "coin_refund.h"
 #include "input.h"
+#include <iostream>
 
-int main()
+input::input()
 {
-	sc_vending_machine sc;
-	input input;
+	// set unbuffered input and disable echo
+	term.echo(false);
+	term.canonical(false);
+}
 
-	input.run();
-
-	return 0;
+void input::run()
+{
+	while (true) {
+		char c;
+		std::cin >> c;
+		if (c == 'q') break;
+		sig_key(c);
+	}
 }
 

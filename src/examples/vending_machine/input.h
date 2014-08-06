@@ -15,18 +15,17 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#include "vending_machine.h"
-#include "dispenser.h"
-#include "coin_refund.h"
-#include "input.h"
+#include "../termio.h"
+#include "signal.h"
 
-int main()
+class input
 {
-	sc_vending_machine sc;
-	input input;
+	termio term;
 
-	input.run();
+	public:
+	input();
+	void run();
 
-	return 0;
-}
-
+	//signals
+	signal<char> sig_key;
+};
