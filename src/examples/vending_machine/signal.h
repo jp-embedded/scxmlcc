@@ -18,8 +18,6 @@
 #include <vector>
 #include <memory>
 
-#include <iostream>
-
 struct null_t {};
 
 template<class P0 = null_t> class functor_impl
