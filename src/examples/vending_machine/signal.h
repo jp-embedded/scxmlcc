@@ -25,15 +25,19 @@ struct null_t {};
 template<class P0 = null_t> class functor_impl
 {
 	public:
-	virtual void operator()(P0) = 0;
+	virtual functor_impl* clone() const = 0;
 	virtual ~functor_impl() {}
+
+	virtual void operator()(P0) = 0;
 };
 
 template<> class functor_impl<null_t>
 {
 	public:
-	virtual void operator()() = 0;
+	virtual functor_impl* clone() const = 0;
 	virtual ~functor_impl() {}
+
+	virtual void operator()() = 0;
 };
 
 // hander for functors and function pointers
@@ -41,6 +45,7 @@ template <class FN, class P0> class functor_handler : public functor_impl<P0>
 {
 	public:
 	functor_handler(const FN& fn) : fun(fn) {}
+	functor_handler* clone() const { return new functor_handler(*this); }
 
 	void operator()() { fun(); }
 	void operator()(P0 p0) { fun(p0); }
@@ -49,11 +54,12 @@ template <class FN, class P0> class functor_handler : public functor_impl<P0>
 	FN fun;
 };
 
-// handler for membur function
+// handler for member function
 template <class O, class PMFN, class P0> class memfun_handler : public functor_impl<P0>
 {
 	public: 
 	memfun_handler(const O& o, PMFN pm) : obj(o), pmfn(pm) {}
+	memfun_handler* clone() const { return new memfun_handler(*this); }
 
 	void operator()() { return ((*obj).*pmfn)(); }
 	void operator()(P0 p0) { return ((*obj).*pmfn)(p0); }
@@ -68,6 +74,8 @@ template<class P0 = null_t> class functor
 	public:
 	template <class FN> functor(const FN& fn) : impl(new functor_handler<FN, P0>(fn)) {};
 	template <class O, class MFN> functor(const O& o, MFN mfn) : impl(new memfun_handler<O, MFN, P0>(o, mfn)) {};
+	functor(const functor& f) : impl(f.impl->clone()) {}
+	functor& operator =(const functor &f) {	impl.reset(f.impl->clone()); return *this; }
 
 	void operator()() { return (*impl)(); }
 	void operator()(P0 p0) { return (*impl)(p0); }
@@ -79,7 +87,8 @@ template<class P0 = null_t> class functor
 template<class P0 = null_t> class signal : public std::vector<functor<P0> > 
 {
 	public:
-	virtual void operator()() { for (typename impl::iterator i = impl::begin(); i != impl::end(); ++i) (*i)(); }
+	void operator()() { for (typename impl::iterator i = impl::begin(); i != impl::end(); ++i) (*i)(); }
+	void operator()(P0 p0) { for (typename impl::iterator i = impl::begin(); i != impl::end(); ++i) (*i)(p0); }
 	
 	private:
 	typedef std::vector<functor<P0> > impl;
