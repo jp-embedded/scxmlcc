@@ -15,6 +15,17 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+/*
+
+   This is basically a simplified implementation of Andrei Alexandrescu's
+   generalized functors. More information on this can be found in his
+   book 'Modern C++'. This functor supports all C++ callable entities.
+
+   The signal class is a functor itself, containing a vector of functors, 
+   to invoke all clients when called.
+
+*/
+
 #include <vector>
 #include <memory>
 
