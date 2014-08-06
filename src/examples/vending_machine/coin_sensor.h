@@ -15,3 +15,16 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+#include "signal.h"
+
+class coin_sensor
+{
+	public:
+
+	void simulate_input(const char c);
+
+	// signals
+	signal<> sig_nickel;
+	signal<> sig_dime;
+};
+

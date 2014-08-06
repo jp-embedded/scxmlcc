@@ -19,11 +19,18 @@
 #include "dispenser.h"
 #include "coin_refund.h"
 #include "input.h"
+#include "coin_sensor.h"
+#include "keypad.h"
 
 int main()
 {
 	sc_vending_machine sc;
 	input input;
+	coin_sensor coin_sensor;
+	keypad keypad;
+
+	input.sig_key.push_back(functor<const char>(&coin_sensor, &coin_sensor::simulate_input));
+	input.sig_key.push_back(functor<const char>(&keypad, &keypad::simulate_input));
 
 	input.run();
 
