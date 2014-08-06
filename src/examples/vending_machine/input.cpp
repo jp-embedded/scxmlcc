@@ -1,5 +1,5 @@
 /*************************************************************************
- ** Copyright (C) 2013 Jan Pedersen <jp@jp-embedded.com>
+ ** Copyright (C) 2014 Jan Pedersen <jp@jp-embedded.com>
  ** 
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -15,43 +15,23 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#ifndef __TERMIO
-#define __TERMIO
+#include "input.h"
+#include <iostream>
 
-#include <termios.h>
-#include <unistd.h>
-#include <algorithm>
-
-class termio
+input::input()
 {
-	termios state, saved_state;
-	public:
+	// set unbuffered input and disable echo
+	term.echo(false);
+	term.canonical(false);
+}
 
-	termio()		
-	{
-	       tcgetattr(STDIN_FILENO, &saved_state); 
-	       std::copy(&saved_state, &saved_state+1, &state); 
+void input::run()
+{
+	while (true) {
+		char c;
+		std::cin >> c;
+		if (c == 'q') break;
+		sig_key(c);
 	}
-
-	~termio()		
-	{
-	       tcsetattr(STDIN_FILENO, TCSANOW, &saved_state); 
-	}
-
-	void echo(bool on)	
-	{ 
-		if(on) state.c_lflag |= ECHO; 
-		else state.c_lflag &= ~ECHO; 
-		tcsetattr(STDIN_FILENO, TCSANOW, &state); 
-	}
-
-	void canonical(bool on)	
-	{ 
-		if(on) state.c_lflag |= ICANON; 
-		else state.c_lflag &= ~ICANON; 
-		tcsetattr(STDIN_FILENO, TCSANOW, &state); 
-	}
-};
-
-#endif
+}
 

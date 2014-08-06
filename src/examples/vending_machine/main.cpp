@@ -18,9 +18,15 @@
 #include "vending_machine.h"
 #include "dispenser.h"
 #include "coin_refund.h"
+#include "input.h"
 
 int main()
 {
+	sc_vending_machine sc;
+	input input;
+
+	input.run();
+
 	return 0;
 }
 
