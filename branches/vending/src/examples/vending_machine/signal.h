@@ -26,6 +26,9 @@
 
 */
 
+#ifndef __signal
+#define __signal
+
 #include <vector>
 #include <memory>
 
@@ -102,3 +105,5 @@ template<class P0 = null_t> class signal : public std::vector<functor<P0> >
 	private:
 	typedef std::vector<functor<P0> > impl;
 };
+
+#endif
