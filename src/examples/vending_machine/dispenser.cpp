@@ -30,7 +30,7 @@ void dispenser::zero()
 	cout << "dispense coke zero" << endl;
 }
 
-void dispenser::light()
+void dispenser::diet()
 {
 	cout << "dispense coke light" << endl;
 }

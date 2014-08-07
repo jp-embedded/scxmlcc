@@ -20,6 +20,6 @@ class dispenser
 	public:
 	void coke();
 	void zero();
-	void light();
+	void diet();
 };
 
