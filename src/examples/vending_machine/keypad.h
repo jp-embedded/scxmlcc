@@ -25,7 +25,7 @@ class keypad
 
 	// signals
 	signal<> sig_coke;
-	signal<> sig_light;
+	signal<> sig_diet;
 	signal<> sig_zero;
 };
 
