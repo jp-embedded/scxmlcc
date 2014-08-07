@@ -31,13 +31,13 @@ int main()
 
 	functor<sc_vending_machine::event> dispatch(&sc, &sc_vending_machine::dispatch);
 
-	input.sig_key.push_back(functor<const char>(&coin_sensor, &coin_sensor::simulate_input));
-	input.sig_key.push_back(functor<const char>(&keypad, &keypad::simulate_input));
-	coin_sensor.sig_dime.push_back(bind(dispatch, &sc_vending_machine::state::event_D));
-	coin_sensor.sig_nickel.push_back(bind(dispatch, &sc_vending_machine::state::event_N));
-	keypad.sig_coke.push_back(bind(dispatch, &sc_vending_machine::state::event_coke));
-	keypad.sig_diet.push_back(bind(dispatch, &sc_vending_machine::state::event_diet));
-//todo	keypad.sig_zero.push_back(bind(dispatch, &sc_vending_machine::state::event_zero));
+	input.sig_key.connect(&coin_sensor, &coin_sensor::simulate_input);
+	input.sig_key.connect(&keypad, &keypad::simulate_input);
+	coin_sensor.sig_dime.connect(bind(dispatch, &sc_vending_machine::state::event_D));
+	coin_sensor.sig_nickel.connect(bind(dispatch, &sc_vending_machine::state::event_N));
+	keypad.sig_coke.connect(bind(dispatch, &sc_vending_machine::state::event_coke));
+	keypad.sig_diet.connect(bind(dispatch, &sc_vending_machine::state::event_diet));
+//todo	keypad.sig_zero.connect(bind(dispatch, &sc_vending_machine::state::event_zero));
 
 	input.run();
 
