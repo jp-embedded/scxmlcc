@@ -22,22 +22,38 @@
 #include "coin_sensor.h"
 #include "keypad.h"
 
+#include <iostream>
+
+typedef sc_vending_machine sc;
+
+struct sc::user_model
+{
+	signal<> sig_dispense_coke;
+	signal<> sig_dispense_diet;
+	signal<> sig_dispense_zero;
+};
+
 int main()
 {
-	sc_vending_machine sc;
+	sc::user_model_p m(new sc::user_model);
+	sc sc(m);
 	input input;
 	coin_sensor coin_sensor;
 	keypad keypad;
+	dispenser dispenser;
 
-	functor<sc_vending_machine::event> dispatch(&sc, &sc_vending_machine::dispatch);
+	functor<sc::event> dispatch(&sc, &sc::dispatch);
 
 	input.sig_key.connect(&coin_sensor, &coin_sensor::simulate_input);
 	input.sig_key.connect(&keypad, &keypad::simulate_input);
-	coin_sensor.sig_dime.connect(bind(dispatch, &sc_vending_machine::state::event_D));
-	coin_sensor.sig_nickel.connect(bind(dispatch, &sc_vending_machine::state::event_N));
-	keypad.sig_coke.connect(bind(dispatch, &sc_vending_machine::state::event_coke));
-	keypad.sig_diet.connect(bind(dispatch, &sc_vending_machine::state::event_diet));
-//todo	keypad.sig_zero.connect(bind(dispatch, &sc_vending_machine::state::event_zero));
+	coin_sensor.sig_dime.connect(bind(dispatch, &sc::state::event_D));
+	coin_sensor.sig_nickel.connect(bind(dispatch, &sc::state::event_N));
+	keypad.sig_coke.connect(bind(dispatch, &sc::state::event_coke));
+	keypad.sig_diet.connect(bind(dispatch, &sc::state::event_diet));
+//todo	keypad.sig_zero.connect(bind(dispatch, &sc::state::event_zero));
+	sc.model.user->sig_dispense_coke.connect(&dispenser, &dispenser::coke);
+	sc.model.user->sig_dispense_diet.connect(&dispenser, &dispenser::diet);
+	sc.model.user->sig_dispense_zero.connect(&dispenser, &dispenser::zero);
 
 	input.run();
 
