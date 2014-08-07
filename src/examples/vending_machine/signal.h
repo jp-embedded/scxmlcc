@@ -115,6 +115,9 @@ template<class FN, class P0> functor<> bind(const FN &fn, P0 p0) { return functo
 template<class P0 = null_t> class signal : public std::vector<functor<P0> > 
 {
 	public:
+	template <class FN> void connect(const FN& fn) { this->push_back(fn); }
+	template <class O, class MFN> void connect(const O& o, MFN mfn) { this->push_back(functor<P0>(o, mfn)); }
+
 	void operator()() { for (typename impl::iterator i = impl::begin(); i != impl::end(); ++i) (*i)(); }
 	void operator()(P0 p0) { for (typename impl::iterator i = impl::begin(); i != impl::end(); ++i) (*i)(p0); }
 	
