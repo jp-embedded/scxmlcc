@@ -86,6 +86,8 @@ template<class P0 = null_t> class functor
 	public:
 	template <class FN> functor(const FN& fn) : impl(new functor_handler<FN, P0>(fn)) {};
 	template <class O, class MFN> functor(const O& o, MFN mfn) : impl(new memfun_handler<O, MFN, P0>(o, mfn)) {};
+
+	explicit functor(std::auto_ptr<functor_impl<P0> > f) : impl(f) {}
 	functor(const functor& f) : impl(f.impl->clone()) {}
 	functor& operator =(const functor &f) {	impl.reset(f.impl->clone()); return *this; }
 
@@ -96,19 +98,19 @@ template<class P0 = null_t> class functor
 	std::auto_ptr<functor_impl<P0> > impl;
 };
 
-template<class P0> class functor_bind : public functor_impl<>
+template <class FN, class P0> class bind_handler : public functor_impl<>
 {
 	public:
-	functor_bind(const functor<P0> &f, P0 p0) : func(f), bound_p0(p0) {}
-	functor_bind* clone() const { return new functor_bind(*this); }
+	bind_handler(const FN& fn, P0 p0) : fun(fn), bound_p0(p0) {}
+	bind_handler* clone() const { return new bind_handler(*this); }
 
-	void operator()() { func(bound_p0); }
-
+	void operator()() { fun(bound_p0); }
+	
 	private:
-	functor<P0> func;
+	FN fun;
 	P0 bound_p0;
 };
-template<class P0> functor<> bind(const functor<P0> &func, P0 p0) { return functor_bind<P0>(func, p0); }
+template<class FN, class P0> functor<> bind(const FN &fn, P0 p0) { return functor<>(std::auto_ptr<functor_impl<> >(new bind_handler<FN, P0>(fn, p0))); }
 
 template<class P0 = null_t> class signal : public std::vector<functor<P0> > 
 {
