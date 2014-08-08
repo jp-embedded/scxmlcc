@@ -21,8 +21,7 @@
 #include "input.h"
 #include "coin_sensor.h"
 #include "keypad.h"
-
-#include <iostream>
+#include "display.h"
 
 typedef sc_vending_machine sc;
 
@@ -31,7 +30,10 @@ struct sc::user_model
 	signal<> sig_dispense_coke;
 	signal<> sig_dispense_diet;
 	signal<> sig_dispense_zero;
+	signal<> sig_select;
 };
+
+template <> void sc::state_actions<sc::state_select>::enter(sc::data_model &m)	{ m.user->sig_select(); }
 
 int main()
 {
@@ -41,6 +43,7 @@ int main()
 	coin_sensor coin_sensor;
 	keypad keypad;
 	dispenser dispenser;
+	display display;
 
 	functor<sc::event> dispatch(&sc, &sc::dispatch);
 
@@ -50,10 +53,11 @@ int main()
 	coin_sensor.sig_nickel.connect(bind(dispatch, &sc::state::event_N));
 	keypad.sig_coke.connect(bind(dispatch, &sc::state::event_coke));
 	keypad.sig_diet.connect(bind(dispatch, &sc::state::event_diet));
-//todo	keypad.sig_zero.connect(bind(dispatch, &sc::state::event_zero));
+	keypad.sig_zero.connect(bind(dispatch, &sc::state::event_zero));
 	sc.model.user->sig_dispense_coke.connect(&dispenser, &dispenser::coke);
 	sc.model.user->sig_dispense_diet.connect(&dispenser, &dispenser::diet);
 	sc.model.user->sig_dispense_zero.connect(&dispenser, &dispenser::zero);
+	sc.model.user->sig_select.connect(&display, &display::select);
 
 	input.run();
 
