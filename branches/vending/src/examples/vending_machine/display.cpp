@@ -25,3 +25,5 @@ void display::show(const char *text)
 	cout << "display: " << text << endl;
 }
 
+
+void display::select() { show("Select Drink"); }
