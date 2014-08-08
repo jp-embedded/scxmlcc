@@ -1,7 +1,7 @@
 <scxml initial="select" name="vending_machine" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=935 h=747  -->
  <state id="select"><!--   node-size-and-position x=200 y=230 w=75 h=75  -->
   <transition event="coke" target="active"><!--   edge-path [active]  pointx=0 pointy=9 offsetx=-30 offsety=-10  --></transition>
-  <transition event="light" target="active"><!--   edge-path [active]  x=330 y=270  --></transition>
+  <transition event="zero" target="active"><!--   edge-path [active]  x=330 y=270  --></transition>
   <transition event="diet" target="active"><!--   edge-path [active]  x=320 y=350  --></transition>
  </state>
  <state id="active" initial="show_price"><!--   node-size-and-position x=380 y=190 w=240 h=450  -->
