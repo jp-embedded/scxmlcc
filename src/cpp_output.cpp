@@ -520,8 +520,11 @@ void cpp_output::gen_sc()
 	out << tab << "{" << endl;
 	if(sc.using_parallel) out << tab << tab << "cur_state.push_back(&m_scxml);" << endl;
 	out << tab << tab << "model.user = user;" << endl;
-	out << tab << tab << "dispatch(&state::initial);" << endl;
 	out << tab << "}" << endl;
+
+	// init
+	out << endl;
+	out << tab << "void init() { dispatch(&state::initial); }" << endl;
 	out << endl;
 
 	//m_scxml
