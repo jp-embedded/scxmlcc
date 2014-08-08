@@ -59,6 +59,7 @@ int main()
 	sc.model.user->sig_dispense_zero.connect(&dispenser, &dispenser::zero);
 	sc.model.user->sig_select.connect(&display, &display::select);
 
+	sc.init();
 	input.run();
 
 	return 0;
