@@ -19,7 +19,5 @@ class display
 {
 	public:
 	void select();
-
-	private:
-	void show(const char *text);
+	void price(int price);
 };
