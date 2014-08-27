@@ -31,9 +31,16 @@ struct sc::user_model
 	signal<> sig_dispense_diet;
 	signal<> sig_dispense_zero;
 	signal<> sig_select;
+	signal<int> sig_show_price;
+	int debit;
 };
 
-template <> void sc::state_actions<sc::state_select>::enter(sc::data_model &m)	{ m.user->sig_select(); }
+template <> void sc::state_actions<sc::state_select>::enter(sc::data_model &m)			{ m.user->sig_select(); }
+template <> void sc::state_actions<sc::state_show_price>::enter(sc::data_model &m)		{ m.user->sig_show_price(m.user->debit); }
+
+template <> void sc::transition_actions<&sc::state::event_coke, sc::state_select, sc::state_active>::enter(sc::data_model &m)	{ m.user->debit = 15; }
+template <> void sc::transition_actions<&sc::state::event_zero, sc::state_select, sc::state_active>::enter(sc::data_model &m)	{ m.user->debit = 16; }
+template <> void sc::transition_actions<&sc::state::event_diet, sc::state_select, sc::state_active>::enter(sc::data_model &m)	{ m.user->debit = 17; }
 
 int main()
 {
@@ -58,6 +65,7 @@ int main()
 	sc.model.user->sig_dispense_diet.connect(&dispenser, &dispenser::diet);
 	sc.model.user->sig_dispense_zero.connect(&dispenser, &dispenser::zero);
 	sc.model.user->sig_select.connect(&display, &display::select);
+	sc.model.user->sig_show_price.connect(&display, &display::price);
 
 	sc.init();
 	input.run();
