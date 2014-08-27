@@ -20,10 +20,7 @@
 
 using namespace std;
 
-void display::show(const char *text)
-{
-	cout << "display: " << text << endl;
-}
+void display::select() 		{ cout << "display: Select Drink" << endl; }
+void display::price(int price) 	{ cout << "display: price = " << price << endl; }
 
 
-void display::select() { show("Select Drink"); }
