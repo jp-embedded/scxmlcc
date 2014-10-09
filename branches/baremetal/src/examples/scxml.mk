@@ -18,5 +18,5 @@
 SCXMLCC:=../scxmlcc
 
 %.h: %.scxml
-	$(SCXMLCC) -b -o $@ $<
+	$(SCXMLCC) -o $@ $<
 
