@@ -60,7 +60,7 @@ void cpp_output::gen_transition_base()
        	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
 	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
 	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
-       	out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
+       	if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
        	out << tab << tab << tab << "s->template exit<D>(sc.model);" << endl;
        	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
        	out << tab << tab << tab << "d.template enter<S>(sc.model);" << endl;
@@ -80,7 +80,7 @@ void cpp_output::gen_transition_base()
        	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
 	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
 	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
-       	out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
+       	if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
        	out << tab << tab << tab << "s->template exit<D>(sc.model, (D*)0);" << endl;
        	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
        	out << tab << tab << tab << "d.template enter<S>(sc.model, (S*)0);" << endl;
@@ -142,7 +142,7 @@ void cpp_output::gen_transition_base()
 		}
 
 		out << tab << tab << tab << "s->exit_parallel(sc, s, &d0);" << endl;
-		out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
+		if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
 		out << tab << tab << tab << "s->template exit<D0>(sc.model, (D0*)0);" << endl;
 
 		out << tab << tab << tab << "transition_actions<E, S";
@@ -194,10 +194,12 @@ void cpp_output::gen_state_composite_base()
 	out << tab << tab << "template<class T> void exit(data_model &m, ...) {";
 	if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << typeid(C).name() << std::endl;";
 	out << " state_actions<C>::exit(m); P::template exit<T>(m, (T*)0); }" << endl;
-
-	out << tab << tab << "virtual void exit(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
-	if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << typeid(C).name() << std::endl;";
-       	out << " state_actions<C>::exit(m); P::exit(m, sti); }" << endl;
+	
+	if(sc.using_compound) {
+		out << tab << tab << "virtual void exit(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
+		if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << typeid(C).name() << std::endl;";
+	       	out << " state_actions<C>::exit(m); P::exit(m, sti); }" << endl;
+	}
 
 	out << tab << "};" << endl;
 	out << endl;
@@ -318,7 +320,6 @@ void cpp_output::gen_model_decl()
 {
 	out << tab << "struct data_model;" << endl;
 	out << tab << "struct user_model;" << endl;
-	out << tab << "typedef std::auto_ptr<user_model> user_model_p;" << endl;
 	out << endl;
 }
 
@@ -326,8 +327,8 @@ void cpp_output::gen_model_base()
 {
 	out << tab << "struct data_model" << endl;
 	out << tab << "{" << endl;
-	out << tab << tab << "std::queue<event> event_queue;" << endl;
-	out << tab << tab << "user_model_p user;" << endl;
+	if (!opt.bare_metal) out << tab << tab << "std::queue<event> event_queue;" << endl;
+	out << tab << tab << "user_model *user;" << endl;
 	out << tab << "} model;" << endl;
 	out << endl;
 }
@@ -359,14 +360,15 @@ void cpp_output::gen_state_base()
 
 	out << tab << tab << "template<class T> void enter(data_model&, ...) {}" << endl;
 	out << tab << tab << "template<class T> void exit(data_model&, ...) {}" << endl;
-	out << tab << tab << "virtual void exit(data_model&, const std::type_info&) {}" << endl;
+	if(sc.using_compound) out << tab << tab << "virtual void exit(data_model&, const std::type_info&) {}" << endl;
 	if(sc.using_parallel) {
  		out << tab << tab << "template<class S> " << state_t() << "* enter_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) { return this; }" << endl;
  		out << tab << tab << "virtual void exit_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) {}" << endl;
  		out << tab << tab << "virtual bool parallel_parent(const std::type_info&) { return false; }" << endl;
 	}
 
-	out << tab << tab << "virtual ~" << state_t() << "() {}" << endl;
+	// removed - this may require delete() wihich is'nt available in some embedded setups
+	//out << tab << tab << "virtual ~" << state_t() << "() {}" << endl;
 
 	out << tab << "};" << endl;
 	out << endl;
@@ -503,14 +505,14 @@ void cpp_output::gen_sc()
 	out << tab << tab << "while (cont) {" << endl;
 	out << tab << tab << tab << "if ((cont = dispatch_event(&state::initial)));" << endl;
 	out << tab << tab << tab << "else if ((cont = dispatch_event(&state::unconditional)));" << endl;
-	out << tab << tab << tab << "else if (model.event_queue.size()) cont = dispatch_event(model.event_queue.front()), model.event_queue.pop(), cont |= model.event_queue.size();" << endl;
+	if(!opt.bare_metal) out << tab << tab << tab << "else if (model.event_queue.size()) cont = dispatch_event(model.event_queue.front()), model.event_queue.pop(), cont |= model.event_queue.size();" << endl;
 	out << tab << tab << tab << "else break;" << endl;
 	out << tab << tab << "}" << endl;
 	out << tab << "}" << endl;
 	out << endl;
 
 	// constructor
-	out << tab << classname() << "(user_model_p user = user_model_p())";
+	out << tab << classname() << "(user_model *user = 0)";
 	if(!sc.using_parallel) out << " : cur_state(&m_scxml)";
 	out << endl;
 
@@ -683,6 +685,19 @@ void cpp_output::gen()
 {
 	if (sc.using_parallel) cerr << "warning: parallel support is not fully implemented/tested" << endl;
 
+	if (opt.bare_metal && sc.using_parallel) {
+		cerr << "error: parallel states is not supported with bare metal C++" << endl;
+		exit(1);
+	}
+	if (opt.bare_metal && sc.using_compound) {
+		cerr << "error: Hierarchical states is not currenty supported with bare metal C++" << endl;
+		exit(1);
+	}
+	if (opt.bare_metal && opt.debug) {
+		cerr << "error: The debug option is not currenty supported with bare metal C++" << endl;
+		exit(1);
+	}
+
 	// include guard
 	out << "// This file is automatically generated by scxmlcc (version " << version() << ")" << endl;
 	out << "// For more information, see http://scxmlcc.org" << endl;
@@ -691,9 +706,8 @@ void cpp_output::gen()
 	out << "#define __SC_" << boost::to_upper_copy(sc.sc().name) << endl;
 	out << endl;
 
-	out << "#include <typeinfo>" << endl;
-	out << "#include <queue>" << endl;
-	out << "#include <memory>" << endl;
+	if(sc.using_compound || opt.debug) out << "#include <typeinfo>" << endl;
+	if(!opt.bare_metal) out << "#include <queue>" << endl;
 	if(opt.debug || sc.using_log) out << "#include <iostream>" << endl;
 	out << endl;
 
