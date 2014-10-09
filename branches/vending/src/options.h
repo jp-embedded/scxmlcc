@@ -25,8 +25,9 @@ struct options
 	boost::filesystem::path input;
 	boost::filesystem::path output;
 	bool debug;
+	bool bare_metal;
 
-	options() : debug(false) {}
+	options() : debug(false), bare_metal(false) {}
 
 };
 
