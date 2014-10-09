@@ -20,6 +20,7 @@
 
 #include <termios.h>
 #include <unistd.h>
+#include <algorithm>
 
 class termio
 {

@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
       	cout << "        t = timer event" << endl;
 	cout << "        q = quit" << endl;
 
-	sc::user_model_p m(new sc::user_model);
-	sc sc(m);
+	sc::user_model m;
+	sc sc(&m);
 
 	while(true) {
 		char c;	
