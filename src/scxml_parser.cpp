@@ -68,7 +68,10 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 		boost::shared_ptr<state> st = boost::make_shared<state>();
 		st->id = xmlattr.get<string>("id");
-		if(parent) st->parent = parent;
+		if(parent) {
+			using_compound = true;
+			st->parent = parent;
+		}
 		st->type.reset("parallel");
 		m_scxml.states.push_back(st);
 		state_list::iterator state_i = --m_scxml.states.end();
@@ -129,7 +132,10 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 		boost::shared_ptr<state> st = boost::make_shared<state>();
 		st->id = xmlattr.get<string>("id");
-		if(parent) st->parent = parent;
+		if(parent) {
+			using_compound = true;
+			st->parent = parent;
+		}
 		boost::optional<string> initial(xmlattr.get_optional<string>("initial"));
 		if(initial) split(st->initial.target, *initial, is_any_of(" "), token_compress_on);
 		if(st->initial.target.size() > 1) parallel_target_sizes.insert(st->initial.target.size());
@@ -293,7 +299,7 @@ void scxml_parser::parse(const ptree &pt)
 	}
 }
 
-scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_event_queue(false), using_log(false)
+scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_event_queue(false), using_log(false), using_compound(false)
 {
 	m_scxml.name = name;
 	parse(pt);
