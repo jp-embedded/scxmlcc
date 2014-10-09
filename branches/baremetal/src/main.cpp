@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
 		("input,i",	value<string>(),	"Input file.")
 		("output,o",	value<string>(),	"Output file.")
 		("debug,d",				"Enable debug output")
+		("baremetal,b",				"Generate code for bare metal C++")
 		("version,v",				"Version information");
 	positional_options_description pdesc;
 	pdesc.add("input", -1);
@@ -74,6 +75,7 @@ int main(int argc, char *argv[])
 	if(vm.count("input")) opt.input = vm["input"].as<string>();
 	if(vm.count("output")) opt.output = vm["output"].as<string>();
 	if(vm.count("debug")) opt.debug = true;
+	if(vm.count("baremetal")) opt.bare_metal = true;
 
 	if(!opt.input.empty() && opt.output.empty()) {
 		opt.output = opt.input;
