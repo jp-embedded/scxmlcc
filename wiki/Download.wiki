@@ -8,4 +8,4 @@ Older versions can be downloaded here:
 
 http://scxmlcc.googlecode.com/svn/download
 
-Or, to optain scxmlCC using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
+Or, to optain scxmlcc using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
