@@ -1,4 +1,5 @@
  * Documentation
   * [DocGettingStarted Getting Started]
+  * [DocCmdOptions Command line options]
   * [DocUserConstructs User Constructs]
  * [Download]
