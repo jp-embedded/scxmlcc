@@ -11,7 +11,7 @@ sudo apt-get install build-essential libboost-all-dev
 == Optaining And Building scxmlcc ==
 scxmlcc is available as compressed releases or directly using SVN. The latest and previous releases is available at [Download].
 
-To optain scxmlCC using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
+To optain scxmlcc using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
 
 To build scxmlcc, simply execute make:
 {{{
