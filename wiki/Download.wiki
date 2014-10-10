@@ -7,3 +7,5 @@ The latest release of scxmlcc is version 0.2.1, and can be downloaded here:
 Older versions can be downloaded here: 
 
 http://scxmlcc.googlecode.com/svn/download
+
+Or, if you want to use subversion, see the Source[https://code.google.com/p/scxmlcc/source/checkout] tab
