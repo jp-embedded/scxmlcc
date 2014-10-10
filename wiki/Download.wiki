@@ -1,11 +1,11 @@
 = Download =
 
-The latest release of scxmlcc is version 0.2.1, and can be downloaded here:
+The latest release of scxmlcc is version 0.3, and can be downloaded here:
 
-[http://scxmlcc.googlecode.com/svn/download/scxmlcc-0.2.1.tar.gz]
+[http://scxmlcc.googlecode.com/svn/download/scxmlcc-0.3.tar.gz]
 
 Older versions can be downloaded here: 
 
 http://scxmlcc.googlecode.com/svn/download
 
-Or, if you want to use subversion, see the [Source https://code.google.com/p/scxmlcc/source/checkout] tab
+Or, to optain scxmlCC using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
