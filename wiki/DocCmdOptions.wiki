@@ -21,3 +21,6 @@ This gives some limitations:
   * The --debug (-d) option is not supported, since it uses std::iostream
 
 The two items could properly be implemented without using RTTI and STL, if requested.
+
+== --version (-v) ==
+Shows the scxmlcc version.
