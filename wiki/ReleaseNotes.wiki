@@ -8,7 +8,7 @@ Not released
 
 == 0.3 ==
 Released 2014-10-10
-  * Added bare metal C++ support (Thanks to christoffer@moveinnovation.dk)
+  * Added bare metal C++ support (Thanks to Christoffer Kjøelbæk)
 
 == 0.2.1 ==
 Released 2014-05-05
