@@ -1,0 +1,6 @@
+= Command line options =
+
+
+== --baremetal(-b) ==
+This option will prevent scxmlcc to generate dependencies to STL or RTTI, so the state machine can compile on tiny embedded systems where this is unwanted or not possible.
+
