@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
 
 	sc::user_model m;
 	sc sc(&m);
+	sc.init();
 
 	while(true) {
 		char c;	
