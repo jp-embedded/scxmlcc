@@ -56,6 +56,12 @@ template <> void sc::transition_actions<&sc::state::event_D, sc::state_collect_c
 	m.user->sig_insert_coins(m.user->debit);
 }
 
+template <> void sc::state_actions<sc::state_dispense>::enter(sc::data_model &m)
+{
+	//tood this should be added automatically
+	m.event_queue.push(&sc::state::event_final);
+}
+
 template <> bool sc::transition_actions<&sc::state::unconditional, sc::state_collect_coins, sc::state_dispense>::condition(sc::data_model &m) { return m.user->debit <= 0; }	
 
 int main()
