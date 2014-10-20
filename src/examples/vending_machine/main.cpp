@@ -44,8 +44,8 @@ template <> void sc::transition_actions<&sc::state::event_diet, sc::state_select
 
 int main()
 {
-	sc::user_model_p m(new sc::user_model);
-	sc sc(m);
+	sc::user_model m;
+	sc sc(&m);
 	input input;
 	coin_sensor coin_sensor;
 	keypad keypad;
