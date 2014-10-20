@@ -31,27 +31,29 @@ struct sc::user_model
 	signal<> sig_dispense_diet;
 	signal<> sig_dispense_zero;
 	signal<> sig_select;
-	signal<int> sig_show_price;
+	signal<int> sig_insert_coins;
 	int debit;
 };
 
 template <> void sc::state_actions<sc::state_select>::enter(sc::data_model &m)			{ m.user->sig_select(); }
-template <> void sc::state_actions<sc::state_show_price>::enter(sc::data_model &m)		{ m.user->sig_show_price(m.user->debit); }
+
+// todo move to collect_coins and make N, D with target
+template <> void sc::state_actions<sc::state_show_price>::enter(sc::data_model &m)		{ m.user->sig_insert_coins(m.user->debit); }
 
 template <> void sc::transition_actions<&sc::state::event_coke, sc::state_select, sc::state_active>::enter(sc::data_model &m)	{ m.user->debit = 15; }
-template <> void sc::transition_actions<&sc::state::event_zero, sc::state_select, sc::state_active>::enter(sc::data_model &m)	{ m.user->debit = 16; }
-template <> void sc::transition_actions<&sc::state::event_diet, sc::state_select, sc::state_active>::enter(sc::data_model &m)	{ m.user->debit = 17; }
+template <> void sc::transition_actions<&sc::state::event_zero, sc::state_select, sc::state_active>::enter(sc::data_model &m)	{ m.user->debit = 15; }
+template <> void sc::transition_actions<&sc::state::event_diet, sc::state_select, sc::state_active>::enter(sc::data_model &m)	{ m.user->debit = 15; }
 
 template <> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins>::enter(sc::data_model &m)	
 {
 	m.user->debit -= 5;
-	m.user->sig_show_price(m.user->debit);
+	m.user->sig_insert_coins(m.user->debit);
 }
 
 template <> void sc::transition_actions<&sc::state::event_D, sc::state_collect_coins>::enter(sc::data_model &m)	
 {
 	m.user->debit -= 10;
-	m.user->sig_show_price(m.user->debit);
+	m.user->sig_insert_coins(m.user->debit);
 }
 
 template <> bool sc::transition_actions<&sc::state::unconditional, sc::state_collect_coins, sc::state_dispense>::condition(sc::data_model &m) { return m.user->debit <= 0; }	
@@ -79,7 +81,7 @@ int main()
 	m.sig_dispense_diet.connect(&dispenser, &dispenser::diet);
 	m.sig_dispense_zero.connect(&dispenser, &dispenser::zero);
 	m.sig_select.connect(&display, &display::select);
-	m.sig_show_price.connect(&display, &display::price);
+	m.sig_insert_coins.connect(&display, &display::insert);
 
 	sc.init();
 	input.run();
