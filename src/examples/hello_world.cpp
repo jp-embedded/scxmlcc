@@ -34,7 +34,8 @@ template<> void sc::state_actions<sc::state_world>::enter(sc::data_model &m)
 
 int main(int argc, char *argv[])
 {
-	sc sc0;
+	sc sc;
+	sc.init();
 
 	return 0;
 }

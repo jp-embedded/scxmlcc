@@ -61,11 +61,11 @@ int main()
 	keypad.sig_coke.connect(bind(dispatch, &sc::state::event_coke));
 	keypad.sig_diet.connect(bind(dispatch, &sc::state::event_diet));
 	keypad.sig_zero.connect(bind(dispatch, &sc::state::event_zero));
-	sc.model.user->sig_dispense_coke.connect(&dispenser, &dispenser::coke);
-	sc.model.user->sig_dispense_diet.connect(&dispenser, &dispenser::diet);
-	sc.model.user->sig_dispense_zero.connect(&dispenser, &dispenser::zero);
-	sc.model.user->sig_select.connect(&display, &display::select);
-	sc.model.user->sig_show_price.connect(&display, &display::price);
+	m.sig_dispense_coke.connect(&dispenser, &dispenser::coke);
+	m.sig_dispense_diet.connect(&dispenser, &dispenser::diet);
+	m.sig_dispense_zero.connect(&dispenser, &dispenser::zero);
+	m.sig_select.connect(&display, &display::select);
+	m.sig_show_price.connect(&display, &display::price);
 
 	sc.init();
 	input.run();
