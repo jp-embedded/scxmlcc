@@ -42,6 +42,20 @@ template <> void sc::transition_actions<&sc::state::event_coke, sc::state_select
 template <> void sc::transition_actions<&sc::state::event_zero, sc::state_select, sc::state_active>::enter(sc::data_model &m)	{ m.user->debit = 16; }
 template <> void sc::transition_actions<&sc::state::event_diet, sc::state_select, sc::state_active>::enter(sc::data_model &m)	{ m.user->debit = 17; }
 
+template <> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins>::enter(sc::data_model &m)	
+{
+	m.user->debit -= 5;
+	m.user->sig_show_price(m.user->debit);
+}
+
+template <> void sc::transition_actions<&sc::state::event_D, sc::state_collect_coins>::enter(sc::data_model &m)	
+{
+	m.user->debit -= 10;
+	m.user->sig_show_price(m.user->debit);
+}
+
+template <> bool sc::transition_actions<&sc::state::unconditional, sc::state_collect_coins, sc::state_dispense>::condition(sc::data_model &m) { return m.user->debit <= 0; }	
+
 int main()
 {
 	sc::user_model m;
