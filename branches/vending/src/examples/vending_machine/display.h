@@ -19,5 +19,5 @@ class display
 {
 	public:
 	void select();
-	void price(int price);
+	void insert(int amount);
 };
