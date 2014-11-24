@@ -18,6 +18,5 @@
 class display
 {
 	public:
-	void select();
 	void insert(int amount);
 };
