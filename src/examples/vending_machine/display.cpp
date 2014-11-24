@@ -20,7 +20,6 @@
 
 using namespace std;
 
-void display::select() 			{ cout << "display: Select Drink" << endl; }
 void display::insert(int amount) 	{ cout << "display: insert coins: " << amount << endl; }
 
 

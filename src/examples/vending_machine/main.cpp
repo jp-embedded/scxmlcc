@@ -30,13 +30,12 @@ struct sc::user_model
 	signal<> sig_dispense_coke;
 	signal<> sig_dispense_diet;
 	signal<> sig_dispense_zero;
-	signal<> sig_select;
 	signal<int> sig_insert_coins;
 	int credit;
 	user_model() : credit(0) {}
 };
 
-template <> void sc::state_actions<sc::state_select>::enter(sc::data_model &m)			{ m.user->sig_select(); }
+template <> void sc::state_actions<sc::state_select>::enter(sc::data_model &m)			{ m.user->sig_insert_coins(m.user->credit); }
 
 template <> void sc::transition_actions<&sc::state::event_N, sc::state_select, sc::state_active>::enter(sc::data_model &m)			{ m.user->credit += 5; }
 template <> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	{ m.user->credit += 5; }
@@ -48,8 +47,24 @@ template <> void sc::state_actions<sc::state_collect_coins>::enter(sc::data_mode
 
 template <> void sc::state_actions<sc::state_dispense_coke>::enter(sc::data_model &m)
 {
-	//tood this should be added automatically
-	m.event_queue.push(&sc::state::event_final);
+	m.user->sig_dispense_coke();
+
+	//tood this should be added automatically, when in final state
+	m.event_queue.push(&sc::state::event_done);
+}
+template <> void sc::state_actions<sc::state_dispense_diet>::enter(sc::data_model &m)
+{
+	m.user->sig_dispense_diet();
+
+	//tood this should be added automatically, when in final state
+	m.event_queue.push(&sc::state::event_done);
+}
+template <> void sc::state_actions<sc::state_dispense_zero>::enter(sc::data_model &m)
+{
+	m.user->sig_dispense_zero();
+
+	//tood this should be added automatically, when in final state
+	m.event_queue.push(&sc::state::event_done);
 }
 
 template <> bool sc::transition_actions<&sc::state::unconditional, sc::state_collect_coins, sc::state_dispense_coke>::condition(sc::data_model &m) { return m.user->credit >= 15; }	
@@ -76,7 +91,6 @@ int main()
 	m.sig_dispense_coke.connect(&dispenser, &dispenser::coke);
 	m.sig_dispense_diet.connect(&dispenser, &dispenser::diet);
 	m.sig_dispense_zero.connect(&dispenser, &dispenser::zero);
-	m.sig_select.connect(&display, &display::select);
 	m.sig_insert_coins.connect(&display, &display::insert);
 
 	sc.init();

@@ -5,7 +5,7 @@
  </state>
  <state id="active" initial="collect_coins"><!--   node-size-and-position x=380 y=190 w=310 h=450  -->
   <transition event="cancel" target="coin_return"><!--   edge-path [coin_return]  pointx=0 pointy=19 offsetx=11 offsety=1  --></transition>
-  <transition event="final" target="coin_return"><!--   edge-path [coin_return]  x=320 y=490  --></transition>
+  <transition event="done" target="coin_return"><!--   edge-path [coin_return]  x=320 y=490  --></transition>
   <state id="collect_coins"><!--   node-size-and-position x=110 y=120 w=75 h=75  -->
    <transition event="N" target="collect_coins"><!--   edge-path [collect_coins]  x=-20 y=50 pointx=0 pointy=-10 offsetx=0 offsety=3  --></transition>
    <transition event="zero" target="dispense_zero"></transition>
