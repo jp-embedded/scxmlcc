@@ -22,17 +22,17 @@ using namespace std;
 
 void dispenser::coke()
 {
-	cout << "dispense coke" << endl;
+	cout << "dispense: coke" << endl;
 }
 
 void dispenser::zero()
 {
-	cout << "dispense coke zero" << endl;
+	cout << "dispense: coke zero" << endl;
 }
 
 void dispenser::diet()
 {
-	cout << "dispense coke light" << endl;
+	cout << "dispense: coke light" << endl;
 }
 
 
