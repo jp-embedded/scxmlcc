@@ -431,28 +431,48 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	}
 
 	//events
-	for (scxml_parser::transition_list::const_iterator t = state.transitions.begin(); t != state.transitions.end(); ++t) {
-		string target;
-		string target_classname = state_classname;
-		string event;
 
-		if(t->get()->target.size()) {
-			target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
-			target_classname = "state_" + t->get()->target.front(); //todo handle multiple targets
-		}
-		if(t->get()->event) {
-			event = "event_" + *t->get()->event;
-		}
-		else {
-			event = "unconditional";
-		}
-		if(target.size()) {
-			// normal transition
-			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc); }" << endl;
-		}
-		else {
-			// transition without target
-			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ">()(this, sc); }" << endl;
+
+	/* goal:
+		state* unconditional(sc_vending_machine &sc) { state *s; return (s = transition<&state::unconditional, state_return_d, state_return_n>()(this, sc.m_state_return_n, sc)) ? s
+			                                                      : (s = transition<&state::unconditional, state_return_d>()(this, sc)) ? s
+			                                                      :  transition<&state::unconditional, state_return_d>()(this, sc); }
+	*/
+
+	// build a map with event as key with vector of transitions with this event
+	std::map<std::string, scxml_parser::transition_list> event_map;
+	for (scxml_parser::transition_list::const_iterator ti = state.transitions.begin(); ti != state.transitions.end(); ++ti) {
+		std::cout << "dbg push a " << *ti->get()->event << std::endl;
+		event_map[*ti->get()->event].push_back(*ti);
+	}
+
+	std::cout << "dbg size " << event_map.size() << std::endl;
+	
+	for (std::map<std::string, scxml_parser::transition_list>::const_iterator mi = event_map.begin(); mi != event_map.end(); ++mi) {
+
+		for (scxml_parser::transition_list::const_iterator t = mi->second.begin(); t != mi->second.end(); ++t) {
+			string target;
+			string target_classname = state_classname;
+			string event;
+
+			if(t->get()->target.size()) {
+				target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
+				target_classname = "state_" + t->get()->target.front(); //todo handle multiple targets
+			}
+			if(t->get()->event) {
+				event = "event_" + *t->get()->event;
+			}
+			else {
+				event = "unconditional";
+			}
+			if(target.size()) {
+				// normal transition
+				out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc); }" << endl;
+			}
+			else {
+				// transition without target
+				out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ">()(this, sc); }" << endl;
+			}
 		}
 	}
 
