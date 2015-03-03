@@ -441,11 +441,10 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	// build a map with event as key with vector of transitions with this event
 	std::map<std::string, scxml_parser::transition_list> event_map;
 	for (scxml_parser::transition_list::const_iterator ti = state.transitions.begin(); ti != state.transitions.end(); ++ti) {
-		std::cout << "dbg push a " << *ti->get()->event << std::endl;
-		event_map[*ti->get()->event].push_back(*ti);
+		string event = "unconditional";
+		if(ti->get()->event) event = "event_" + *ti->get()->event;
+		event_map[event].push_back(*ti);
 	}
-
-	std::cout << "dbg size " << event_map.size() << std::endl;
 	
 	for (std::map<std::string, scxml_parser::transition_list>::const_iterator mi = event_map.begin(); mi != event_map.end(); ++mi) {
 
