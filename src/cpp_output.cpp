@@ -452,25 +452,23 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 		for (scxml_parser::transition_list::const_iterator t = mi->second.begin(); t != mi->second.end(); ++t) {
 			string target;
 			string target_classname = state_classname;
-			string event;
+			const string event = mi->first;
+			const bool first = t == mi->second.begin();
 
 			if(t->get()->target.size()) {
 				target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
 				target_classname = "state_" + t->get()->target.front(); //todo handle multiple targets
 			}
-			if(t->get()->event) {
-				event = "event_" + *t->get()->event;
-			}
-			else {
-				event = "unconditional";
-			}
-			if(target.size()) {
-				// normal transition
-				out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc); }" << endl;
-			}
-			else {
-				// transition without target
-				out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ">()(this, sc); }" << endl;
+
+			if (first) {
+				if(target.size()) {
+					// normal transition
+					out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc); }" << endl;
+				}
+				else {
+					// transition without target
+					out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ">()(this, sc); }" << endl;
+				}
 			}
 		}
 	}
