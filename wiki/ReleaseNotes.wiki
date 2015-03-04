@@ -5,6 +5,7 @@
 Not released
   * {{{<log>}}} support
   * {{{<raise>}}} support
+  * Support for multiple transitions from same state with same event
 
 == 0.3 ==
 Released 2014-10-10
