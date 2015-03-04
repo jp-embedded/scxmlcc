@@ -454,6 +454,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			string target_classname = state_classname;
 			const string event = mi->first;
 			const bool first = t == mi->second.begin();
+			const size_t size = mi->second.size();
 
 			if(t->get()->target.size()) {
 				target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
@@ -461,14 +462,17 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			}
 
 			if (first) {
+				out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { ";
+				if (size) out << state_t() << " *s; ";
 				if(target.size()) {
 					// normal transition
-					out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc); }" << endl;
+					out << "return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc)";
 				}
 				else {
 					// transition without target
-					out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ">()(this, sc); }" << endl;
+					out << "return transition<&state::" << event << ", " << state_classname << ">()(this, sc)";
 				}
+				out << "; }" << endl;
 			}
 		}
 	}
