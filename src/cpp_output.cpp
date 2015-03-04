@@ -468,10 +468,10 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 				if (multiple) s += state_t() + " *s; ";
 				s += "return ";
 				out << tab << tab << s;
-				indent = string(s.size() - 2, ' ');
+				indent = string(s.size() - 3, ' ');
 			}
-			else out << tab << tab << indent << ": ";
-			if (multiple && !last) out << "(s = ";
+			else out << tab << tab << indent << "|| ";
+			if (multiple) out << "(s = ";
 			if(target.size()) {
 				// normal transition
 				out << "transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc)";
@@ -480,8 +480,9 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 				// transition without target
 				out << "transition<&state::" << event << ", " << state_classname << ">()(this, sc)";
 			}
+			if (multiple && last) out << "), s";
+			else if (multiple) out << ")" << endl;
 			if (last) out << "; }" << endl;
-			else if (multiple) out << ") ? s" << endl;
 		}
 	}
 
