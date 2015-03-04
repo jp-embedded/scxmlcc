@@ -395,6 +395,8 @@ scxml_parser::state_list cpp_output::children(const scxml_parser::state &state)
 
 void cpp_output::gen_state(const scxml_parser::state &state)
 {
+	const bool use_ancestor = true; // call parent if condition is false
+
 	const bool parallel_state = state.type && *state.type == "parallel";
 	string parent, prefix;
 	if(state.type && *state.type == "inter") prefix = "inter";
@@ -408,7 +410,8 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			out << tab << "class state_" << (*i)->id << ';' << endl;
 		}
 	}
-	out << tab << "class " << state_classname << " : public ";
+	//out << tab << "class " << state_classname << " : public ";
+	out << tab << "struct " << state_classname << " : public ";
 	if(parallel_state) out << state_parallel_t();
        	else out << state_composite_t();
         out << '<' << state_classname << ", " << parent;
@@ -454,7 +457,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			string target_classname = state_classname;
 			const string event = mi->first;
 			const bool first = t == mi->second.begin();
-			const bool multiple = mi->second.size() > 1;
+			const bool multiple = mi->second.size() > 1 || use_ancestor;
 			const bool last = t == mi->second.end() - 1;
 
 			if(t->get()->target.size()) {
@@ -479,7 +482,13 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 				// transition without target
 				out << "transition<&state::" << event << ", " << state_classname << ">()(this, sc)";
 			}
-			if (multiple && last) out << "), s";
+
+			string ancestor;
+			if (use_ancestor) {
+				ancestor = " || (s = " + parent + "::" + event + "(sc))";
+			}
+
+			if (multiple && last) out << ")" << ancestor << ", s";
 			else if (multiple) out << ")" << endl;
 			if (last) out << "; }" << endl;
 		}
