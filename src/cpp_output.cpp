@@ -396,7 +396,7 @@ scxml_parser::state_list cpp_output::children(const scxml_parser::state &state)
 
 void cpp_output::gen_state(const scxml_parser::state &state)
 {
-	const bool use_ancestor = true; // call parent if condition is false
+	const bool use_ancestor = sc.using_compound; // call parent if condition is false
 
 	const bool parallel_state = state.type && *state.type == "parallel";
 	string parent, prefix;
