@@ -449,12 +449,14 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	
 	for (std::map<std::string, scxml_parser::transition_list>::const_iterator mi = event_map.begin(); mi != event_map.end(); ++mi) {
 
+		string indent;
 		for (scxml_parser::transition_list::const_iterator t = mi->second.begin(); t != mi->second.end(); ++t) {
 			string target;
 			string target_classname = state_classname;
 			const string event = mi->first;
 			const bool first = t == mi->second.begin();
-			const size_t size = mi->second.size();
+			const bool multiple = mi->second.size() > 1;
+			const bool last = t == mi->second.end() - 1;
 
 			if(t->get()->target.size()) {
 				target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
@@ -462,18 +464,24 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			}
 
 			if (first) {
-				out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { ";
-				if (size) out << state_t() << " *s; ";
-				if(target.size()) {
-					// normal transition
-					out << "return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc)";
-				}
-				else {
-					// transition without target
-					out << "return transition<&state::" << event << ", " << state_classname << ">()(this, sc)";
-				}
-				out << "; }" << endl;
+				string s = state_t() + "* " + event + "(" + classname() + " &sc) { ";
+				if (multiple) s += state_t() + " *s; ";
+				s += "return ";
+				out << tab << tab << s;
+				indent = string(s.size() - 2, ' ');
 			}
+			else out << tab << tab << indent << ": ";
+			if (multiple && !last) out << "(s = ";
+			if(target.size()) {
+				// normal transition
+				out << "transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc)";
+			}
+			else {
+				// transition without target
+				out << "transition<&state::" << event << ", " << state_classname << ">()(this, sc)";
+			}
+			if (last) out << "; }" << endl;
+			else if (multiple) out << ") ? s" << endl;
 		}
 	}
 
