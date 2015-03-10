@@ -1,5 +1,5 @@
 <scxml initial="idle" name="vending_machine" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=935 h=747  -->
- <state id="idle"><!--   node-size-and-position x=200 y=230 w=75 h=75  -->
+ <state id="idle"><!--   node-size-and-position x=160 y=210 w=75 h=75  -->
   <transition event="D" target="active"><!--   edge-path [active]  pointx=0 pointy=9 offsetx=-30 offsety=-10  --></transition>
   <transition event="N" target="active"><!--   edge-path [active]  x=330 y=270  --></transition>
  </state>
@@ -18,7 +18,7 @@
   <final id="dispense_diet"><!--   node-size-and-position x=220 y=310 w=75 h=75  --></final>
  </state>
  <state id="coin_return"><!--   node-size-and-position x=110 y=360 w=170 h=340  -->
-  <transition target="idle"></transition>
+  <transition event="done" target="idle"><!--   edge-path [idle]  pointx=0 pointy=-22 offsetx=1 offsety=-6  --></transition>
   <state id="return_d"><!--   node-size-and-position x=20 y=40 w=75 h=75  -->
    <transition target="return_n"></transition>
    <transition></transition>
