@@ -21,9 +21,10 @@
 void keypad::simulate_input(const char c)
 {
 	switch (c) {
-		case '1': std::cout << __PRETTY_FUNCTION__ << ": coke" << std::endl; sig_coke(); break;
-		case '2': std::cout << __PRETTY_FUNCTION__ << ": light" << std::endl; sig_diet(); break;
-		case '3': std::cout << __PRETTY_FUNCTION__ << ": zero" << std::endl; sig_zero(); break;
+		case '1': sig_coke(); break;
+		case '2': sig_diet(); break;
+		case '3': sig_zero(); break;
+		case 'c': sig_cancel(); break;
 	}
 }
 

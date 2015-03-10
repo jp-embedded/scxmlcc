@@ -22,11 +22,11 @@ using namespace std;
 
 void coin_refund::nickel()
 {
-	cout << "refund nickel" << endl;
+	cout << "refund: nickel" << endl;
 }
 
 void coin_refund::dime()
 {
-	cout << "refund dime" << endl;
+	cout << "refund: dime" << endl;
 }
 

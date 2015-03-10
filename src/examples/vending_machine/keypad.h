@@ -27,5 +27,6 @@ class keypad
 	signal<> sig_coke;
 	signal<> sig_diet;
 	signal<> sig_zero;
+	signal<> sig_cancel;
 };
 
