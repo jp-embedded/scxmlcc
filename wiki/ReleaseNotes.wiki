@@ -6,6 +6,7 @@ Not released
   * {{{<log>}}} support
   * {{{<raise>}}} support
   * Support for multiple transitions from same state with same event
+  * Invoke event in parent if transition condition is false
 
 == 0.3 ==
 Released 2014-10-10
