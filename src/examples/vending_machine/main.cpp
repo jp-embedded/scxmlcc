@@ -23,6 +23,8 @@
 #include "keypad.h"
 #include "display.h"
 
+#include <iostream>
+
 typedef sc_vending_machine sc;
 
 struct sc::user_model
@@ -31,43 +33,121 @@ struct sc::user_model
 	signal<> sig_dispense_diet;
 	signal<> sig_dispense_zero;
 	signal<int> sig_insert_coins;
+	signal<> sig_refund_nickel;
+	signal<> sig_refund_dime;
 	int credit;
 	user_model() : credit(0) {}
 };
 
-template <> void sc::state_actions<sc::state_idle>::enter(sc::data_model &m)			{ m.user->sig_insert_coins(m.user->credit); }
+template<> void sc::state_actions<sc::state_idle>::enter(sc::data_model &m)
+{
+	m.user->sig_insert_coins(m.user->credit); 
+}
 
-template <> void sc::transition_actions<&sc::state::event_N, sc::state_idle, sc::state_active>::enter(sc::data_model &m)			{ m.user->credit += 5; }
-template <> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	{ m.user->credit += 5; }
-template <> void sc::transition_actions<&sc::state::event_D, sc::state_idle, sc::state_active>::enter(sc::data_model &m)			{ m.user->credit += 10; }
-template <> void sc::transition_actions<&sc::state::event_D, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	{ m.user->credit += 10; }
+template<> void sc::transition_actions<&sc::state::event_N, sc::state_idle, sc::state_active>::enter(sc::data_model &m)			
+{
+       m.user->credit += 5; 
+}
 
-template <> void sc::state_actions<sc::state_collect_coins>::enter(sc::data_model &m) 		{ m.user->sig_insert_coins(m.user->credit); }
+template<> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	
+{ 
+	m.user->credit += 5; 
+}
 
+template<> void sc::transition_actions<&sc::state::event_D, sc::state_idle, sc::state_active>::enter(sc::data_model &m)			
+{ 
+	m.user->credit += 10; 
+}
 
-template <> void sc::state_actions<sc::state_dispense_coke>::enter(sc::data_model &m)
+template<> void sc::transition_actions<&sc::state::event_D, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	
+{ 
+	m.user->credit += 10; 
+}
+
+template<> void sc::state_actions<sc::state_collect_coins>::enter(sc::data_model &m) 		
+{ 
+	m.user->sig_insert_coins(m.user->credit); 
+}
+
+template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_return_d, sc::state_return_n>::condition(sc::data_model &m)
+{
+	return m.user->credit < 10;
+}
+
+template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_return_d>::condition(sc::data_model &m)
+{
+	return m.user->credit >= 10;
+}
+
+template<> void sc::transition_actions<&sc::state::unconditional, sc::state_return_d>::enter(sc::data_model &m)
+{
+	m.user->sig_refund_dime();
+	m.user->credit -= 5;
+}
+
+template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_return_n, sc::state_return_done>::condition(sc::data_model &m)
+{
+	return m.user->credit < 5;
+}
+
+template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_return_n>::condition(sc::data_model &m)
+{
+	return m.user->credit >= 5;
+}
+
+template<> void sc::transition_actions<&sc::state::unconditional, sc::state_return_n>::enter(sc::data_model &m)
+{
+	m.user->sig_refund_nickel();
+	m.user->credit -= 5;
+}
+
+template<> void sc::state_actions<sc::state_return_done>::enter(sc::data_model &m)
+{
+	//todo this should be added automatically, when in final state
+	m.event_queue.push(&sc::state::event_done);
+}
+
+template<> bool sc::transition_actions<&sc::state::event_zero, sc::state_collect_coins, sc::state_dispense_zero>::condition(sc::data_model &m)
+{
+	return m.user->credit >= 15;
+}
+
+template<> bool sc::transition_actions<&sc::state::event_coke, sc::state_collect_coins, sc::state_dispense_coke>::condition(sc::data_model &m)
+{
+	return m.user->credit >= 15;
+}
+
+template<> bool sc::transition_actions<&sc::state::event_diet, sc::state_collect_coins, sc::state_dispense_diet>::condition(sc::data_model &m)
+{
+	return m.user->credit >= 15;
+}
+
+template<> void sc::state_actions<sc::state_dispense_coke>::enter(sc::data_model &m)
 {
 	m.user->sig_dispense_coke();
+	m.user->credit -= 15;
 
-	//tood this should be added automatically, when in final state
+	//todo this should be added automatically, when in final state
 	m.event_queue.push(&sc::state::event_done);
 }
-template <> void sc::state_actions<sc::state_dispense_diet>::enter(sc::data_model &m)
+
+template<> void sc::state_actions<sc::state_dispense_diet>::enter(sc::data_model &m)
 {
 	m.user->sig_dispense_diet();
+	m.user->credit -= 15;
 
-	//tood this should be added automatically, when in final state
+	//todo this should be added automatically, when in final state
 	m.event_queue.push(&sc::state::event_done);
 }
-template <> void sc::state_actions<sc::state_dispense_zero>::enter(sc::data_model &m)
+
+template<> void sc::state_actions<sc::state_dispense_zero>::enter(sc::data_model &m)
 {
 	m.user->sig_dispense_zero();
+	m.user->credit -= 15;
 
-	//tood this should be added automatically, when in final state
+	//todo this should be added automatically, when in final state
 	m.event_queue.push(&sc::state::event_done);
 }
-
-template <> bool sc::transition_actions<&sc::state::unconditional, sc::state_collect_coins, sc::state_dispense_coke>::condition(sc::data_model &m) { return m.user->credit >= 15; }	
 
 int main()
 {
@@ -78,6 +158,7 @@ int main()
 	keypad keypad;
 	dispenser dispenser;
 	display display;
+	coin_refund coin_refund;
 
 	functor<sc::event> dispatch(&sc, &sc::dispatch);
 
@@ -88,10 +169,21 @@ int main()
 	keypad.sig_coke.connect(bind(dispatch, &sc::state::event_coke));
 	keypad.sig_diet.connect(bind(dispatch, &sc::state::event_diet));
 	keypad.sig_zero.connect(bind(dispatch, &sc::state::event_zero));
+	keypad.sig_cancel.connect(bind(dispatch, &sc::state::event_cancel));
 	m.sig_dispense_coke.connect(&dispenser, &dispenser::coke);
 	m.sig_dispense_diet.connect(&dispenser, &dispenser::diet);
 	m.sig_dispense_zero.connect(&dispenser, &dispenser::zero);
 	m.sig_insert_coins.connect(&display, &display::insert);
+	m.sig_refund_dime.connect(&coin_refund, &coin_refund::dime);
+	m.sig_refund_nickel.connect(&coin_refund, &coin_refund::nickel);
+
+	std::cout << "input:  1 = coke button" << std::endl;
+	std::cout << "        2 = zero button" << std::endl;
+	std::cout << "        3 = light button" << std::endl;
+	std::cout << "        c = cancel button" << std::endl;
+	std::cout << "        n = insert nickel" << std::endl;
+	std::cout << "        d = inserd dime" << std::endl;
+	std::cout << "        q = quit" << std::endl;
 
 	sc.init();
 	input.run();

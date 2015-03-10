@@ -21,8 +21,8 @@
 void coin_sensor::simulate_input(const char c)
 {
 	switch (c) {
-		case 'n': std::cout << __PRETTY_FUNCTION__ << ": nickel" << std::endl; sig_nickel(); break;
-		case 'd': std::cout << __PRETTY_FUNCTION__ << ": dime" << std::endl; sig_dime(); break;
+		case 'n': sig_nickel(); break;
+		case 'd': sig_dime(); break;
 	}
 }
 
