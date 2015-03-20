@@ -15,18 +15,13 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-//todo fix this in releases
+#include "autorevision.h"
 
-#ifndef VER
-#define VER "unknown"
-#endif
-#define STR_EXPAND(tok) #tok
-#define STR(tok) STR_EXPAND(tok)
-
-static const char _version[] = STR(VER);
+static const char _version[] = VCS_TAG;
 
 const char* version()
 {
+	if (_version[0] == 0) return "unknown";
 	return _version;
 }
 

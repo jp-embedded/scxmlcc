@@ -15,13 +15,8 @@
 #** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #*************************************************************************
 
-URL := "$HeadURL$"
-URL_TRUNK := $(findstring trunk,$(URL))
-URL_TAG := $(firstword $(subst /, ,$(word 3,$(subst tags, ,$(URL)))))
-VER := $(or $(URL_TRUNK), $(URL_TAG), unknown)
-
 OBJS := main.o cpp_output.o scxml_parser.o version.o
-CPPFLAGS := -Wall -O2 -MD -MP -DVER="$(VER)"
+CPPFLAGS := -Wall -O2 -MD -MP
 
 all: scxmlcc
 
@@ -31,6 +26,13 @@ scxmlcc: $(OBJS)
 clean:
 	rm -f $(OBJS) $(OBJS:.o=.d) scxmlcc
 
+autorevision.h:
+	autorevision -th > $@
 
 -include $(OBJS:.o=.d)
+
+# Initial depedency files must be generated to be able to auto generate .h (from autorevision)
+%.d: %.cpp
+	$(CXX) -MM -MG $^ > $@
+
 
