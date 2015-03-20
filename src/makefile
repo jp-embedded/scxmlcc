@@ -26,14 +26,10 @@ scxmlcc: $(OBJS)
 clean:
 	rm -f $(OBJS) $(OBJS:.o=.d) scxmlcc
 
-autorevision.h:
-	autorevision -th > $@~ && mv $@~ $@ || true
-.PHONY: autorevision.h
+autorevision:
+	autorevision -th > $@.h~ && (diff -q $@.h $@.h~ && rm $@.h~ || mv $@.h~ $@.h) || true
+.PHONY: autorevision
+-include autorevision	
 
 -include $(OBJS:.o=.d)
-
-# Initial depedency files must be generated to be able to auto generate .h (from autorevision)
-%.d: %.cpp
-	$(CXX) -MM -MG $^ > $@
-
 
