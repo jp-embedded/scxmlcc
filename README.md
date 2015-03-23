@@ -1,6 +1,6 @@
 Documentation | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://code.google.com/p/scxmlgui/)
 # Welcome to scxmlcc.
-scxml to c++ compiler.
+The scxml to c++ compiler.
 
 ## What?
 The goal of scxmlcc is to make a Open Source full featured state machine compiler that can gererate simple and effective C++ state machines from scxml state charts.
