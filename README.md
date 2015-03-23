@@ -1,3 +1,4 @@
+Documentation | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://code.google.com/p/scxmlgui/)
 # Welcome to scxmlcc.
 scxml to c++ compiler.
 
