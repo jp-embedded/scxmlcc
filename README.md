@@ -37,4 +37,4 @@ Next todo on the feature list is to complete the core constructs of the scxml st
 * History states
 * Final states
 
-If you have any suggestions on features to prioritize, please create an issue or contact me.
+If you have any suggestions on features to prioritize, please create an [issue](https://github.com/jp-embedded/scxmlcc/issues).
