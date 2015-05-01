@@ -27,7 +27,7 @@ clean:
 	rm -f $(OBJS) $(OBJS:.o=.d) scxmlcc
 
 autorevision:
-	autorevision -th > $@.h~ && (diff -q $@.h $@.h~ && rm $@.h~ || mv $@.h~ $@.h) || true
+	autorevision -o $@.h~ -th > $@.h~ && (diff -q $@.h $@.h~ && rm $@.h~ || mv $@.h~ $@.h) || true
 .PHONY: autorevision
 -include autorevision	
 
