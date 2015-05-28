@@ -1,11 +1,8 @@
-# Getting Started
-
-bla bla bla
 
 ![My image](hello.png)
 
-= Getting started =
-== Prerequisites ==
+# Getting started
+## Prerequisites
 To build scxmlcc, you will need:
  * The boost library
  * Basic build tools
@@ -14,7 +11,7 @@ On Ubuntu, install these with e.g. apt-get:
 {{{
 sudo apt-get install build-essential libboost-all-dev autorevision
 }}}
-== Optaining And Building scxmlcc ==
+## Optaining And Building scxmlcc
 scxmlcc is available as compressed releases or directly using SVN. The latest and previous releases is available at [Download].
 
 To optain scxmlcc using SVN, see the [https://code.google.com/p/scxmlcc/source/checkout Source] tab.
@@ -29,9 +26,9 @@ If you also want to build the examples:
 cd examples
 make
 }}}
-== The Examples ==
+## The Examples
 This sections describes the examples which can be found at src/examples.
-=== Hello World ===
+### Hello World
 This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [https://code.google.com/p/scxmlgui/ scxmlgui], just two states connected with an unconditional transition. 
 
 http://scxmlcc.googlecode.com/svn/wiki/img/hello.png
@@ -85,7 +82,7 @@ hello
 world
 }}}
 Note that, as stated on the [https://code.google.com/p/scxmlcc/ Home] page, no external libraries is nedded, and zero code is generated for the non specialized actions making it an efficient implementation.
-=== Timer Switch ===
+### Timer Switch
 This example implements a simple timer switch:
 
 http://scxmlcc.googlecode.com/svn/wiki/img/timer_switch.png
