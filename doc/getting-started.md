@@ -1,6 +1,4 @@
 
-![My image](hello.png)
-
 # Getting started
 ## Prerequisites
 To build scxmlcc, you will need:
@@ -31,7 +29,7 @@ This sections describes the examples which can be found at src/examples.
 ### Hello World
 This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [https://code.google.com/p/scxmlgui/ scxmlgui], just two states connected with an unconditional transition. 
 
-http://scxmlcc.googlecode.com/svn/wiki/img/hello.png
+![hello_img](hello.png)
 
 scxmlgui stores this as the following scxml:
 
@@ -85,7 +83,7 @@ Note that, as stated on the [https://code.google.com/p/scxmlcc/ Home] page, no e
 ### Timer Switch
 This example implements a simple timer switch:
 
-http://scxmlcc.googlecode.com/svn/wiki/img/timer_switch.png
+![timer_switch](timer_switch.png)
 
 The idea is that the switch can be turned on or off by sending a button event to the state machine. In the on state the state machine also returns to the off state after a timeout. 
 In the on state, a timer event counts up a timer value. The unconditional event from on to off then have a condition, so it will be executed when this timer value is >= 5. Finaly, the off state will reset the timer value to 0.
