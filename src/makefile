@@ -27,9 +27,7 @@ clean:
 	rm -f $(OBJS) $(OBJS:.o=.d) scxmlcc
 
 autorevision:
-	autorevision -o $@.cache -th > $@.h~ && (diff -q $@.h $@.h~ && rm $@.h~ || mv $@.h~ $@.h) || true
-	# by some reason the cache file is generated in the root directory
-	test ! -f ../$@.cache || mv ../$@.cache .
+	autorevision -th > $@.h~ && (diff -q $@.h $@.h~ && rm $@.h~ || mv $@.h~ $@.h) || true
 .PHONY: autorevision
 -include autorevision	
 
