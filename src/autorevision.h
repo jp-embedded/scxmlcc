@@ -4,14 +4,16 @@
 
 #define VCS_TYPE		"git"
 #define VCS_BASENAME	"scxmlcc"
-#define VCS_NUM			37
-#define VCS_DATE		"2015-03-20T16:25:43+0100"
+#define VCS_UUID		"5bf20d2ccc46b148ed8c858ba16181a954adf7af"
+#define VCS_NUM			49
+#define VCS_DATE		"2015-05-06T20:12:12+0200"
 #define VCS_BRANCH		"master"
 #define VCS_TAG			""
-#define VCS_TICK		37
+#define VCS_TICK		49
+#define VCS_EXTRA		""
 
-#define VCS_FULL_HASH		"5759a22b7ff459e5a44a3d101c57f0dfc9014c5d"
-#define VCS_SHORT_HASH		"5759a22"
+#define VCS_FULL_HASH		"2eed7aaa97fab0c368529555e7b16946e32b46ca"
+#define VCS_SHORT_HASH		"2eed7aa"
 
 #define VCS_WC_MODIFIED		1
 
