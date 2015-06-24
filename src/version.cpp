@@ -15,13 +15,13 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+#include "autoversion.h"
 #include "autorevision.h"
 
-static const char _version[] = VCS_TAG;
+static const char _version[] = VERSION;
 
 const char* version()
 {
-	if (_version[0] == 0) return "unknown";
 	return _version;
 }
 

@@ -24,12 +24,15 @@ scxmlcc: $(OBJS)
 	$(CXX) -o $@ $^ -lboost_program_options -lboost_system -lboost_filesystem
 
 clean:
-	rm -f $(OBJS) $(OBJS:.o=.d) scxmlcc
+	rm -f $(OBJS) $(OBJS:.o=.d) scxmlcc autorevision.mk
 
-autorevision:
-	autorevision -th > $@.h~ && (diff -q $@.h $@.h~ && rm $@.h~ || mv $@.h~ $@.h) || true
-.PHONY: autorevision
--include autorevision	
+autorevision.mk:
+	autorevision -tsh > $@ || true
+	autorevision -th | grep "VCS_BRANCH" > autorevision.h~ || true
+	test -f autorevision.h~ && diff -q autorevision.h autorevision.h~ || cp autorevision.h~ autorevision.h
+	rm autorevision.h~
+.PHONY: autorevision.mk
+-include autorevision.mk	
 
 -include $(OBJS:.o=.d)
 
