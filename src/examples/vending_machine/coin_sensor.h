@@ -1,5 +1,5 @@
 /*************************************************************************
- ** Copyright (C) 2013 Jan Pedersen <jp@jp-embedded.com>
+ ** Copyright (C) 2014 Jan Pedersen <jp@jp-embedded.com>
  ** 
  ** This program is free software: you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -15,28 +15,16 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#include "hello_world.h"
-#include <iostream>
+#include "signal.h"
 
-using namespace std;
-
-typedef sc_hello_world sc;
-
-template<> void sc::state_actions<sc::state_hello>::enter(sc::data_model &m)
+class coin_sensor
 {
-	cout << "hello" << endl;	
-}
+	public:
 
-template<> void sc::state_actions<sc::state_world>::enter(sc::data_model &m)
-{
-	cout << "world" << endl;	
-}
+	void simulate_input(const char c);
 
-int main(int argc, char *argv[])
-{
-	sc sc;
-	sc.init();
-
-	return 0;
-}
+	// signals
+	signal<> sig_nickel;
+	signal<> sig_dime;
+};
 

@@ -17,18 +17,20 @@
 
 CPPFLAGS := -Wall -O2 -MD -MP
 
-APPS := timer_switch hello_world
+APPS := timer_switch hello_world vending_machine/vending_machine
 
 timer_switch.objs := timer_switch.o
 hello_world.objs := hello_world.o
+vending_machine/vending_machine.objs := $(patsubst %.cpp,%.o,$(wildcard vending_machine/*.cpp))
 
 all: $(APPS)
 clean: $(APPS:=.clean)
 	rm -f $(patsubst %.scxml,%.h,$(wildcard *.scxml))
+	rm -f $(patsubst %.scxml,%.h,$(wildcard */*.scxml))
 
 define TARGET
 $1: $($1.objs)
-	$(CXX) -o $1 $($1.objs)
+	$(CXX) -o $$@ $$^
 
 $1.clean:
 	rm -f $1 $($1.objs) $($1.objs:.o=.d)
@@ -39,7 +41,8 @@ $(foreach app,$(APPS),$(eval $(call TARGET,$(app))))
 
 include scxml.mk
 
-# Initial depedency files must be generated to be able to auto generate .h from .scxml
-%.d: %.cpp
-	$(CXX) -MM -MG $^ > $@
+#todo auto generate these
+vending_machine/main.cpp: vending_machine/vending_machine.h
+timer_switch.cpp: timer_switch.h
+hello_world.cpp: hello_world.h
 
