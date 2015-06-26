@@ -25,7 +25,7 @@ make
 ## The Examples
 This sections describes the examples which can be found at src/examples.
 ### Hello World
-This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [https://code.google.com/p/scxmlgui/ scxmlgui], just two states connected with an unconditional transition. 
+This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [scxmlgui](https://code.google.com/p/scxmlgui/), just two states connected with an unconditional transition. 
 
 ![hello_img](hello.png)
 
