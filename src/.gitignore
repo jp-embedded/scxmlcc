@@ -1,3 +1,6 @@
 *.d
 *.o
 scxmlcc
+autorevision.mk
+autorevision_postfix.h
+

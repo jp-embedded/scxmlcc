@@ -1,1 +1,1 @@
-#define VCS_BRANCH		"master"
+#define VERSION "0.3"

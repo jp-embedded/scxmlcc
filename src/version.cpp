@@ -15,10 +15,14 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#include "autoversion.h"
 #include "autorevision.h"
+#include "autorevision_postfix.h"
 
-static const char _version[] = VERSION;
+#ifndef VERSION_POSTFIX
+#define VERSION_POSTFIX ""
+#endif
+
+static const char _version[] = VERSION VERSION_POSTFIX;
 
 const char* version()
 {
