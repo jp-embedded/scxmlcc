@@ -1,4 +1,4 @@
-[Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](https://github.com/jp-embedded/scxmlcc/blob/master/doc/getting-started.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://code.google.com/p/scxmlgui/)
+[Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](https://github.com/jp-embedded/scxmlcc/blob/master/doc/getting-started.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Getting started
 ## Prerequisites
 To build scxmlcc, you will need:
@@ -25,7 +25,7 @@ make
 ## The Examples
 This sections describes the examples which can be found at src/examples.
 ### Hello World
-This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [scxmlgui](https://code.google.com/p/scxmlgui/), just two states connected with an unconditional transition. 
+This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [scxmlgui](https://github.com/fmorbini/scxmlgui/), just two states connected with an unconditional transition. 
 
 ![hello_img](hello.png)
 
