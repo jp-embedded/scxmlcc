@@ -1,4 +1,4 @@
-
+[Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](https://github.com/jp-embedded/scxmlcc/blob/master/doc/getting-started.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://code.google.com/p/scxmlgui/)
 # Getting started
 ## Prerequisites
 To build scxmlcc, you will need:
