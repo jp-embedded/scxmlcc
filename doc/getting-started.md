@@ -45,7 +45,7 @@ This statechart can be compiled to an .h file using scxmlcc:
 scxmlcc -o hello_world.h hello_world.scxml
 ```
 
-This will generate hello_world.h which contains a sc_hello_world class implementing the statechart. For further detalis about this construct, see [Implementation].
+This will generate hello_world.h which contains a sc_hello_world class implementing the statechart. 
 
 Custom actions can be added to this statechart in C++ by specializing members in the sc_hello_world class. For example, consider the hello_world.cpp example which specializes the enter action on both states and instantiates the state machine:
 ```
