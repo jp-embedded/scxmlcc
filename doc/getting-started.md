@@ -77,7 +77,7 @@ As expected, this will output the hello world words:
 hello
 world
 ```
-Note that, as stated on the [https://code.google.com/p/scxmlcc/ Home] page, no external libraries is nedded, and zero code is generated for the non specialized actions making it an efficient implementation.
+Note that, as stated on the [home](https://github.com/jp-embedded/scxmlcc) page, no external libraries is nedded, and zero code is generated for the non specialized actions making it an efficient implementation.
 ### Timer Switch
 This example implements a simple timer switch:
 
