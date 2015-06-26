@@ -10,9 +10,7 @@ On Ubuntu, install these with e.g. apt-get:
 sudo apt-get install build-essential libboost-all-dev autorevision
 ```
 ## Optaining And Building scxmlcc
-scxmlcc is available as compressed releases or directly using SVN. The latest and previous releases is available at [Releases](https://github.com/jp-embedded/scxmlcc/releases).
-
-To optain scxmlcc using SVN, see the https://code.google.com/p/scxmlcc/source/checkout Source tab.
+scxmlcc is available as compressed releases or through github. The latest and previous releases is available at [Releases](https://github.com/jp-embedded/scxmlcc/releases).
 
 To build scxmlcc, simply execute make:
 ```
