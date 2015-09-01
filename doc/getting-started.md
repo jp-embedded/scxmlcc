@@ -1,4 +1,4 @@
-
+[Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](https://github.com/jp-embedded/scxmlcc/blob/master/doc/getting-started.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Getting started
 ## Prerequisites
 To build scxmlcc, you will need:
@@ -10,9 +10,7 @@ On Ubuntu, install these with e.g. apt-get:
 sudo apt-get install build-essential libboost-all-dev autorevision
 ```
 ## Optaining And Building scxmlcc
-scxmlcc is available as compressed releases or directly using SVN. The latest and previous releases is available at [Releases](https://github.com/jp-embedded/scxmlcc/releases).
-
-To optain scxmlcc using SVN, see the https://code.google.com/p/scxmlcc/source/checkout Source tab.
+scxmlcc is available as compressed releases or through github. The latest and previous releases is available at [Releases](https://github.com/jp-embedded/scxmlcc/releases).
 
 To build scxmlcc, simply execute make:
 ```
@@ -27,7 +25,7 @@ make
 ## The Examples
 This sections describes the examples which can be found at src/examples.
 ### Hello World
-This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [https://code.google.com/p/scxmlgui/ scxmlgui], just two states connected with an unconditional transition. 
+This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [scxmlgui](https://github.com/fmorbini/scxmlgui/), just two states connected with an unconditional transition. 
 
 ![hello_img](hello.png)
 
@@ -47,7 +45,7 @@ This statechart can be compiled to an .h file using scxmlcc:
 scxmlcc -o hello_world.h hello_world.scxml
 ```
 
-This will generate hello_world.h which contains a sc_hello_world class implementing the statechart. For further detalis about this construct, see [Implementation].
+This will generate hello_world.h which contains a sc_hello_world class implementing the statechart. 
 
 Custom actions can be added to this statechart in C++ by specializing members in the sc_hello_world class. For example, consider the hello_world.cpp example which specializes the enter action on both states and instantiates the state machine:
 ```
@@ -79,7 +77,7 @@ As expected, this will output the hello world words:
 hello
 world
 ```
-Note that, as stated on the [https://code.google.com/p/scxmlcc/ Home] page, no external libraries is nedded, and zero code is generated for the non specialized actions making it an efficient implementation.
+Note that, as stated on the [home](https://github.com/jp-embedded/scxmlcc) page, no external libraries is nedded, and zero code is generated for the non specialized actions making it an efficient implementation.
 ### Timer Switch
 This example implements a simple timer switch:
 
