@@ -24,6 +24,7 @@
 #include <boost/filesystem.hpp>
 #include <algorithm>
 #include <cctype>
+#include <iostream>
 
 using namespace boost::property_tree;
 using namespace std;

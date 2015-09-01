@@ -21,6 +21,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/make_shared.hpp>
 #include <set>
+#include <iostream>
 
 using namespace std;
 

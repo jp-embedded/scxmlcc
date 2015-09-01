@@ -19,6 +19,7 @@
 #include <boost/smart_ptr/make_shared.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <iostream>
 
 using namespace boost::property_tree;
 using namespace std;
