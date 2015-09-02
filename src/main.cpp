@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cctype>
 #include <iostream>
+#include <string>
 
 using namespace boost::property_tree;
 using namespace std;
@@ -39,10 +40,10 @@ void scxmlcc(const options &opt)
 {
 	ptree pt;
 	read_xml(opt.input.string(), pt);
-	string sc_name = opt.input.stem().string();
+	std::string sc_name = opt.input.stem().c_str();
 	replace_if(sc_name.begin(), sc_name.end(), c_pred, '_');
 	scxml_parser sc(sc_name.c_str(), pt);
-	ofstream ofs(opt.output.c_str());
+	ofstream ofs(opt.output.string().c_str());
 	cpp_output out(ofs, sc, opt);
 	out.gen();
 }
