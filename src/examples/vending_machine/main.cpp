@@ -15,7 +15,7 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#include "vending_machine.h"
+#include "machine.h"
 #include "dispenser.h"
 #include "coin_refund.h"
 #include "input.h"
@@ -24,115 +24,6 @@
 #include "display.h"
 
 #include <iostream>
-
-typedef sc_vending_machine sc;
-
-struct sc::user_model
-{
-	signal<> sig_dispense_coke;
-	signal<> sig_dispense_diet;
-	signal<> sig_dispense_zero;
-	signal<int> sig_insert_coins;
-	signal<> sig_refund_nickel;
-	signal<> sig_refund_dime;
-	int credit;
-	user_model() : credit(0) {}
-};
-
-template<> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	
-{ 
-	m.user->credit += 5; 
-}
-
-template<> void sc::transition_actions<&sc::state::event_D, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	
-{ 
-	m.user->credit += 10; 
-}
-
-template<> void sc::state_actions<sc::state_collect_coins>::enter(sc::data_model &m) 		
-{ 
-	m.user->sig_insert_coins(m.user->credit); 
-}
-
-template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_return_d, sc::state_return_n>::condition(sc::data_model &m)
-{
-	return m.user->credit < 10;
-}
-
-template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_return_d>::condition(sc::data_model &m)
-{
-	return m.user->credit >= 10;
-}
-
-template<> void sc::transition_actions<&sc::state::unconditional, sc::state_return_d>::enter(sc::data_model &m)
-{
-	m.user->sig_refund_dime();
-	m.user->credit -= 5;
-}
-
-template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_return_n, sc::state_return_done>::condition(sc::data_model &m)
-{
-	return m.user->credit < 5;
-}
-
-template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_return_n>::condition(sc::data_model &m)
-{
-	return m.user->credit >= 5;
-}
-
-template<> void sc::transition_actions<&sc::state::unconditional, sc::state_return_n>::enter(sc::data_model &m)
-{
-	m.user->sig_refund_nickel();
-	m.user->credit -= 5;
-}
-
-template<> void sc::state_actions<sc::state_return_done>::enter(sc::data_model &m)
-{
-	//todo this should be added automatically, when in final state
-	m.event_queue.push(&sc::state::event_done);
-}
-
-template<> bool sc::transition_actions<&sc::state::event_zero, sc::state_collect_coins, sc::state_dispense_zero>::condition(sc::data_model &m)
-{
-	return m.user->credit >= 15;
-}
-
-template<> bool sc::transition_actions<&sc::state::event_coke, sc::state_collect_coins, sc::state_dispense_coke>::condition(sc::data_model &m)
-{
-	return m.user->credit >= 15;
-}
-
-template<> bool sc::transition_actions<&sc::state::event_diet, sc::state_collect_coins, sc::state_dispense_diet>::condition(sc::data_model &m)
-{
-	return m.user->credit >= 15;
-}
-
-template<> void sc::state_actions<sc::state_dispense_coke>::enter(sc::data_model &m)
-{
-	m.user->sig_dispense_coke();
-	m.user->credit -= 15;
-
-	//todo this should be added automatically, when in final state
-	m.event_queue.push(&sc::state::event_done);
-}
-
-template<> void sc::state_actions<sc::state_dispense_diet>::enter(sc::data_model &m)
-{
-	m.user->sig_dispense_diet();
-	m.user->credit -= 15;
-
-	//todo this should be added automatically, when in final state
-	m.event_queue.push(&sc::state::event_done);
-}
-
-template<> void sc::state_actions<sc::state_dispense_zero>::enter(sc::data_model &m)
-{
-	m.user->sig_dispense_zero();
-	m.user->credit -= 15;
-
-	//todo this should be added automatically, when in final state
-	m.event_queue.push(&sc::state::event_done);
-}
 
 int main()
 {
@@ -147,18 +38,29 @@ int main()
 
 	functor<sc::event> dispatch(&sc, &sc::dispatch);
 
+	// connect input simulator to coin sensor and keypad
 	input.sig_key.connect(&coin_sensor, &coin_sensor::simulate_input);
 	input.sig_key.connect(&keypad, &keypad::simulate_input);
+
+	// connect coin sensor to state machine
 	coin_sensor.sig_dime.connect(bind(dispatch, &sc::state::event_D));
 	coin_sensor.sig_nickel.connect(bind(dispatch, &sc::state::event_N));
+
+	// connect keypad to state machine
 	keypad.sig_coke.connect(bind(dispatch, &sc::state::event_coke));
 	keypad.sig_diet.connect(bind(dispatch, &sc::state::event_diet));
 	keypad.sig_zero.connect(bind(dispatch, &sc::state::event_zero));
 	keypad.sig_cancel.connect(bind(dispatch, &sc::state::event_cancel));
+
+	// connect dispenser to state machine
 	m.sig_dispense_coke.connect(&dispenser, &dispenser::coke);
 	m.sig_dispense_diet.connect(&dispenser, &dispenser::diet);
 	m.sig_dispense_zero.connect(&dispenser, &dispenser::zero);
+
+	// connect display co state machine
 	m.sig_insert_coins.connect(&display, &display::insert);
+
+	// connect coin refund to state machine
 	m.sig_refund_dime.connect(&coin_refund, &coin_refund::dime);
 	m.sig_refund_nickel.connect(&coin_refund, &coin_refund::nickel);
 

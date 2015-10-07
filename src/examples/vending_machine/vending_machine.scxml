@@ -16,7 +16,7 @@
   <final id="dispense_coke"><!--   node-size-and-position x=120 y=310 w=75 h=75  --></final>
   <final id="dispense_diet"><!--   node-size-and-position x=220 y=310 w=75 h=75  --></final>
  </state>
- <state id="coin_return"><!--   node-size-and-position x=110 y=360 w=170 h=340  -->
+ <state id="coin_return" initial="return_d"><!--   node-size-and-position x=110 y=360 w=170 h=340  -->
   <transition event="done" target="init"><!--   edge-path [init]  pointx=0 pointy=-22 offsetx=1 offsety=-6  --></transition>
   <state id="return_d"><!--   node-size-and-position x=20 y=40 w=75 h=75  -->
    <transition target="return_n"></transition>
