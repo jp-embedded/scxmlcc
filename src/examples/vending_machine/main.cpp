@@ -39,24 +39,9 @@ struct sc::user_model
 	user_model() : credit(0) {}
 };
 
-template<> void sc::state_actions<sc::state_idle>::enter(sc::data_model &m)
-{
-	m.user->sig_insert_coins(m.user->credit); 
-}
-
-template<> void sc::transition_actions<&sc::state::event_N, sc::state_idle, sc::state_active>::enter(sc::data_model &m)			
-{
-       m.user->credit += 5; 
-}
-
 template<> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	
 { 
 	m.user->credit += 5; 
-}
-
-template<> void sc::transition_actions<&sc::state::event_D, sc::state_idle, sc::state_active>::enter(sc::data_model &m)			
-{ 
-	m.user->credit += 10; 
 }
 
 template<> void sc::transition_actions<&sc::state::event_D, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	
