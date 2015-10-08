@@ -130,3 +130,5 @@ sc sc(m);
 ```
 
 For the full example source, see timer_switch.cpp.
+### Vending machine
+This example brings a bit more realistic example, where diffrent components neet to interact with the state machine.The example implemets a simplified vending machine which can dispense three types of coke, after the customer has inserted currency into the machine.
