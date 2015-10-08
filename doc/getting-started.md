@@ -1,4 +1,4 @@
-[Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](https://github.com/jp-embedded/scxmlcc/blob/master/doc/getting-started.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
+[Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](getting-started.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Getting started
 ## Prerequisites
 To build scxmlcc, you will need:
@@ -69,6 +69,7 @@ template<> void sc::state_actions<sc::state_world>::enter(sc::data_model &m)
 int main(int argc, char *argv[])
 {
 	sc sc0;
+	sc.init();
 	return 0;
 }
 ```
@@ -77,6 +78,8 @@ As expected, this will output the hello world words:
 hello
 world
 ```
+The init method initializes the state machine and makes it enter its initial state.
+
 Note that, as stated on the [home](https://github.com/jp-embedded/scxmlcc) page, no external libraries is nedded, and zero code is generated for the non specialized actions making it an efficient implementation.
 ### Timer Switch
 This example implements a simple timer switch:

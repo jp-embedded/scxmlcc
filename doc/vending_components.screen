@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore">
+  <widgets xsi:type="model:Arrow" id="10" x="224" y="144" width="41" height="84" text="key" measuredWidth="41" measuredHeight="84" left="false" right="true"/>
+  <widgets xsi:type="model:Shape" id="19" x="152" y="40" text="Input Simulator" measuredWidth="105" measuredHeight="105" shapeType="rectangle">
+    <font/>
+  </widgets>
+  <widgets xsi:type="model:Shape" id="20" x="95" y="539" text="Coin Refund" measuredWidth="83" measuredHeight="83" shapeType="rectangle">
+    <font/>
+  </widgets>
+  <widgets xsi:type="model:Shape" id="21" x="112" y="214" text="Coin Sensor" measuredWidth="82" measuredHeight="82" shapeType="rectangle">
+    <font/>
+  </widgets>
+  <widgets xsi:type="model:Shape" id="22" x="240" y="544" text="Dispenser" measuredWidth="73" measuredHeight="73" shapeType="rectangle">
+    <font/>
+  </widgets>
+  <widgets xsi:type="model:Shape" id="23" x="240" y="227" text="Keypad" measuredWidth="56" measuredHeight="56" shapeType="rectangle">
+    <font/>
+  </widgets>
+  <widgets xsi:type="model:Shape" id="24" x="336" y="371" text="Display" measuredWidth="56" measuredHeight="56" shapeType="rectangle">
+    <font/>
+  </widgets>
+  <widgets xsi:type="model:Shape" id="25" x="152" y="360" text="State Machine" measuredWidth="100" measuredHeight="100" shapeType="rectangle-rounded">
+    <font/>
+  </widgets>
+  <widgets xsi:type="model:Arrow" id="26" x="153" y="144" width="25" height="71" text="coin insert" measuredWidth="25" measuredHeight="71" direction="bottom"/>
+  <widgets xsi:type="model:Arrow" id="27" x="224" y="282" width="40" height="79" text="key" measuredWidth="40" measuredHeight="79" direction="bottom"/>
+  <widgets xsi:type="model:Arrow" id="28" x="144" y="295" width="35" height="66" text="coin insert" measuredWidth="35" measuredHeight="66" left="false" right="true"/>
+  <widgets xsi:type="model:Arrow" id="29" x="251" y="392" width="86" height="9" text="msg" measuredWidth="86" measuredHeight="9" left="false" right="true"/>
+  <widgets xsi:type="model:Arrow" id="30" x="224" y="459" width="49" height="86" text="dispense" measuredWidth="49" measuredHeight="86" left="false" right="true"/>
+  <widgets xsi:type="model:Arrow" id="31" x="136" y="459" width="33" height="78" text="refund" measuredWidth="33" measuredHeight="78" direction="bottom"/>
+  <hRuler/>
+  <vRuler/>
+  <font name="Comic Sans MS" size="12px"/>
+</model:Screen>
