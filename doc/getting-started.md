@@ -131,7 +131,23 @@ sc sc(m);
 
 For the full example source, see timer_switch.cpp.
 ### Vending machine
-This example brings a bit more realistic example, where diffrent components neet to interact with the state machine.The example implemets a simplified vending machine which can dispense three types of coke, after the customer has inserted currency into the machine.
-
+This example brings a bit more realistic example, where diffrent components need to interact with a state machine.The example implemets a simplified vending machine which can dispense three types of coke, after the customer has inserted currency into the machine. Below is a drawing of the diffrent components:
 ![vending_components](vending_components.png)
+ * The 'State Machine' is responsible for the logic. This is described later.
+ * The 'Coin Sensor' is responsible for detecting coin inserts.
+ * The 'Keypad' is responsible for detecting key presses.
+ * The 'Display' is responsible for displaying text messages.
+ * The 'Coin refund' is responsible for refunding coins to the user.
+ * The 'Dispenser' is responsible for dispensing the three coke types to the user.
+ * The 'Input simulator' is reading input from your PC's keyboard and trigger the coin sensor and the keypad.
+
+The input simulator is added so we can simulate the vending machine, since we don't have a real coin sensor and keypad. Also since this example is only for simulating, the component implementations are really small and does not imlpement any real hardware support. But the machine are split into these components anyway to make the example a bit more realistic.
+
+The communication between the componets is made with a signaling mechanism, which is a way of decoubling dependencies between components. So the individual components does not know of each other.
+
+The state machine is implemented as follows:
 ![vending_machine](vending_machine.png)
+
+After initialization, the state machine will enter the 'collect_coins' state, waiting for coins. When coins are inserted, a 'credit' variable in the user model is incremented through the 'N' and 'D' events. When the 'zero', 'coke' or 'diet' button is pressed on the machine, the corersponing event 'zero', 'coke' or 'diet' is signaled. The three transitions to the 'dispense_\*' states have a condition that the credit must be equal or above the price for the coke. If this condition is met, the state machine will transition to the according dispense_\* state, where the corresponding coke is dispensed. The three dispense states are final states, so they will signal a 'done' and the state machine will transition to the 'coin_return' state. While in the 'active' state, if the 'cancel' button is pressed, the corresponding 'cancel' event is issued, and the state machine will as well transition to the 'coin_return' state.
+
+In the 'coin_return' state, the state machine 
