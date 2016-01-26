@@ -396,6 +396,8 @@ scxml_parser::state_list cpp_output::children(const scxml_parser::state &state)
 
 void cpp_output::gen_state(const scxml_parser::state &state)
 {
+	const bool use_ancestor = sc.using_compound; // call parent if condition is false
+
 	const bool parallel_state = state.type && *state.type == "parallel";
 	string parent, prefix;
 	if(state.type && *state.type == "inter") prefix = "inter";
@@ -409,7 +411,8 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			out << tab << "class state_" << (*i)->id << ';' << endl;
 		}
 	}
-	out << tab << "class " << state_classname << " : public ";
+	//out << tab << "class " << state_classname << " : public ";
+	out << tab << "struct " << state_classname << " : public ";
 	if(parallel_state) out << state_parallel_t();
        	else out << state_composite_t();
         out << '<' << state_classname << ", " << parent;
@@ -431,28 +434,57 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	}
 
 	//events
-	for (scxml_parser::transition_list::const_iterator t = state.transitions.begin(); t != state.transitions.end(); ++t) {
-		string target;
-		string target_classname = state_classname;
-		string event;
 
-		if(t->get()->target.size()) {
-			target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
-			target_classname = "state_" + t->get()->target.front(); //todo handle multiple targets
-		}
-		if(t->get()->event) {
-			event = "event_" + *t->get()->event;
-		}
-		else {
-			event = "unconditional";
-		}
-		if(target.size()) {
-			// normal transition
-			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc); }" << endl;
-		}
-		else {
-			// transition without target
-			out << tab << tab << state_t() << "* " << event << "(" << classname() << " &sc) { return transition<&state::" << event << ", " << state_classname << ">()(this, sc); }" << endl;
+	// build a map with event as key with vector of transitions with this event
+	std::map<std::string, scxml_parser::transition_list> event_map;
+	for (scxml_parser::transition_list::const_iterator ti = state.transitions.begin(); ti != state.transitions.end(); ++ti) {
+		string event = "unconditional";
+		if(ti->get()->event) event = "event_" + *ti->get()->event;
+		event_map[event].push_back(*ti);
+	}
+	
+	for (std::map<std::string, scxml_parser::transition_list>::const_iterator mi = event_map.begin(); mi != event_map.end(); ++mi) {
+
+		string indent;
+		for (scxml_parser::transition_list::const_iterator t = mi->second.begin(); t != mi->second.end(); ++t) {
+			string target;
+			string target_classname = state_classname;
+			const string event = mi->first;
+			const bool first = t == mi->second.begin();
+			const bool multiple = mi->second.size() > 1 || use_ancestor;
+			const bool last = t == mi->second.end() - 1;
+
+			if(t->get()->target.size()) {
+				target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
+				target_classname = "state_" + t->get()->target.front(); //todo handle multiple targets
+			}
+
+			if (first) {
+				string s = state_t() + "* " + event + "(" + classname() + " &sc) { ";
+				if (multiple) s += state_t() + " *s; ";
+				s += "return ";
+				out << tab << tab << s;
+				indent = string(s.size() - 3, ' ');
+			}
+			else out << tab << tab << indent << "|| ";
+			if (multiple) out << "(s = ";
+			if(target.size()) {
+				// normal transition
+				out << "transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc)";
+			}
+			else {
+				// transition without target
+				out << "transition<&state::" << event << ", " << state_classname << ">()(this, sc)";
+			}
+
+			string ancestor;
+			if (use_ancestor) {
+				ancestor = " || (s = " + parent + "::" + event + "(sc))";
+			}
+
+			if (multiple && last) out << ")" << ancestor << ", s";
+			else if (multiple) out << ")" << endl;
+			if (last) out << "; }" << endl;
 		}
 	}
 
@@ -520,8 +552,11 @@ void cpp_output::gen_sc()
 	out << tab << "{" << endl;
 	if(sc.using_parallel) out << tab << tab << "cur_state.push_back(&m_scxml);" << endl;
 	out << tab << tab << "model.user = user;" << endl;
-	out << tab << tab << "dispatch(&state::initial);" << endl;
 	out << tab << "}" << endl;
+
+	// init
+	out << endl;
+	out << tab << "void init() { dispatch(&state::initial); }" << endl;
 	out << endl;
 
 	//m_scxml

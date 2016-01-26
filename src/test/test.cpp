@@ -6,12 +6,14 @@
 TEST(w3c, 355)
 {
 	sc_test355 sc;
+        sc.init();
 	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
 }
 
 TEST(w3c, 576)
 {
 	sc_test576 sc;
+        sc.init();
 	EXPECT_EQ(1, sc.cur_state.size());
 	EXPECT_EQ(&sc.m_state_pass, sc.cur_state.front());
 }
@@ -19,6 +21,7 @@ TEST(w3c, 576)
 TEST(w3c, 412)
 {
 	sc_test412 sc;
+        sc.init();
 	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
 }
 
