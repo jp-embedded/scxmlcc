@@ -123,10 +123,11 @@ struct sc::user_model
 };
 ```
 
-The state machine stores this struct in an auto pointer, declared as user_model_p. Thus the model is automatically destructed and deleted, when the state machine is destructed. The custom data model can be constructed and passed to the state machine's constructor as:
+The custom data model can be constructed and passed to the state machine's constructor as:
 ```
-sc::user_model_p m(new sc::user_model);
-sc sc(m);
+sc::user_model m;
+sc sc(&m);
+sc.init();
 ```
 
 For the full example source, see timer_switch.cpp.
