@@ -1,0 +1,31 @@
+<scxml initial="init" name="vending_machine" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=700 h=630  -->
+ <state id="init"><!--   node-size-and-position x=100 y=100 w=75 h=75  -->
+  <transition target="active"><!--   edge-path [active]  pointx=0 pointy=9 offsetx=-30 offsety=-10  --></transition>
+ </state>
+ <state id="active" initial="collect_coins"><!--   node-size-and-position x=320 y=80 w=310 h=450  -->
+  <transition event="cancel" target="coin_return"><!--   edge-path [coin_return]  pointx=0 pointy=-12 offsetx=3 offsety=-1  --></transition>
+  <transition event="done" target="coin_return"><!--   edge-path [coin_return]  x=260 y=411 pointx=0 pointy=12 offsetx=-7 offsety=4  --></transition>
+  <state id="collect_coins"><!--   node-size-and-position x=110 y=120 w=75 h=75  -->
+   <transition event="N" target="collect_coins"><!--   edge-path [collect_coins]  x=-20 y=50 pointx=0 pointy=-10 offsetx=0 offsety=3  --></transition>
+   <transition event="zero" target="dispense_zero"></transition>
+   <transition event="D" target="collect_coins"><!--   edge-path [collect_coins]  pointx=0 pointy=5 offsetx=0 offsety=3  --></transition>
+   <transition event="coke" target="dispense_coke"></transition>
+   <transition event="diet" target="dispense_diet"></transition>
+  </state>
+  <final id="dispense_zero"><!--   node-size-and-position x=20 y=310 w=75 h=75  --></final>
+  <final id="dispense_coke"><!--   node-size-and-position x=120 y=310 w=75 h=75  --></final>
+  <final id="dispense_diet"><!--   node-size-and-position x=220 y=310 w=75 h=75  --></final>
+ </state>
+ <state id="coin_return" initial="return_d"><!--   node-size-and-position x=50 y=250 w=170 h=340  -->
+  <transition event="done" target="init"><!--   edge-path [init]  pointx=0 pointy=-22 offsetx=1 offsety=-6  --></transition>
+  <state id="return_d"><!--   node-size-and-position x=20 y=40 w=75 h=75  -->
+   <transition target="return_n"></transition>
+   <transition></transition>
+  </state>
+  <state id="return_n"><!--   node-size-and-position x=20 y=140 w=75 h=75  -->
+   <transition target="return_done"></transition>
+   <transition></transition>
+  </state>
+  <state id="return_done"><!--   node-size-and-position x=20 y=240 w=75 h=75  --></state>
+ </state>
+</scxml>

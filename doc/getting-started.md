@@ -1,4 +1,4 @@
-[Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](https://github.com/jp-embedded/scxmlcc/blob/master/doc/getting-started.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
+[Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](getting-started.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Getting started
 ## Prerequisites
 To build scxmlcc, you will need:
@@ -69,6 +69,7 @@ template<> void sc::state_actions<sc::state_world>::enter(sc::data_model &m)
 int main(int argc, char *argv[])
 {
 	sc sc0;
+	sc.init();
 	return 0;
 }
 ```
@@ -77,6 +78,8 @@ As expected, this will output the hello world words:
 hello
 world
 ```
+The init method initializes the state machine and makes it enter its initial state.
+
 Note that, as stated on the [home](https://github.com/jp-embedded/scxmlcc) page, no external libraries is nedded, and zero code is generated for the non specialized actions making it an efficient implementation.
 ### Timer Switch
 This example implements a simple timer switch:
@@ -120,10 +123,34 @@ struct sc::user_model
 };
 ```
 
-The state machine stores this struct in an auto pointer, declared as user_model_p. Thus the model is automatically destructed and deleted, when the state machine is destructed. The custom data model can be constructed and passed to the state machine's constructor as:
+The custom data model can be constructed and passed to the state machine's constructor as:
 ```
-sc::user_model_p m(new sc::user_model);
-sc sc(m);
+sc::user_model m;
+sc sc(&m);
+sc.init();
 ```
 
 For the full example source, see timer_switch.cpp.
+### Vending machine
+This example brings a bit more realistic example, where diffrent components need to interact with a state machine.The example implemets a simplified vending machine which can dispense three types of coke, after the customer has inserted currency into the machine. Below is a drawing of the diffrent components:
+![vending_components](vending_components.png)
+ * The 'State Machine' is responsible for the logic. This is described later.
+ * The 'Coin Sensor' is responsible for detecting coin inserts.
+ * The 'Keypad' is responsible for detecting key presses.
+ * The 'Display' is responsible for displaying text messages.
+ * The 'Coin refund' is responsible for refunding coins to the user.
+ * The 'Dispenser' is responsible for dispensing the three coke types to the user.
+ * The 'Input simulator' is reading input from your PC's keyboard and trigger the coin sensor and the keypad.
+
+The input simulator is added so we can simulate the vending machine, since we don't have a real coin sensor and keypad. Also since this example is only for simulating, the component implementations are really small and does not imlpement any real hardware support. But the machine are split into these components anyway to make the example a bit more realistic.
+
+The communication between the componets is made with a signaling mechanism, which is a way of decoubling dependencies between components. So the individual components does not know of each other.
+
+The state machine is implemented as follows:
+![vending_machine](vending_machine.png)
+
+After initialization, the state machine will enter the 'collect_coins' state, waiting for coins. When coins are inserted, a 'credit' variable in the user model is incremented through the 'N' and 'D' events. When the 'zero', 'coke' or 'diet' button is pressed on the machine, the corersponing event 'zero', 'coke' or 'diet' is signaled. The three transitions to the 'dispense_\*' states have a condition that the credit must be equal or above the price for the coke. If this condition is met, the state machine will transition to the according dispense_\* state, where the corresponding coke is dispensed, and the credit is decremented. The three dispense states are final states, so they will signal a 'done' and the state machine will transition to the 'coin_return' state. While in the 'active' state, if the 'cancel' button is pressed, the corresponding 'cancel' event is issued, and the state machine will as well transition to the 'coin_return' state.
+
+In the 'coin_return' state, the state machine will enter the 'return_d' state. This state has two conditional transitions. One which is entered when the credit value is below a dime, which will transition to the 'return_n' state. The other is entered if the credit value is equal or above a dime. This transition will signal the 'Coin Refund' component to refund a dime, and return to 'return_d'. The 'return_n' state is similar, just for nickel's instead. When the credit is zero, the 'return_done' state is entered which is a final state, wich will signal a 'done' event and the machine will transition back to the 'init' state.
+
+The full source code can be found under src/examples/vending.
