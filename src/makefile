@@ -16,7 +16,7 @@
 #*************************************************************************
 
 OBJS := main.o cpp_output.o scxml_parser.o version.o
-CPPFLAGS := -Wall -O2 -MD -MP
+CPPFLAGS := -Wall -MD -MP -O2
 
 all: scxmlcc
 
