@@ -107,7 +107,7 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 scxml_parser::transition scxml_parser::parse_initial(const ptree &pt)
 {
 	scxml_parser::transition initial;
-	initial.event = "initial";
+	initial.event.push_back("initial");
 
 	try {
 
@@ -272,7 +272,8 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 			boost::optional<string> target(xmlattr->get_optional<string>("target"));
 			if(target) split(tr->target, *target, is_any_of(" "), token_compress_on);
 			if(tr->target.size() > 1) parallel_target_sizes.insert(tr->target.size());
-			tr->event = xmlattr->get_optional<string>("event");
+			boost::optional<string> event = xmlattr->get_optional<string>("event");
+			if(event) split(tr->event, *event, is_any_of(" "), token_compress_on);
 		}
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {

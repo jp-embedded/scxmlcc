@@ -346,9 +346,11 @@ void cpp_output::gen_state_base()
 	// events
 	// pass through set, to sort out dublicates
 	set<string> event_set;
-	for (scxml_parser::state_list::const_iterator s = states.begin(); s != states.end(); ++s) {
-		for (scxml_parser::transition_list::const_iterator i = s->get()->transitions.begin(); i != s->get()->transitions.end(); ++i) {
-			if(i->get()->event) event_set.insert(*i->get()->event);
+	for (scxml_parser::state_list::const_iterator istate = states.begin(); istate != states.end(); ++istate) {
+		for (scxml_parser::transition_list::const_iterator itrans = istate->get()->transitions.begin(); itrans != istate->get()->transitions.end(); ++itrans) {
+			for(scxml_parser::slist::const_iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
+				event_set.insert(*ievent);
+			}
 		}
 	}
 	for (set<string>::const_iterator i = event_set.begin(); i != event_set.end(); ++i) {
@@ -437,10 +439,14 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	// build a map with event as key with vector of transitions with this event
 	std::map<std::string, scxml_parser::transition_list> event_map;
-	for (scxml_parser::transition_list::const_iterator ti = state.transitions.begin(); ti != state.transitions.end(); ++ti) {
-		string event = "unconditional";
-		if(ti->get()->event) event = "event_" + *ti->get()->event;
-		event_map[event].push_back(*ti);
+	for (scxml_parser::transition_list::const_iterator itrans = state.transitions.begin(); itrans != state.transitions.end(); ++itrans) {
+		if (itrans->get()->event.size() == 0) {
+			event_map["unconditional"].push_back(*itrans);
+		}
+		else for (scxml_parser::slist::const_iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
+			string event = "event_" + *ievent;
+			event_map[event].push_back(*itrans);
+		}
 	}
 	
 	for (std::map<std::string, scxml_parser::transition_list>::const_iterator mi = event_map.begin(); mi != event_map.end(); ++mi) {
@@ -656,15 +662,16 @@ void cpp_output::gen_actions()
 		}
 
 		// transition actions
-		for (scxml_parser::transition_list::const_iterator ti = s->get()->transitions.begin(); ti != s->get()->transitions.end(); ++ti) {
-			if(ti->get()->actions.size()) {
-				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::event_" << *ti->get()->event << ", " << classname() << "::state_" << s->get()->id;
-				for(scxml_parser::slist::const_iterator ai = ti->get()->target.begin(); ai != ti->get()->target.end(); ++ai) {
-					out << ", " << classname() << "::state_" << *ai;
+		// todo support multiple events. create an action for each event which calls a common action?
+		for (scxml_parser::transition_list::const_iterator itrans = s->get()->transitions.begin(); itrans != s->get()->transitions.end(); ++itrans) {
+			if(itrans->get()->actions.size()) {
+				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::event_" << itrans->get()->event.front() << ", " << classname() << "::state_" << s->get()->id;
+				for(scxml_parser::slist::const_iterator iaction = itrans->get()->target.begin(); iaction != itrans->get()->target.end(); ++iaction) {
+					out << ", " << classname() << "::state_" << *iaction;
 				}
 			       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
 				out << '{' << endl;
-				for (scxml_parser::plist<scxml_parser::action>::const_iterator i = ti->get()->actions.begin(); i != ti->get()->actions.end(); ++i) {
+				for (scxml_parser::plist<scxml_parser::action>::const_iterator i = itrans->get()->actions.begin(); i != itrans->get()->actions.end(); ++i) {
 					gen_action_part(*i->get());
 				}
 				out << '}' << endl;
@@ -683,33 +690,33 @@ void cpp_output::trim()
 	// replace '-' with '_' in actions
 	// replace '*' with 'A' in event names, todo: not currently supported
 	// replace '.' with '_' in event names todo: see '3.12.1 event descriptors how to handle event tokens
-	for (scxml_parser::state_list::const_iterator s = states.begin(); s != states.end(); ++s) {
-		for (scxml_parser::transition_list::const_iterator i = s->get()->transitions.begin(); i != s->get()->transitions.end(); ++i) {
-			if(i->get()->event) {
-				if(i->get()->event->find('.') != string::npos) cerr << "warning: event tokens not currently supported" << endl;
-				if(i->get()->event->find('*') != string::npos) cerr << "warning: event asteriks not currently supported" << endl;
-				replace(i->get()->event->begin(), i->get()->event->end(), '.', '_');
-				replace(i->get()->event->begin(), i->get()->event->end(), '-', '_');
-				replace(i->get()->event->begin(), i->get()->event->end(), '*', 'A');
+	for (scxml_parser::state_list::const_iterator istate = states.begin(); istate != states.end(); ++istate) {
+		for (scxml_parser::transition_list::const_iterator itrans = istate->get()->transitions.begin(); itrans != istate->get()->transitions.end(); ++itrans) {
+			for (scxml_parser::slist::iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
+				if(ievent->find('.') != string::npos) cerr << "warning: event tokens not currently supported" << endl;
+				if(ievent->find('*') != string::npos) cerr << "warning: event asteriks not currently supported" << endl;
+				replace(ievent->begin(), ievent->end(), '.', '_');
+				replace(ievent->begin(), ievent->end(), '-', '_');
+				replace(ievent->begin(), ievent->end(), '*', 'A');
+			}
 
-				// transition actions
-				for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = i->get()->actions.begin(); ai != i->get()->actions.end(); ++ai) {
-					for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
-						replace(attri->second.begin(), attri->second.end(), '-', '_');
-					}
+			// transition actions
+			for (scxml_parser::plist<scxml_parser::action>::const_iterator iaction = itrans->get()->actions.begin(); iaction != itrans->get()->actions.end(); ++iaction) {
+				for (map<string, string>::iterator iattr = iaction->get()->attr.begin(); iattr != iaction->get()->attr.end(); ++iattr) {
+					replace(iattr->second.begin(), iattr->second.end(), '-', '_');
 				}
 			}
 		}
 
 		// entry actions
-		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = s->get()->entry_actions.begin(); ai != s->get()->entry_actions.end(); ++ai) {
+		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = istate->get()->entry_actions.begin(); ai != istate->get()->entry_actions.end(); ++ai) {
 			for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
 				replace(attri->second.begin(), attri->second.end(), '-', '_');
 			}
 		}
 
 		// exit actions
-		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = s->get()->exit_actions.begin(); ai != s->get()->exit_actions.end(); ++ai) {
+		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = istate->get()->exit_actions.begin(); ai != istate->get()->exit_actions.end(); ++ai) {
 			for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
 				replace(attri->second.begin(), attri->second.end(), '-', '_');
 			}
