@@ -133,7 +133,9 @@ sc.init();
 For the full example source, see timer_switch.cpp.
 ### Vending machine
 This example brings a bit more realistic example, where diffrent components need to interact with a state machine.The example implemets a simplified vending machine which can dispense three types of coke, after the customer has inserted currency into the machine. Below is a drawing of the diffrent components:
+
 ![vending_components](vending_components.png)
+
  * The 'State Machine' is responsible for the logic. This is described later.
  * The 'Coin Sensor' is responsible for detecting coin inserts.
  * The 'Keypad' is responsible for detecting key presses.
