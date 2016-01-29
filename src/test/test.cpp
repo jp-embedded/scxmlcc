@@ -26,6 +26,33 @@ TEST(w3c, 576)
 	EXPECT_EQ(&sc.m_state_pass, sc.cur_state.front());
 }
 
+TEST(event_list, event_a)
+{
+	sc_event_list sc;
+	sc.init();
+	EXPECT_EQ(&sc.m_state_init, sc.cur_state);
+	sc.dispatch(&sc_event_list::state::event_a);
+	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
+}
+
+TEST(event_list, event_b)
+{
+	sc_event_list sc;
+	sc.init();
+	EXPECT_EQ(&sc.m_state_init, sc.cur_state);
+	sc.dispatch(&sc_event_list::state::event_b);
+	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
+}
+
+TEST(event_list, event_c)
+{
+	sc_event_list sc;
+	sc.init();
+	EXPECT_EQ(&sc.m_state_init, sc.cur_state);
+	sc.dispatch(&sc_event_list::state::event_c);
+	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
+}
+
 int main(int argc, char *argv[])
 {
 	::testing::InitGoogleTest(&argc, argv);
