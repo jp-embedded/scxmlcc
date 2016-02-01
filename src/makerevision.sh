@@ -4,7 +4,7 @@
 # Generate autoversion.h - the scxmlcc version
 # This file is stored in version control
 # todo: generate version if on release branch. Otherwise, leave it
-echo '#define VERSION "0.5"' > autorevision.h~
+echo '#define VERSION "0.6.1"' > autorevision.h~
 diff -q autorevision.h~ autorevision.h || cp autorevision.h~ autorevision.h
 
 # Generate autoversion_postfix.h
