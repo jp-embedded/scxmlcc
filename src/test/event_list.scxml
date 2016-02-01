@@ -1,0 +1,6 @@
+<scxml initial="init" name="event_list" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=664 h=619  -->
+ <state id="init"><!--   node-size-and-position x=230 y=100 w=75 h=75  -->
+  <transition event="a b c" target="pass"></transition>
+ </state>
+ <state id="pass"><!--   node-size-and-position x=230 y=230 w=75 h=75  --></state>
+</scxml>
