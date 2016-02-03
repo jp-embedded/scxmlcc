@@ -5,10 +5,18 @@ To build scxmlcc, you will need:
  * The boost library
  * Basic build tools
 
+To build the test suite, you will also need:
+ * xsltproc
+
 On Ubuntu, install these with e.g. apt-get:
 ```
-sudo apt-get install build-essential libboost-all-dev autorevision
+sudo apt-get install build-essential libboost-all-dev autorevision xsltproc
 ```
+
+autorevision is used to set update the scxmlcc revision. This can be omitted.
+
+So if you plan to jus use scxmlcc as is for building your state machines, you can ommit autorevision and xsltproc.
+
 ## Optaining And Building scxmlcc
 scxmlcc is available as compressed releases or through github. The latest and previous releases is available at [Releases](https://github.com/jp-embedded/scxmlcc/releases).
 
