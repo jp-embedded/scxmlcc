@@ -13,7 +13,7 @@ On Ubuntu, install these with e.g. apt-get:
 sudo apt-get install build-essential libboost-all-dev autorevision xsltproc
 ```
 
-autorevision is used to set update the scxmlcc revision. This can be omitted.
+autorevision is used to update the scxmlcc revision. This can be omitted.
 
 So if you plan to jus use scxmlcc as is for building your state machines, you can ommit autorevision and xsltproc.
 
