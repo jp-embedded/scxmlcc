@@ -4,5 +4,6 @@
 ## Custom Constructs
 todo what is this
 ### Transition Actions
+#### Transition Actions With Multiple Eventes
 template<> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	
 ## Including scxmlcc in your makefile
