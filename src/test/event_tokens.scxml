@@ -1,0 +1,14 @@
+<scxml initial="init" name="event_tokens" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=664 h=619  -->
+ <state id="init"><!--   node-size-and-position x=270 y=80 w=75 h=75  -->
+  <transition event="a" target="a"></transition>
+  <transition event="a.b.*" target="ab"></transition>
+  <transition event="a.b.c dummy1" target="abc"></transition>
+  <transition event="*" target="default"></transition>
+ </state>
+ <state id="a"><!--   node-size-and-position x=140 y=210 w=75 h=75  --></state>
+ <state id="ab"><!--   node-size-and-position x=270 y=210 w=75 h=75  --></state>
+ <state id="abc"><!--   node-size-and-position x=400 y=210 w=75 h=75  --></state>
+ <state id="default"><!--   node-size-and-position x=440 y=80 w=75 h=75  -->
+  <transition event="dummy0"></transition>
+ </state>
+</scxml>
