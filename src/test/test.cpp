@@ -2,6 +2,7 @@
 #include "test412.h"
 #include "test576.h"
 #include "event_list.h"
+#include "event_tokens.h"
 #include <gtest/gtest.h>
 
 TEST(w3c, 355)
