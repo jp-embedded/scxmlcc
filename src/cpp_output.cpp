@@ -344,7 +344,14 @@ void cpp_output::gen_state_base()
 	out << tab << tab << "public:" << endl;
 
 	// events
-	// pass through set, to sort out dublicates
+        // generate events for each token, eg:
+        // ev.a.b.c =>
+        // ev        call '*' - if there
+        // ev_a      call ev
+        // ev_a_b    call ev_a
+        // ev_a_b_c  call ev_a_b
+
+	// pass through set, to filter out dublicates
 	set<string> event_set;
 	for (scxml_parser::state_list::const_iterator istate = states.begin(); istate != states.end(); ++istate) {
 		for (scxml_parser::transition_list::const_iterator itrans = istate->get()->transitions.begin(); itrans != istate->get()->transitions.end(); ++itrans) {
