@@ -15,7 +15,7 @@
   </state>
   <state id="c"><!--   node-size-and-position x=50 y=340 w=75 h=75  --></state>
   <state id="b"><!--   node-size-and-position x=50 y=190 w=75 h=75  -->
-   <transition event="but.c dummy0" target="c"></transition>
+   <transition event="but.c dummy1" target="c"></transition>
   </state>
  </state>
 </scxml>

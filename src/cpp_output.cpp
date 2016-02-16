@@ -337,6 +337,8 @@ void cpp_output::gen_model_base()
 
 void cpp_output::gen_state_base()
 {
+        using namespace boost::algorithm;
+
 	const scxml_parser::state_list &states = sc.sc().states;
 
 	// state actions class
@@ -358,7 +360,6 @@ void cpp_output::gen_state_base()
 	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
 		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
 			for(scxml_parser::slist::const_iterator i_event = i_trans->get()->event.begin(); i_event != i_trans->get()->event.end(); ++i_event) {
-		                using namespace boost::algorithm;
                                 if (*i_event == "*") {
                                         use_base_event = true;
                                 }
@@ -367,7 +368,6 @@ void cpp_output::gen_state_base()
 		                split(tokens, *i_event, is_any_of("."), token_compress_on);
                                 string event;
                                 for (scxml_parser::slist::const_iterator i_token = tokens.begin(); i_token != tokens.end(); ++i_token) {
-                                        if (i_token != tokens.begin() && *i_token == "*") continue; // skip post asteriks (eventa.b.*) - expect match all (*)
                                         if (event.size()) event += '.';
                                         event += *i_token;
                                         event_set.insert(event);
@@ -377,12 +377,25 @@ void cpp_output::gen_state_base()
 	}
         (void)use_base_event;
         for (set<string>::const_iterator i_event = event_set.begin(); i_event != event_set.end(); ++i_event) {
+               
+                // event parent
+                string parent;
+                scxml_parser::slist tokens;
+                split(tokens, *i_event, is_any_of("."), token_compress_on);
+                if (tokens.size() > 1) parent = *(tokens.rbegin() + 1);
+
+                // event name
                 string event;
                 if (*i_event != "*") event = "_" + *i_event;
+
+                // replace '.' with '_'
+                replace(event.begin(), event.end(), '.', '_');
+
                 out << tab << tab << "virtual " << state_t() << "* event" << event << "(" << classname() << '&';
-                if (event.size()) out << " sc"; //todo if shoud be same if as +2
+                if (parent.size() || (event.size() && use_base_event)) out << " sc";
                 out << ") { return ";
-                if (event.size() && use_base_event) out << "event(sc)";
+                if (parent.size()) out << "event_" << parent << "(sc)";
+                else if (event.size() && use_base_event) out << "event(sc)";
                 else out << "0";
                 out << "; }" << endl;
 	}
@@ -476,6 +489,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 		else for (scxml_parser::slist::const_iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
                         string event = "event";
                         if (*ievent != "*") event += '_' + *ievent;
+                        replace(event.begin(), event.end(), '.', '_'); // replace '.' with '_'
 			event_map[event].push_back(*itrans);
 		}
 	}
@@ -719,10 +733,12 @@ void cpp_output::trim()
 
 	// replace '-' with '_' in event names
 	// replace '-' with '_' in actions
+        // remove '.*' postfix in events
 	for (scxml_parser::state_list::const_iterator istate = states.begin(); istate != states.end(); ++istate) {
 		for (scxml_parser::transition_list::const_iterator itrans = istate->get()->transitions.begin(); itrans != istate->get()->transitions.end(); ++itrans) {
 			for (scxml_parser::slist::iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
 				replace(ievent->begin(), ievent->end(), '-', '_');
+                                if (string(ievent->rbegin(), ievent->rbegin() + 2) == "*.") ievent->erase(ievent->size()-2, 2);
 			}
 
 			// transition actions
