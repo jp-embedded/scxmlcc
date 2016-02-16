@@ -25,6 +25,7 @@ all: test
 clean: gtest.clean
 	rm -f test
 	rm -f $(patsubst %.txml,%.h,$(wildcard *.txml))
+	rm -f $(patsubst %.scxml,%.h,$(wildcard *.scxml))
 	rm -f $(patsubst %.txml,%.scxml,$(wildcard *.txml))
 	rm -f $(test.objs) $(test.objs:.o=.d)
 
