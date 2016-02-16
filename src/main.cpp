@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 		("output,o",	value<string>(),	"Output file.")
 		("debug,d",				"Enable debug output")
 		("baremetal,b",				"Generate code for bare metal C++")
-		("version,v",				"Version information");
+		("version,v",				"Version and copyright information");
 	positional_options_description pdesc;
 	pdesc.add("input", -1);
 	variables_map vm;

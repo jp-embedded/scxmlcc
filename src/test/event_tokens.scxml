@@ -1,0 +1,21 @@
+<scxml initial="init" name="event_tokens" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=660 h=780  -->
+ <state id="init"><!--   node-size-and-position x=230 y=70 w=75 h=75  -->
+  <transition event="but.a" target="seq"></transition>
+  <transition event="*" target="default"></transition>
+ </state>
+ <state id="default"><!--   node-size-and-position x=440 y=80 w=75 h=75  -->
+  <transition event="dummy0"></transition>
+ </state>
+ <state id="but"><!--   node-size-and-position x=450 y=410 w=75 h=75  --></state>
+ <state id="seq"><!--   node-size-and-position x=180 y=230 w=180 h=450  -->
+  <transition event="but" target="but"></transition>
+  <transition event="*" target="default"></transition>
+  <state id="a"><!--   node-size-and-position x=60 y=40 w=75 h=75  -->
+   <transition event="but.b.*" target="b"></transition>
+  </state>
+  <state id="c"><!--   node-size-and-position x=50 y=340 w=75 h=75  --></state>
+  <state id="b"><!--   node-size-and-position x=50 y=190 w=75 h=75  -->
+   <transition event="but.c dummy1" target="c"></transition>
+  </state>
+ </state>
+</scxml>
