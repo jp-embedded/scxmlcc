@@ -28,9 +28,6 @@ clean:
 
 autorevision.mk:
 	autorevision -tsh > $@ && sh makerevision.sh || truncate -s0 version_auto.h
-#	autorevision -th | grep "VCS_BRANCH" > autorevision.h~ || true
-#	test -f autorevision.h~ && diff -q autorevision.h autorevision.h~ || cp autorevision.h~ autorevision.h
-#	rm autorevision.h~
 .PHONY: autorevision.mk
 -include autorevision.mk	
 
