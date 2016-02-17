@@ -2,5 +2,6 @@
 *.o
 scxmlcc
 autorevision.mk
-autorevision_postfix.h
+version_auto.h*
+**/.tags
 
