@@ -15,8 +15,8 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#include "autorevision.h"
-#include "autorevision_postfix.h"
+#include "version.h"
+#include "version_auto.h"
 
 #ifndef VERSION_POSTFIX
 #define VERSION_POSTFIX ""
