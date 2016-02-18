@@ -1,5 +1,4 @@
 #! /bin/bash
-set -x
 version=`git diff HEAD^..HEAD -- "$(git rev-parse --show-toplevel)"/src/version.h | grep '^\+.*VERSION' | sed -s 's/[^0-9\.]//g'`
 
 if [ "$version" != "" ]; then
