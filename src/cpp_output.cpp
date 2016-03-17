@@ -93,19 +93,21 @@ void cpp_output::gen_transition_base()
 	out << endl;
 	
 	// transition without target
-	out << tab << "// transition with no target" << endl;
-	out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
-	out << tab << "{" << endl;
-	out << tab << tab << "public:" << endl;
-	out << tab << tab << "S* operator ()(S *s, " << classname() << " &sc)" << endl;
-       	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return 0;" << endl;
-	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << std::endl;" << endl;
-       	out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
-       	out << tab << tab << tab << "return s;" << endl;
-       	out << tab << tab << "}" << endl;
-	out << tab << "};" << endl;
-	out << endl;
+        if (sc.using_transition_no_target) {
+           out << tab << "// transition with no target" << endl;
+           out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
+           out << tab << "{" << endl;
+           out << tab << tab << "public:" << endl;
+           out << tab << tab << "S* operator ()(S *s, " << classname() << " &sc)" << endl;
+           out << tab << tab << "{" << endl;
+           out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return 0;" << endl;
+           if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << std::endl;" << endl;
+           out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
+           out << tab << tab << tab << "return s;" << endl;
+           out << tab << tab << "}" << endl;
+           out << tab << "};" << endl;
+           out << endl;
+        }
 
 	for (set<int>::const_iterator i = sc.parallel_target_sizes.begin(); i != sc.parallel_target_sizes.end(); ++i) {
 		const int sz = *i;

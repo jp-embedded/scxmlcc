@@ -289,6 +289,7 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
+        if (!tr->target.size()) using_transition_no_target = true;
 	return tr;
 }
 
@@ -301,7 +302,7 @@ void scxml_parser::parse(const ptree &pt)
 	}
 }
 
-scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_event_queue(false), using_log(false), using_compound(false)
+scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_event_queue(false), using_log(false), using_compound(false), using_transition_no_target(false)
 {
 	m_scxml.name = name;
 	parse(pt);
