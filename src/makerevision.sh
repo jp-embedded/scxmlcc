@@ -21,9 +21,9 @@ if [ "$VCS_BRANCH" == "master" ]; then
    if [ "$VCS_TICK" == "0" -a "$mod" == "" ]; then
       truncate -s0 version_auto.h~
    else
-      echo '#define VERSION_POSTFIX "-'${VCS_TICK}''${mod}'"' > version_auto.h~
+      echo '#define VERSION_POSTFIX "'${mod}'-'${VCS_TICK}'"' > version_auto.h~
    fi
 else
-   echo '#define VERSION_POSTFIX "-'${VCS_FULL_HASH}''${mod}'"' > version_auto.h~
+   echo '#define VERSION_POSTFIX "'${mod}'-'${VCS_FULL_HASH}'"' > version_auto.h~
 fi
 diff -q version_auto.h~ version_auto.h || cp version_auto.h~ version_auto.h
