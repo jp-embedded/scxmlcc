@@ -383,8 +383,9 @@ void cpp_output::gen_state_base()
                 // event parent
                 string parent;
                 scxml_parser::slist tokens;
-                split(tokens, *i_event, is_any_of("."), token_compress_on);
-                if (tokens.size() > 1) parent = *(tokens.rbegin() + 1);
+
+               size_t delim = i_event->rfind(".");
+               if (delim != string::npos) parent = i_event->substr(0, delim);
 
                 // event name
                 string event;
@@ -392,6 +393,7 @@ void cpp_output::gen_state_base()
 
                 // replace '.' with '_'
                 replace(event.begin(), event.end(), '.', '_');
+                replace(parent.begin(), parent.end(), '.', '_');
 
                 out << tab << tab << "virtual " << state_t() << "* event" << event << "(" << classname() << '&';
                 if (parent.size() || (event.size() && use_base_event)) out << " sc";
