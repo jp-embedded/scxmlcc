@@ -1,10 +1,12 @@
 #include "test355.h"
+#include "test372.h"
 #include "test412.h"
 #include "test576.h"
 #include "event_list.h"
 #include "event_tokens.h"
 #include <gtest/gtest.h>
 
+// test that default initial state is first in document order.  If we enter s0 first we succeed, if s1, failure.
 TEST(w3c, 355)
 {
 	sc_test355 sc;
@@ -12,6 +14,16 @@ TEST(w3c, 355)
 	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
 }
 
+// test that entering a final state generates done.state.parentid after executing the onentry elements.  
+// Var1 should be set to 2 (but not 3) by the time the event is raised
+TEST(w3c, 372)
+{
+	sc_test372 sc;
+        sc.init();
+}
+
+// test that executable content in the <initial> transition executes after the onentry handler on the state
+// and before the onentry handler of the child states.  Event1, event2, and event3 should occur in that order.
 TEST(w3c, 412)
 {
 	sc_test412 sc;
@@ -19,6 +31,9 @@ TEST(w3c, 412)
 	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
 }
 
+
+// test that the 'initial' value of scxml is respected.  We set the value to deeply nested non-default parallel siblings and
+// test that both are entered. 
 TEST(w3c, 576)
 {
 	sc_test576 sc;
