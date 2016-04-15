@@ -509,6 +509,8 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			const bool multiple = mi->second.size() > 1 || use_ancestor;
 			const bool last = t == mi->second.end() - 1;
 
+                        //todo I think this can be simplified by making a transition method in composite taking the template parameters and the member function pointer to call the parent event
+
 			if(t->get()->target.size()) {
 				target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
 				target_classname = "state_" + t->get()->target.front(); //todo handle multiple targets
