@@ -713,7 +713,7 @@ void cpp_output::gen_actions()
 		}
 
 		// transition actions
-		// todo support multiple events. create an action for each event which calls a common action?
+		// todo support multiple events. create an action for each event which calls a common action? - this would work only for the last transition if multiple transitions because of the call priority.
 		for (scxml_parser::transition_list::const_iterator itrans = s->get()->transitions.begin(); itrans != s->get()->transitions.end(); ++itrans) {
 			if(itrans->get()->actions.size()) {
 				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::event_" << itrans->get()->event.front() << ", " << classname() << "::state_" << s->get()->id;
