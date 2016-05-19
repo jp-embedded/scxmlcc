@@ -1,0 +1,15 @@
+<scxml initial="init" name="conditional" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=664 h=625  -->
+ <state id="init"><!--   node-size-and-position x=240 y=50 w=75 h=75  -->
+  <transition target="cluster"></transition>
+ </state>
+ <state id="cluster" initial="ok0"><!--   node-size-and-position x=60 y=200 w=260 h=310  -->
+  <transition event="a" target="end0"></transition>
+  <state id="ok0"><!--   node-size-and-position x=50 y=50 w=75 h=75  -->
+   <transition event="a" target="end1"></transition>
+   <transition event="a" target="end2"></transition>
+  </state>
+  <state id="end1"><!--   node-size-and-position x=40 y=180 w=75 h=75  --></state>
+  <state id="end2"><!--   node-size-and-position x=140 y=180 w=75 h=75  --></state>
+ </state>
+ <state id="end0"><!--   node-size-and-position x=370 y=320 w=75 h=75  --></state>
+</scxml>
