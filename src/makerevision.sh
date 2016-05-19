@@ -14,11 +14,11 @@
 # - otherwise: Use '-$FULL_HASH'
 # - add M if locally modified
 mod=""
-if [ "$VCS_WC_MODIFIED" == "1" ]; then
+if [ "$VCS_WC_MODIFIED" = "1" ]; then
   mod="M"
 fi
-if [ "$VCS_BRANCH" == "master" ]; then
-   if [ "$VCS_TICK" == "0" -a "$mod" == "" ]; then
+if [ "$VCS_BRANCH" = "master" ]; then
+   if [ "$VCS_TICK" = "0" -a "$mod" = "" ]; then
       truncate -s0 version_auto.h~
    else
       echo '#define VERSION_POSTFIX "'${mod}'-'${VCS_TICK}'"' > version_auto.h~
