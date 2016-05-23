@@ -4,6 +4,7 @@
 #include "test576.h"
 #include "event_list.h"
 #include "event_tokens.h"
+#include "conditional.h"
 #include <gtest/gtest.h>
 
 // test that default initial state is first in document order.  If we enter s0 first we succeed, if s1, failure.
@@ -114,6 +115,95 @@ TEST(event_tokens, 3)
         EXPECT_EQ(&sc.m_state_a, sc.cur_state);
         sc.dispatch(&sc_event_tokens::state::event_dummy0);
         EXPECT_EQ(&sc.m_state_default, sc.cur_state);
+}
+
+struct sc_conditional::user_model
+{
+	bool e0, e1, e2;
+	user_model() : e0(false), e1(false), e2(false) {}
+};
+
+template<> bool sc_conditional::transition_actions<&sc_conditional::state::event_a, sc_conditional::state_cluster, sc_conditional::state_end0>::condition(sc_conditional::data_model &m)
+{
+	return m.user->e0;
+}
+
+template<> bool sc_conditional::transition_actions<&sc_conditional::state::event_a, sc_conditional::state_ok0, sc_conditional::state_end1>::condition(sc_conditional::data_model &m)
+{
+	return m.user->e1;
+}
+
+template<> bool sc_conditional::transition_actions<&sc_conditional::state::event_a, sc_conditional::state_ok0, sc_conditional::state_end2>::condition(sc_conditional::data_model &m)
+{
+	return m.user->e2;
+}
+
+TEST(conditional, 0)
+{
+	sc_conditional::user_model m;
+	sc_conditional sc(&m);
+	sc.init();
+	EXPECT_EQ(&sc.m_state_ok0, sc.cur_state);
+	sc.dispatch(&sc_conditional::state::event_a);
+	EXPECT_EQ(&sc.m_state_ok0, sc.cur_state);
+}
+
+TEST(conditional, 1)
+{
+	sc_conditional::user_model m;
+	sc_conditional sc(&m);
+	sc.init();
+	EXPECT_EQ(&sc.m_state_ok0, sc.cur_state);
+	sc.model.user->e0 = true;
+	sc.dispatch(&sc_conditional::state::event_a);
+	EXPECT_EQ(&sc.m_state_end0, sc.cur_state);
+}
+
+TEST(conditional, 2)
+{
+	sc_conditional::user_model m;
+	sc_conditional sc(&m);
+	sc.init();
+	EXPECT_EQ(&sc.m_state_ok0, sc.cur_state);
+	sc.model.user->e1 = true;
+	sc.dispatch(&sc_conditional::state::event_a);
+	EXPECT_EQ(&sc.m_state_end1, sc.cur_state);
+}
+
+TEST(conditional, 3)
+{
+	sc_conditional::user_model m;
+	sc_conditional sc(&m);
+	sc.init();
+	EXPECT_EQ(&sc.m_state_ok0, sc.cur_state);
+	sc.model.user->e2 = true;
+	sc.dispatch(&sc_conditional::state::event_a);
+	EXPECT_EQ(&sc.m_state_end2, sc.cur_state);
+}
+
+TEST(conditional, 4)
+{
+	sc_conditional::user_model m;
+	sc_conditional sc(&m);
+	sc.init();
+	EXPECT_EQ(&sc.m_state_ok0, sc.cur_state);
+	sc.model.user->e0 = true;
+	sc.model.user->e1 = true;
+	sc.model.user->e2 = true;
+	sc.dispatch(&sc_conditional::state::event_a);
+	EXPECT_EQ(&sc.m_state_end1, sc.cur_state);
+}
+
+TEST(conditional, 5)
+{
+	sc_conditional::user_model m;
+	sc_conditional sc(&m);
+	sc.init();
+	EXPECT_EQ(&sc.m_state_ok0, sc.cur_state);
+	sc.model.user->e0 = true;
+	sc.model.user->e2 = true;
+	sc.dispatch(&sc_conditional::state::event_a);
+	EXPECT_EQ(&sc.m_state_end2, sc.cur_state);
 }
 
 int main(int argc, char *argv[])
