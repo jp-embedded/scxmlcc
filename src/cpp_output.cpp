@@ -51,6 +51,7 @@ void cpp_output::gen_transition_base()
 	out << tab << "};" << endl;
 	out << endl;
 
+/*
 	// external transition
 	out << tab << "// external transition" << endl;
 	out << tab << "template<event E, class S, class D = no_state, transition_type T = external> class transition : public transition_actions<E, S, D>" << endl;
@@ -91,7 +92,34 @@ void cpp_output::gen_transition_base()
        	out << tab << tab << "}" << endl;
 	out << tab << "};" << endl;
 	out << endl;
-	
+*/
+
+	// combined external/internal transition
+	out << tab << "// external/internal transition" << endl;
+	out << tab << "template<event E, class S, class D = no_state, transition_type T = external> class transition : public transition_actions<E, S, D>" << endl;
+	out << tab << "{" << endl;
+	out << tab << tab << "template<transition_type I> struct id { };" << endl;
+	out << tab << tab << "void state_enter(id<external>, D& d, data_model &m) { d.template enter<S>(m); };" << endl;
+	out << tab << tab << "void state_enter(id<internal>, D& d, data_model &m) { d.template enter<S>(m, (S*)0); };" << endl;
+	out << tab << tab << "void state_exit(id<external>, S* s, data_model &m) { s->template exit<D>(m); };" << endl;
+	out << tab << tab << "void state_exit(id<internal>, S* s, data_model &m) { s->template exit<D>(m, (D*)0); };" << endl;
+	out << tab << tab << "public:" << endl;
+	// exit/enter is called here without parameter, which forces the action to always exit/enter at least current state
+	out << tab << tab << "state* operator ()(S *s, D &d, " << classname() << " &sc)" << endl;
+	out << tab << tab << "{" << endl;
+       	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
+	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
+	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
+       	if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
+       	out << tab << tab << tab << "state_exit(id<T>(), s, sc.model);" << endl;
+       	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
+       	out << tab << tab << tab << "state_enter(id<T>(), d, sc.model);" << endl;
+       	if(sc.using_parallel) out << tab << tab << tab << "return d.template enter_parallel<S>(sc, &d, s);" << endl;
+	else out << tab << tab << tab << "return &d;" << endl;
+       	out << tab << tab << "}" << endl;
+	out << tab << "};" << endl;
+	out << endl;
+		
 	// transition without target
         if (sc.using_transition_no_target) {
            out << tab << "// transition with no target" << endl;
@@ -508,8 +536,6 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			const bool first = t == mi->second.begin();
 			const bool multiple = mi->second.size() > 1 || use_ancestor;
 			const bool last = t == mi->second.end() - 1;
-
-                        //todo I think this can be simplified by making a transition method in composite taking the template parameters and the member function pointer to call the parent event
 
 			if(t->get()->target.size()) {
 				target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
