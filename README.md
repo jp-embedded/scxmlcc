@@ -1,3 +1,8 @@
+<!--
+  Title: scxmlcc
+  Description: scxml state machine to c++ compiler.
+  Author: jp@jp-embedded.com
+  -->
 [Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](doc/getting-started.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Welcome to scxmlcc.
 The scxml state machine to c++ compiler.
