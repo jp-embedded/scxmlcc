@@ -49,6 +49,7 @@ class scxml_parser
 			slist target;
 			slist event;
 			plist<action> actions;
+			boost::optional<std::string> type;
 		};
 		typedef plist<transition> transition_list;
 
@@ -79,6 +80,7 @@ class scxml_parser
 		void parse_scxml(const boost::property_tree::ptree &pt);
 		void parse(const boost::property_tree::ptree &pt);
 		void parse_state(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
+		void parse_final(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
 		void parse_parallel(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
 		transition parse_initial(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<transition> parse_transition(const boost::property_tree::ptree &pt);

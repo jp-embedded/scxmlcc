@@ -476,6 +476,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	const bool use_ancestor = sc.using_compound; // call parent if condition is false
 
 	const bool parallel_state = state.type && *state.type == "parallel";
+	const bool final_state = state.type && *state.type == "final";
 	string parent, prefix;
 	if(state.type && *state.type == "inter") prefix = "inter";
 	if(state.parent) parent = "state_" + state.parent->id;
@@ -503,8 +504,12 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	out << tab << "{" << endl;
 
+	if (final_state) {
+		//todo handle final in parallel states
+		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { sc.model.event_queue.push(&state::event_done_" << parent << "); return 0; }" << endl;
+	}
 	//todo there may be multiple targets
-	if(state.initial.target.size()) {
+	else if(state.initial.target.size()) {
 		string target = "sc.m_state_" + state.initial.target.front();
 		string target_classname = "state_" + state.initial.target.front();
 		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { return transition<&state::initial, " << state_classname << ", " << target_classname << ", internal>()(this, " << target << ", sc); }" << endl;
