@@ -26,6 +26,6 @@
    <transition target="return_done"></transition>
    <transition></transition>
   </state>
-  <state id="return_done"><!--   node-size-and-position x=20 y=240 w=75 h=75  --></state>
+  <final id="return_done"><!--   node-size-and-position x=20 y=240 w=75 h=75  --></final>
  </state>
 </scxml>
