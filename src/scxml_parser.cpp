@@ -172,6 +172,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 void scxml_parser::parse_final(const ptree &pt, const boost::shared_ptr<state> &parent)
 {
 	try {
+		using_final = true;
 		using namespace boost::algorithm;
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 		boost::shared_ptr<state> st = boost::make_shared<state>();
@@ -336,7 +337,7 @@ void scxml_parser::parse(const ptree &pt)
 	}
 }
 
-scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_event_queue(false), using_log(false), using_compound(false), using_transition_no_target(false)
+scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_final(false), using_event_queue(false), using_log(false), using_compound(false), using_transition_no_target(false)
 {
 	m_scxml.name = name;
 	parse(pt);

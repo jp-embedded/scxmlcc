@@ -820,6 +820,10 @@ void cpp_output::gen()
 		cerr << "error: parallel states is not supported with bare metal C++" << endl;
 		exit(1);
 	}
+	if (opt.bare_metal && sc.using_final) {
+		cerr << "error: final states is not supported with bare metal C++" << endl;
+		exit(1);
+	}
 	if (opt.bare_metal && sc.using_compound) {
 		cerr << "error: Hierarchical states is not currenty supported with bare metal C++" << endl;
 		exit(1);

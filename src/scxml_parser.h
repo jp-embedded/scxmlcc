@@ -33,6 +33,7 @@ class scxml_parser
 		typedef std::vector<std::string> slist;
 
 		bool using_parallel;
+		bool using_final;
 		bool using_event_queue;
 		bool using_log;
 		bool using_compound;
