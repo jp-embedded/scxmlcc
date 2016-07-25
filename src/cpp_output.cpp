@@ -384,25 +384,35 @@ void cpp_output::gen_state_base()
         // ev_a_b    call ev_a
         // ev_a_b_c  call ev_a_b
 
+	// collect events
+	vector<string> events;
+	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
+		if (i_state->get()->type && *i_state->get()->type == "final") {
+			string event = "done.state." + i_state->get()->parent->id;
+			events.push_back(event);
+		}
+		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
+			for(scxml_parser::slist::const_iterator i_event = i_trans->get()->event.begin(); i_event != i_trans->get()->event.end(); ++i_event) {
+				events.push_back(*i_event);
+			}
+		}
+	}
+
 	// pass through set, to filter out dublicates
         bool use_base_event = false;
 	set<string> event_set;
-	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
-		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
-			for(scxml_parser::slist::const_iterator i_event = i_trans->get()->event.begin(); i_event != i_trans->get()->event.end(); ++i_event) {
-                                if (*i_event == "*") {
-                                        use_base_event = true;
-                                }
-                                // loop through event tokens 
-                                scxml_parser::slist tokens;
-		                split(tokens, *i_event, is_any_of("."), token_compress_on);
-                                string event;
-                                for (scxml_parser::slist::const_iterator i_token = tokens.begin(); i_token != tokens.end(); ++i_token) {
-                                        if (event.size()) event += '.';
-                                        event += *i_token;
-                                        event_set.insert(event);
-                                }
-			}
+	for (vector<string>::const_iterator i_event = events.begin(); i_event != events.end(); ++ i_event) {
+		if (*i_event == "*") {
+			use_base_event = true;
+		}
+		// loop through event tokens 
+		scxml_parser::slist tokens;
+		split(tokens, *i_event, is_any_of("."), token_compress_on);
+		string event;
+		for (scxml_parser::slist::const_iterator i_token = tokens.begin(); i_token != tokens.end(); ++i_token) {
+			if (event.size()) event += '.';
+			event += *i_token;
+			event_set.insert(event);
 		}
 	}
         (void)use_base_event;
@@ -476,6 +486,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	const bool use_ancestor = sc.using_compound; // call parent if condition is false
 
 	const bool parallel_state = state.type && *state.type == "parallel";
+	const bool final_state = state.type && *state.type == "final";
 	string parent, prefix;
 	if(state.type && *state.type == "inter") prefix = "inter";
 	if(state.parent) parent = "state_" + state.parent->id;
@@ -503,8 +514,12 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	out << tab << "{" << endl;
 
+	if (final_state) {
+		//todo handle final in parallel states
+		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { sc.model.event_queue.push(&state::event_done_" << parent << "); return 0; }" << endl;
+	}
 	//todo there may be multiple targets
-	if(state.initial.target.size()) {
+	else if(state.initial.target.size()) {
 		string target = "sc.m_state_" + state.initial.target.front();
 		string target_classname = "state_" + state.initial.target.front();
 		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { return transition<&state::initial, " << state_classname << ", " << target_classname << ", internal>()(this, " << target << ", sc); }" << endl;
@@ -803,6 +818,10 @@ void cpp_output::gen()
 
 	if (opt.bare_metal && sc.using_parallel) {
 		cerr << "error: parallel states is not supported with bare metal C++" << endl;
+		exit(1);
+	}
+	if (opt.bare_metal && sc.using_final) {
+		cerr << "error: final states is not supported with bare metal C++" << endl;
 		exit(1);
 	}
 	if (opt.bare_metal && sc.using_compound) {

@@ -39,7 +39,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
 			else if (it->first == "state") parse_state(it->second, boost::shared_ptr<state>());
 			else if (it->first == "history") parse_state(it->second, boost::shared_ptr<state>());
-			else if (it->first == "final") parse_state(it->second, boost::shared_ptr<state>());
+			else if (it->first == "final") parse_final(it->second, boost::shared_ptr<state>());
 			else if (it->first == "parallel") parse_parallel(it->second, boost::shared_ptr<state>());
 			else if (it->first == "initial") m_scxml.initial = parse_initial(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <scxml>" << endl;
@@ -140,7 +140,6 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 		boost::optional<string> initial(xmlattr.get_optional<string>("initial"));
 		if(initial) split(st->initial.target, *initial, is_any_of(" "), token_compress_on);
 		if(st->initial.target.size() > 1) parallel_target_sizes.insert(st->initial.target.size());
-		st->type = xmlattr.get_optional<string>("type");
 		m_scxml.states.push_back(st);
 		state_list::iterator state_i = --m_scxml.states.end();
 
@@ -149,12 +148,47 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
 			else if (it->first == "state") parse_state(it->second, st);
 			else if (it->first == "history") parse_state(it->second, st);
-			else if (it->first == "final") parse_state(it->second, st);
+			else if (it->first == "final") parse_final(it->second, st);
 			else if (it->first == "parallel") parse_parallel(it->second, st);
 			else if (it->first == "transition") state_i->get()->transitions.push_back(parse_transition(it->second));
 			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
 			else if (it->first == "onexit") state_i->get()->exit_actions = parse_entry(it->second);
 			else if (it->first == "initial") state_i->get()->initial = parse_initial(it->second);
+			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
+		}
+
+		// if initial state is not set, use first state in document order
+		// if parent is parallel put all states in initial
+		if(parent && (parent->initial.target.empty() || (parent->type && *parent->type == "parallel"))) {
+			parent->initial.target.push_back(st->id);
+		}
+	}
+	catch (ptree_error e) {
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
+		exit(1);
+	}
+}
+
+void scxml_parser::parse_final(const ptree &pt, const boost::shared_ptr<state> &parent)
+{
+	try {
+		using_final = true;
+		using namespace boost::algorithm;
+		const ptree &xmlattr = pt.get_child("<xmlattr>");
+		boost::shared_ptr<state> st = boost::make_shared<state>();
+		st->id = xmlattr.get<string>("id");
+		if(parent) {
+			using_compound = true;
+			st->parent = parent;
+		}
+		st->type.reset("final");
+		m_scxml.states.push_back(st);
+		state_list::iterator state_i = --m_scxml.states.end();
+		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
+			if (it->first == "<xmlcomment>") ; // ignore comments
+			else if (it->first == "<xmlattr>") ; // ignore, parsed above
+			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
+			else if (it->first == "onexit") state_i->get()->exit_actions = parse_entry(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
 		}
 
@@ -274,6 +308,7 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 			if(tr->target.size() > 1) parallel_target_sizes.insert(tr->target.size());
 			boost::optional<string> event = xmlattr->get_optional<string>("event");
 			if(event) split(tr->event, *event, is_any_of(" "), token_compress_on);
+			tr->type = xmlattr->get_optional<string>("type");
 		}
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
@@ -302,7 +337,7 @@ void scxml_parser::parse(const ptree &pt)
 	}
 }
 
-scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_event_queue(false), using_log(false), using_compound(false), using_transition_no_target(false)
+scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_final(false), using_event_queue(false), using_log(false), using_compound(false), using_transition_no_target(false)
 {
 	m_scxml.name = name;
 	parse(pt);

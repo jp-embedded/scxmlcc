@@ -97,12 +97,6 @@ template<> void sc::transition_actions<&sc::state::unconditional, sc::state_retu
 	m.user->credit -= nickel;
 }
 
-template<> void sc::state_actions<sc::state_return_done>::enter(sc::data_model &m)
-{
-	//todo this should be added automatically, when in final state
-	m.event_queue.push(&sc::state::event_done);
-}
-
 template<> bool sc::transition_actions<&sc::state::event_zero, sc::state_collect_coins, sc::state_dispense_zero>::condition(sc::data_model &m)
 {
 	// enough credit for zero?
@@ -126,9 +120,6 @@ template<> void sc::state_actions<sc::state_dispense_coke>::enter(sc::data_model
 	// dispense coke
 	m.user->sig_dispense_coke();
 	m.user->credit -= price_coke;
-
-	//todo this should be added automatically, when in final state
-	m.event_queue.push(&sc::state::event_done);
 }
 
 template<> void sc::state_actions<sc::state_dispense_diet>::enter(sc::data_model &m)
@@ -136,9 +127,6 @@ template<> void sc::state_actions<sc::state_dispense_diet>::enter(sc::data_model
 	// dispense diet
 	m.user->sig_dispense_diet();
 	m.user->credit -= price_diet;
-
-	//todo this should be added automatically, when in final state
-	m.event_queue.push(&sc::state::event_done);
 }
 
 template<> void sc::state_actions<sc::state_dispense_zero>::enter(sc::data_model &m)
@@ -146,9 +134,6 @@ template<> void sc::state_actions<sc::state_dispense_zero>::enter(sc::data_model
 	// dispense zero
 	m.user->sig_dispense_zero();
 	m.user->credit -= price_zero;
-
-	//todo this should be added automatically, when in final state
-	m.event_queue.push(&sc::state::event_done);
 }
 
 #endif

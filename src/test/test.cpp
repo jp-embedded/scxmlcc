@@ -21,6 +21,7 @@ TEST(w3c, 372)
 {
 	sc_test372 sc;
         sc.init();
+	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
 }
 
 // test that executable content in the <initial> transition executes after the onentry handler on the state
