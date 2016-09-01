@@ -35,11 +35,11 @@ The folowing features are currently implemented:
 * Custom transition actions and conditons.
 * Zero runtime overhead for emtpy actions and conditions.
 * LCA calculation is done (mostly) compile time.
+* Final states
 
 Next todo on the feature list is to complete the core constructs of the scxml standard. Most importantly, this include:
 
 * Parallel states (in progress)
 * History states
-* Final states
 
 If you have any suggestions on features to prioritize, please create an [issue](https://github.com/jp-embedded/scxmlcc/issues).
