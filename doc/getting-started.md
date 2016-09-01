@@ -142,7 +142,7 @@ This example brings a bit more realistic example, where diffrent components need
  * The 'Display' is responsible for displaying text messages.
  * The 'Coin refund' is responsible for refunding coins to the user.
  * The 'Dispenser' is responsible for dispensing the three coke types to the user.
- * The 'Input simulator' is reading input from your PC's keyboard and trigger the coin sensor and the keypad.
+ * The 'Input simulator' is reading input from your PC's keyboard and trigger the coin sensor and the keypad, so the system can be simulated.
 
 The input simulator is added so we can simulate the vending machine, since we don't have a real coin sensor and keypad. Also since this example is only for simulating, the component implementations are really small and does not imlpement any real hardware support. But the machine are split into these components anyway to make the example a bit more realistic.
 
