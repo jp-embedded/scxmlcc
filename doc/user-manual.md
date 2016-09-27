@@ -2,11 +2,26 @@
 # Users Manual
 ## Current Status
 ### Core Constructs
-#### \<scxml\>
-Attributes implemented:
+#### Constructs and Attributes Currently imlpemented
+##### \<scxml\>
 - initial
 
 
+##### \<state\>
+- id
+- initial
+
+
+##### \<parallel\>
+- id
+
+
+This construct is currently only partially implemented. Other constructs may not work correctly in combination with parallel states.
+##### \<transition\>
+- event
+- target
+
+##### \<initial\>
 ## Invoking scxmlcc
 ## Custom Constructs
 todo what is this
