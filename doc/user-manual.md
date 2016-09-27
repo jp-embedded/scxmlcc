@@ -1,5 +1,7 @@
 [Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](index.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Users Manual
+## Current Status
+
 ## Invoking scxmlcc
 ## Custom Constructs
 todo what is this
