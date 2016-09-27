@@ -2,7 +2,9 @@
 # Users Manual
 ## Current Status
 ### Core Constructs
-#### <scxml>
+#### \<scxml\>
+Attributes implemented:
+- initial
 ## Invoking scxmlcc
 ## Custom Constructs
 todo what is this
