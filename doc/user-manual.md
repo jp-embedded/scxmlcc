@@ -1,27 +1,31 @@
 [Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](index.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Users Manual
-## Current Status
-### Core Constructs
-#### Constructs and Attributes Currently imlpemented
-##### \<scxml\>
+## Core Constructs
+### Constructs and Attributes
+This is a description of the supported constructs and attributes from the scxml standard.
+#### \<scxml\>
 - initial
 
 
-##### \<state\>
+#### \<state\>
 - id
 - initial
 
 
-##### \<parallel\>
+#### \<parallel\>
 - id
 
 
 This construct is currently only partially implemented. Other constructs may not work correctly in combination with parallel states.
-##### \<transition\>
+#### \<transition\>
 - event
 - target
 
-##### \<initial\>
+#### \<initial\>
+#### \<final\>
+- id
+
+
 ## Invoking scxmlcc
 ## Custom Constructs
 todo what is this
