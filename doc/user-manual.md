@@ -5,6 +5,8 @@
 #### \<scxml\>
 Attributes implemented:
 - initial
+
+
 ## Invoking scxmlcc
 ## Custom Constructs
 todo what is this
