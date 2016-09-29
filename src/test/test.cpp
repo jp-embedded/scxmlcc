@@ -47,6 +47,9 @@ TEST(w3c, 504)
 // Otherwise, if the transition has 'type' "internal", its source state is a compound state and all its target states are proper descendents of its source state, the target set consists of all active states that are proper descendents of its source state.
 TEST(w3c, 505)
 {
+	sc_test505 sc;
+	sc.init();
+	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
 	// todo
 }
 
