@@ -1,6 +1,11 @@
+#include "test144.h"
 #include "test355.h"
 #include "test372.h"
 #include "test412.h"
+//#include "test504.h"
+#include "test505.h"
+#include "test506.h"
+//#include "test533.h"
 #include "test576.h"
 #include "event_list.h"
 #include "event_tokens.h"
@@ -33,6 +38,29 @@ TEST(w3c, 412)
 	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
 }
 
+// if [a transition's] 'type' is "external", its exit set consists of all active states that are proper descendents of the Least Common Compound Ancestor (LCCA) of the source and target states.
+TEST(w3c, 504)
+{
+	// todo
+}
+
+// Otherwise, if the transition has 'type' "internal", its source state is a compound state and all its target states are proper descendents of its source state, the target set consists of all active states that are proper descendents of its source state.
+TEST(w3c, 505)
+{
+	// todo
+}
+
+// If a transition has 'type' of "internal", but its source state is not a compound state or its target states are not all proper descendents of its source state, its exit set is defined as if it had 'type' of "external".
+TEST(w3c, 506)
+{
+	// todo
+}
+
+// If a transition has 'type' of "internal", but its source state is not a compound state, its exit set is defined as if it had 'type' of "external".
+TEST(w3c, 533)
+{
+	// todo
+}
 
 // test that the 'initial' value of scxml is respected.  We set the value to deeply nested non-default parallel siblings and
 // test that both are entered. 
