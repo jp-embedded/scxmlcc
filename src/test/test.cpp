@@ -50,13 +50,15 @@ TEST(w3c, 505)
 	sc_test505 sc;
 	sc.init();
 	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
-	// todo
 }
 
 // If a transition has 'type' of "internal", but its source state is not a compound state or its target states are not all proper descendents of its source state, its exit set is defined as if it had 'type' of "external".
 TEST(w3c, 506)
 {
-	// todo
+	sc_test506 sc;
+	sc.init();
+	EXPECT_EQ(&sc.m_state_pass, sc.cur_state);
+	// todo s2 does not exit twice
 }
 
 // If a transition has 'type' of "internal", but its source state is not a compound state, its exit set is defined as if it had 'type' of "external".
