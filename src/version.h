@@ -16,11 +16,12 @@
  *************************************************************************/
 
 // Note: There is a post-commit hook in ^/hooks which automatically will add a git tag when this file is changed.
+//       This hook can be installed with install_hooks.sh
 
 #ifndef __VERSION
 #define __VERSION
 
-#define VERSION "0.6.2"
+#define VERSION "0.7.1"
 
 const char* version();
 
