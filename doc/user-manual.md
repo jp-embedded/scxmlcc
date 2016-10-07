@@ -1,5 +1,8 @@
 [Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](index.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Users Manual
+## Current Status
+All the following tags are supported: `<onentry>`, `<onexit>`, `<log>`, `<state>`, `<initial>`, `<final>`, `<scxml>`, `<transition>`.
+  
 ## Core Constructs
 ### Constructs and Attributes
 This is a description of the supported constructs and attributes from the scxml standard.
@@ -7,12 +10,15 @@ This is a description of the supported constructs and attributes from the scxml 
 - initial
 
 
-#### \<state\>
+#### State (`<state>`)
 - id
 - initial
 
+### Enter Action (`<onentry>`)
 
-#### \<parallel\>
+### Custom Enter Action
+
+#### Parallel State (`<parallel>`)
 - id
 
 
