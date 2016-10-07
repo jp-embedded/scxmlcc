@@ -4,31 +4,30 @@
 All the following tags from the scxml standard are supported: `<onentry>`, `<onexit>`, `<log>`, `<state>`, `<initial>`, `<final>`, `<scxml>`, `<transition>`. For some tags, not all attributes may be supported. See below for further description.
   
 ## Core Constructs
-### Constructs and Attributes
 This is a description of the supported constructs and attributes from the scxml standard.
-#### \<scxml\>
+### \<scxml\>
 - initial
 
 
-#### State (`<state>`)
+### State (`<state>`)
 - id
 - initial
 
-#### Enter Action (`<onentry>`)
+### Enter Action (`<onentry>`)
 
-#### Custom Enter Action
+### Custom Enter Action
 
-#### Parallel State (`<parallel>`)
+### Parallel State (`<parallel>`)
 - id
 
 
 This construct is currently only partially implemented. Other constructs may not work correctly in combination with parallel states.
-#### \<transition\>
+### \<transition\>
 - event
 - target
 
-#### \<initial\>
-#### \<final\>
+### \<initial\>
+### \<final\>
 - id
 
 
