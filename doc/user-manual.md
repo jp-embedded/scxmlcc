@@ -4,7 +4,7 @@
 All the following tags from the scxml standard are supported: `<scxml>`, `<state>`, `<parallel>`, `<transition>`, `<initial>`, `<final>`, `<onentry>`, `<onexit>`, `<raise>`, `<log>`. For some tags, not all attributes may be supported. See below for further description.
   
 ## Core Constructs
-This is a description of the supported constructs and attributes from the scxml standard.
+This is a description of the supported core constructs and attributes from the scxml standard.
 ### Machine (`<scxml>`)
 The top-level wrapper element. The actual state machine consists of its children.
 
