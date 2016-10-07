@@ -6,11 +6,15 @@ All the following tags from the scxml standard are supported: `<scxml>`, `<state
 ## Core Constructs
 This is a description of the supported constructs and attributes from the scxml standard.
 ### Machine (`<scxml>`)
+The top-level wrapper element. The actual state machine consists of its children.
+
 #### Attribute `name`
 Specifies the name of the state machine. This name will be used for the class name of the generated state machine code. If omitted, the filename will be used as name.
 
 #### Attribute `initial`
 The id of the initial state(s) for the scxml document. If not specified, the default initial state is the first child state in document order.
+
+#### Children
 
 #### Example
 
