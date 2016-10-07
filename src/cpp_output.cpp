@@ -51,69 +51,29 @@ void cpp_output::gen_transition_base()
 	out << tab << "};" << endl;
 	out << endl;
 
-/*
-	// external transition
-	out << tab << "// external transition" << endl;
-	out << tab << "template<event E, class S, class D = no_state, transition_type T = external> class transition : public transition_actions<E, S, D>" << endl;
-	out << tab << "{" << endl;
-	out << tab << tab << "public:" << endl;
-	// exit/enter is called here without parameter, which forces the action to always exit/enter at least current state
-	out << tab << tab << "state* operator ()(S *s, D &d, " << classname() << " &sc)" << endl;
-	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
-	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
-	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
-       	if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
-       	out << tab << tab << tab << "s->template exit<D>(sc.model);" << endl;
-       	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
-       	out << tab << tab << tab << "d.template enter<S>(sc.model);" << endl;
-       	if(sc.using_parallel) out << tab << tab << tab << "return d.template enter_parallel<S>(sc, &d, s);" << endl;
-	else out << tab << tab << tab << "return &d;" << endl;
-       	out << tab << tab << "}" << endl;
-	out << tab << "};" << endl;
-	out << endl;
-	
-	// todo veryfy how these work at down transition
-	out << tab << "// internal transition" << endl;
-	out << tab << "template<event E, class S, class D> class transition<E, S, D, internal> : public transition_actions<E, S, D>" << endl;
-	out << tab << "{" << endl;
-	out << tab << tab << "public:" << endl;
-	out << tab << tab << "state* operator ()(S *s, D &d, " << classname() << " &sc)" << endl; 
-	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
-	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
-	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
-       	if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
-       	out << tab << tab << tab << "s->template exit<D>(sc.model, (D*)0);" << endl;
-       	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
-       	out << tab << tab << tab << "d.template enter<S>(sc.model, (S*)0);" << endl;
-       	if(sc.using_parallel) out << tab << tab << tab << "return d.template enter_parallel<S>(sc, &d, s);" << endl;
-	else out << tab << tab << tab << "return &d;" << endl;
-       	out << tab << tab << "}" << endl;
-	out << tab << "};" << endl;
-	out << endl;
-*/
-
 	// combined external/internal transition
 	out << tab << "// external/internal transition" << endl;
 	out << tab << "template<event E, class S, class D = no_state, transition_type T = external> class transition : public transition_actions<E, S, D>" << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "template<transition_type I> struct id { };" << endl;
-	out << tab << tab << "void state_enter(id<external>, D& d, data_model &m) { d.template enter<S>(m); };" << endl;
-	out << tab << tab << "void state_enter(id<internal>, D& d, data_model &m) { d.template enter<S>(m, (S*)0); };" << endl;
-	out << tab << tab << "void state_exit(id<external>, S* s, data_model &m) { s->template exit<D>(m); };" << endl;
-	out << tab << tab << "void state_exit(id<internal>, S* s, data_model &m) { s->template exit<D>(m, (D*)0); };" << endl;
+	// when exit/enter is called here without parameter, it forces the action to always exit/enter at least current state
+	// for internal transitions, D must be child of S, otherwise, handle as external transition
+	// S is the source state of the transition, not current state
+	out << tab << tab << "void state_enter(D& d, data_model &m, id<internal>, S*) { d.template enter<S>(m, (S*)0); };" << endl;
+	out << tab << tab << "void state_enter(D& d, data_model &m, ...) { d.template enter<S>(m); };" << endl;
+	//out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) { s->template exit<D>(m, (D*)0); };" << endl;
+	out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) {};" << endl;
+	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<D>(m); };" << endl;
 	out << tab << tab << "public:" << endl;
-	// exit/enter is called here without parameter, which forces the action to always exit/enter at least current state
 	out << tab << tab << "state* operator ()(S *s, D &d, " << classname() << " &sc)" << endl;
 	out << tab << tab << "{" << endl;
        	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
 	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
 	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
        	if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
-       	out << tab << tab << tab << "state_exit(id<T>(), s, sc.model);" << endl;
+       	out << tab << tab << tab << "state_exit(s, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
        	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
-       	out << tab << tab << tab << "state_enter(id<T>(), d, sc.model);" << endl;
+       	out << tab << tab << tab << "state_enter(d, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
        	if(sc.using_parallel) out << tab << tab << tab << "return d.template enter_parallel<S>(sc, &d, s);" << endl;
 	else out << tab << tab << tab << "return &d;" << endl;
        	out << tab << tab << "}" << endl;
@@ -214,6 +174,7 @@ void cpp_output::gen_state_composite_base()
 
 	// lca calculation
 	out << tab << tab << "public:" << endl;
+	out << tab << tab << "typedef P parent_t;" << endl;
 	out << tab << tab << "// LCA calculation" << endl;
 	out << tab << tab << "template<class T> void enter(data_model&, " << state_composite_t() << "*) {}" << endl;
 
