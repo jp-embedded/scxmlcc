@@ -1,7 +1,7 @@
 [Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](index.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Users Manual
 ## Current Status
-All the following tags are supported: `<onentry>`, `<onexit>`, `<log>`, `<state>`, `<initial>`, `<final>`, `<scxml>`, `<transition>`.
+All the following tags from the scxml standard are supported: `<onentry>`, `<onexit>`, `<log>`, `<state>`, `<initial>`, `<final>`, `<scxml>`, `<transition>`. For some tags, not all attributes may be supported. See below for further description.
   
 ## Core Constructs
 ### Constructs and Attributes
