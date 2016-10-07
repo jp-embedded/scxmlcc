@@ -14,9 +14,9 @@ This is a description of the supported constructs and attributes from the scxml 
 - id
 - initial
 
-### Enter Action (`<onentry>`)
+#### Enter Action (`<onentry>`)
 
-### Custom Enter Action
+#### Custom Enter Action
 
 #### Parallel State (`<parallel>`)
 - id
