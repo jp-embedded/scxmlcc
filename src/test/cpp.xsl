@@ -51,12 +51,17 @@
 
 <!-- datamodel -->
 <xsl:template match="//@conf:datamodel">
-	<xsl:attribute name="datamodel">ecmascript</xsl:attribute>
+	<xsl:attribute name="datamodel">cplusplus</xsl:attribute>
 </xsl:template>
 
 <!-- creates id for <data> element, etc. -->
 <xsl:template match="//@conf:id">
 	<xsl:attribute name="id">Var<xsl:value-of select="." /></xsl:attribute>
+</xsl:template>
+
+<!-- creates expr for <expr> element, etc. -->
+<xsl:template match="//@conf:expr">
+	<xsl:attribute name="expr"><xsl:value-of select="." /></xsl:attribute>
 </xsl:template>
 
 <!-- creates name for <param>, etc. -->

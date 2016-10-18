@@ -42,6 +42,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 			else if (it->first == "final") parse_final(it->second, boost::shared_ptr<state>());
 			else if (it->first == "parallel") parse_parallel(it->second, boost::shared_ptr<state>());
 			else if (it->first == "initial") m_scxml.initial = parse_initial(it->second);
+			else if (it->first == "datamodel") m_scxml.datamodel = parse_datamodel(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <scxml>" << endl;
 		}
 
@@ -102,6 +103,49 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
+}
+
+boost::shared_ptr<scxml_parser::data> scxml_parser::parse_data(const ptree &pt)
+{
+	boost::shared_ptr<scxml_parser::data> data = boost::make_shared<scxml_parser::data>();
+	
+	try {
+		using namespace boost::algorithm;
+		const ptree &xmlattr = pt.get_child("<xmlattr>");
+		data->id = xmlattr.get<string>("id");
+		data->expr = xmlattr.get_optional<string>("expr");
+	
+		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
+			if (it->first == "<xmlcomment>") ; // ignore comments
+			else if (it->first == "<xmlattr>") ; // ignore, parsed above
+			else cerr << "warning: unknown item '" << it->first << "' in <data>" << endl;
+		}
+
+	}
+	catch (ptree_error e) {
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
+		exit(1);
+	}
+	return data;
+}
+
+scxml_parser::data_list scxml_parser::parse_datamodel(const ptree &pt)
+{
+	scxml_parser::data_list datamodel;
+	try {
+
+		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
+			if (it->first == "<xmlcomment>") ; // ignore comments
+			else if (it->first == "data") datamodel.push_back(parse_data(it->second));
+			else cerr << "warning: unknown item '" << it->first << "' in <datamodel>" << endl;
+		}
+
+	}
+	catch (ptree_error e) {
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
+		exit(1);
+	}
+	return datamodel;
 }
 
 scxml_parser::transition scxml_parser::parse_initial(const ptree &pt)
