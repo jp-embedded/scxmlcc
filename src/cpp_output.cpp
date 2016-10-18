@@ -316,12 +316,25 @@ void cpp_output::gen_model_decl()
 	out << endl;
 }
 
+void cpp_output::gen_model_base_data()
+{
+	const scxml_parser::data_list &datamodel = sc.sc().datamodel;
+	for (scxml_parser::data_list::const_iterator i_data = datamodel.begin(); i_data != datamodel.end(); ++i_data) {
+		const string id = i_data->get()->id;
+		const boost::optional<string> expr_opt = i_data->get()->expr;
+		// todo: type float, bool, sting ??
+		out << tab << tab << "int " << id << ';' << endl;
+
+	}
+}
+
 void cpp_output::gen_model_base()
 {
 	out << tab << "struct data_model" << endl;
 	out << tab << "{" << endl;
 	if (!opt.bare_metal) out << tab << tab << "std::queue<event> event_queue;" << endl;
 	out << tab << tab << "user_model *user;" << endl;
+	gen_model_base_data();
 	out << tab << "} model;" << endl;
 	out << endl;
 }

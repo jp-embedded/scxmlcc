@@ -43,6 +43,7 @@ class cpp_output {
 	std::string state_composite_t();
 	std::string state_parallel_t();
 	void gen_model_decl();
+	void gen_model_base_data();
 	void gen_model_base();
 	void gen_state_base();
 	void gen_state_composite_base();
