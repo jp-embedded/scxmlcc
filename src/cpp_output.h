@@ -53,6 +53,7 @@ class cpp_output {
 	void gen_state(const scxml_parser::state &state);
 	void gen_action_part_log(scxml_parser::action &a);
 	void gen_action_part_raise(scxml_parser::action &a);
+	void gen_action_part_assign(scxml_parser::action &a);
 	void gen_action_part(scxml_parser::action &a);
 	void gen_actions();
 	void gen_sc();

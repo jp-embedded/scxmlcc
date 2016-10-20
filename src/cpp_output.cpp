@@ -318,13 +318,19 @@ void cpp_output::gen_model_decl()
 
 void cpp_output::gen_model_base_data()
 {
+	using namespace boost::algorithm;
 	const scxml_parser::data_list &datamodel = sc.sc().datamodel;
 	for (scxml_parser::data_list::const_iterator i_data = datamodel.begin(); i_data != datamodel.end(); ++i_data) {
-		const string id = i_data->get()->id;
+		string id = i_data->get()->id;
 		const boost::optional<string> expr_opt = i_data->get()->expr;
-		// todo: type float, bool, sting ??
-		out << tab << tab << "int " << id << ';' << endl;
-
+		vector<string> id_tokens;
+		split(id_tokens, id, is_any_of(" "), token_compress_on);
+		string type = "int"; // default type
+		if (id_tokens.size() == 2) {
+			type = id_tokens[0];
+			id = id_tokens[1];
+		}
+		out << tab << tab << type << ' ' << id << ';' << endl;
 	}
 }
 
@@ -670,6 +676,15 @@ void cpp_output::gen_action_part_log(scxml_parser::action &a)
 	out << " << \"" << expr << "\" << std::endl;" << endl;
 }
 
+void cpp_output::gen_action_part_assign(scxml_parser::action &a)
+{
+	const string location = a.attr["location"];
+	const string expr = a.attr["expr"];
+
+	out << tab << "// " << a.type << " location=" << location << " exrp=" << expr << endl;
+	out << tab << "m." << location << " = " << expr << ';' << endl;
+}
+
 void cpp_output::gen_action_part_raise(scxml_parser::action &a)
 {
 	const string ev = a.attr["event"];
@@ -682,6 +697,7 @@ void cpp_output::gen_action_part(scxml_parser::action &a)
 {
 	if(a.type == "raise") gen_action_part_raise(a);
 	else if(a.type == "log") gen_action_part_log(a);
+	else if(a.type == "assign") gen_action_part_assign(a);
 	else {
 		out << tab << "// warning: unknown action type '" << a.type << "'" << endl;
 		cerr << "warning: unknown action type '" << a.type << "'" << endl;

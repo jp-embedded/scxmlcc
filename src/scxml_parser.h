@@ -97,6 +97,7 @@ class scxml_parser
 		boost::shared_ptr<action> parse_script(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_log(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_raise(const boost::property_tree::ptree &pt);
+		boost::shared_ptr<action> parse_assign(const boost::property_tree::ptree &pt);
 		plist<action> parse_entry(const boost::property_tree::ptree &pt);
 
 };

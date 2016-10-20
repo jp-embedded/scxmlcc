@@ -54,17 +54,22 @@
 	<xsl:attribute name="datamodel">cplusplus</xsl:attribute>
 </xsl:template>
 
-<!-- creates id for <data> element, etc. -->
+<!-- creates id for <data> element. -->
 <xsl:template match="//@conf:id">
 	<xsl:attribute name="id">Var<xsl:value-of select="." /></xsl:attribute>
 </xsl:template>
 
-<!-- creates expr for <expr> element, etc. -->
+<!-- creates expr for <expr> element. -->
 <xsl:template match="//@conf:expr">
 	<xsl:attribute name="expr"><xsl:value-of select="." /></xsl:attribute>
 </xsl:template>
 
-<!-- creates name for <param>, etc. -->
+<!-- creates expr for <location> element. -->
+<xsl:template match="//@conf:location">
+	<xsl:attribute name="location">Var<xsl:value-of select="." /></xsl:attribute>
+</xsl:template>
+
+<!-- creates name for <param>. -->
 <xsl:template match="//@conf:name">
 	<xsl:attribute name="name">Var<xsl:value-of select="." /></xsl:attribute>
 </xsl:template>

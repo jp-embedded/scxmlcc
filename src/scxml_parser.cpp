@@ -257,6 +257,7 @@ scxml_parser::plist<scxml_parser::action> scxml_parser::parse_entry(const ptree 
 			else if (it->first == "script") l_ac.push_back(parse_script(it->second));
 			else if (it->first == "log") l_ac.push_back(parse_log(it->second));
 			else if (it->first == "raise") l_ac.push_back(parse_raise(it->second));
+			else if (it->first == "assign") l_ac.push_back(parse_assign(it->second));
 			else cerr << "warning: unknown item '" << it->first << "' in <onentry> or <onexit>" << endl;
 		}
 	}
@@ -321,6 +322,33 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_log(const ptree &pt)
 	return ac;
 }
 
+boost::shared_ptr<scxml_parser::action> scxml_parser::parse_assign(const ptree &pt)
+{
+	boost::shared_ptr<action> ac = boost::make_shared<action>();
+	try {
+		const ptree &xmlattr = pt.get_child("<xmlattr>");
+
+		const string location = xmlattr.get<string>("location");
+		boost::optional<string> expr(xmlattr.get_optional<string>("expr"));
+
+		ac->type = "assign";
+		ac->attr["location"] = location;
+		if(expr) ac->attr["expr"] = *expr;
+
+		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
+			if (it->first == "<xmlcomment>") ; // ignore comments
+			else if (it->first == "<xmlattr>") ; // ignore, parsed above
+			else cerr << "warning: unknown item '" << it->first << "' in <assign>" << endl;
+		}
+	}
+	catch (ptree_error e) {
+		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
+		exit(1);
+	}
+
+	return ac;
+}
+
 boost::shared_ptr<scxml_parser::action> scxml_parser::parse_script(const ptree &pt)
 {
 	boost::shared_ptr<action> ac = boost::make_shared<action>();
@@ -361,6 +389,7 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 			else if (it->first == "script") tr->actions.push_back(parse_script(it->second));
 			else if (it->first == "log") tr->actions.push_back(parse_log(it->second));
 			else if (it->first == "raise") tr->actions.push_back(parse_raise(it->second));
+			else if (it->first == "assign") tr->actions.push_back(parse_assign(it->second));
 			else cerr << "warning: unknown item '" << it->first << "' in <transition>" << endl;
 		}
 	}
