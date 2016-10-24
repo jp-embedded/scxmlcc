@@ -358,6 +358,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_script(const ptree &
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
+			else if (it->first == "<xmlattr>") ; // ignore, parsed above
 			else cerr << "warning: unknown item '" << it->first << "' in <script>" << endl;
 		}
 	}

@@ -35,8 +35,8 @@
 </xsl:template>
 
 <xsl:template match="conf:pass">
- <state xmlns="http://www.w3.org/2005/07/scxml" id="pass">
- </state>
+  <state xmlns="http://www.w3.org/2005/07/scxml" id="pass">
+  </state>
 </xsl:template>
 
 <!-- Failure criteria -->
@@ -45,8 +45,8 @@
 </xsl:template>
 
 <xsl:template match="conf:fail">
- <state xmlns="http://www.w3.org/2005/07/scxml" id="fail">
-</state>
+  <state xmlns="http://www.w3.org/2005/07/scxml" id="fail">
+  </state>
 </xsl:template>
 
 <!-- datamodel -->
@@ -72,6 +72,16 @@
 <!-- creates name for <param>. -->
 <xsl:template match="//@conf:name">
 	<xsl:attribute name="name">Var<xsl:value-of select="." /></xsl:attribute>
+</xsl:template>
+
+<!-- incrementID. -->
+<xsl:template match="conf:incrementID">
+	<script>++m.Var<xsl:value-of select="@id"/></script>
+</xsl:template>
+
+<!-- incrementID. -->
+<xsl:template match="conf:incrementID">
+	<script>++m.Var<xsl:value-of select="@id"/>;</script>
 </xsl:template>
 
 </xsl:stylesheet>
