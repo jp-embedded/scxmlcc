@@ -76,12 +76,12 @@
 
 <!-- incrementID. -->
 <xsl:template match="conf:incrementID">
-	<script>++m.Var<xsl:value-of select="@id"/></script>
+	<script>++m.Var<xsl:value-of select="@id"/>;</script>
 </xsl:template>
 
-<!-- incrementID. -->
-<xsl:template match="conf:incrementID">
-	<script>++m.Var<xsl:value-of select="@id"/>;</script>
+<!-- transition condition - value -->
+<xsl:template match="//@conf:idVal">
+	<xsl:attribute name="cond">Var<xsl:value-of select="concat(substring-before(.,'='),'==',substring-after(.,'='))" /></xsl:attribute>
 </xsl:template>
 
 </xsl:stylesheet>
