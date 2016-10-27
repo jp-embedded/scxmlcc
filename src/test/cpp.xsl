@@ -81,7 +81,14 @@
 
 <!-- transition condition - value -->
 <xsl:template match="//@conf:idVal">
-	<xsl:attribute name="cond">Var<xsl:value-of select="concat(substring-before(.,'='),'==',substring-after(.,'='))" /></xsl:attribute>
+	<xsl:choose>
+		<xsl:when test="contains(.,'!=')">
+			<xsl:attribute name="cond">Var<xsl:value-of select="." /></xsl:attribute>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:attribute name="cond">Var<xsl:value-of select="concat(substring-before(.,'='),'==',substring-after(.,'='))" /></xsl:attribute>
+		</xsl:otherwise>
+	</xsl:choose>
 </xsl:template>
 
 </xsl:stylesheet>
