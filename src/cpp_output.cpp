@@ -670,8 +670,8 @@ void cpp_output::gen_action_part_log(scxml_parser::action &a)
 	const string label = a.attr["label"];
 	const string expr = a.attr["expr"];
 
-	out << tab << "// " << a.type << " label=" << label << " expr=" << expr << endl;
-	out << tab << "std::clog";
+	out << tab << tab << "// " << a.type << " label=" << label << " expr=" << expr << endl;
+	out << tab << tab << "std::clog";
 	if(label.size()) out << " << \"[" << label << "] \""; 
 	out << " << \"" << expr << "\" << std::endl;" << endl;
 }
@@ -681,24 +681,24 @@ void cpp_output::gen_action_part_assign(scxml_parser::action &a)
 	const string location = a.attr["location"];
 	const string expr = a.attr["expr"];
 
-	out << tab << "// " << a.type << " location=" << location << " expr=" << expr << endl;
-	out << tab << "m." << location << " = " << expr << ';' << endl;
+	out << tab << tab << "// " << a.type << " location=" << location << " expr=" << expr << endl;
+	out << tab << tab << location << " = " << expr << ';' << endl;
 }
 
 void cpp_output::gen_action_part_script(scxml_parser::action &a)
 {
 	const string expr = a.attr["expr"];
 
-	out << tab << "// " << a.type << " expr=" << expr << endl;
-	out << tab << expr << endl;
+	out << tab << tab << "// " << a.type << " expr=" << expr << endl;
+	out << tab << tab << expr << endl;
 }
 
 void cpp_output::gen_action_part_raise(scxml_parser::action &a)
 {
 	const string ev = a.attr["event"];
 
-	out << tab << "// " << a.type << " event=" << ev << endl;
-	out << tab << "m.event_queue.push(&" << classname() << "::state::event_" << ev << ");" << endl;
+	out << tab << tab << "// " << a.type << " event=" << ev << endl;
+	out << tab << tab << "event_queue.push(&" << classname() << "::state::event_" << ev << ");" << endl;
 }
 
 void cpp_output::gen_action_part(scxml_parser::action &a)
@@ -708,11 +708,21 @@ void cpp_output::gen_action_part(scxml_parser::action &a)
 	else if(a.type == "assign") gen_action_part_assign(a);
 	else if(a.type == "script") gen_action_part_script(a);
 	else {
-		out << tab << "// warning: unknown action type '" << a.type << "'" << endl;
+		out << tab << tab << "// warning: unknown action type '" << a.type << "'" << endl;
 		cerr << "warning: unknown action type '" << a.type << "'" << endl;
 	}
 }
 
+void cpp_output::gen_with_begin()
+{
+	out << tab << "struct with : " << classname() << "::data_model { void operator ()() { // 'with' construct, to bring model variables in scope" << endl;
+}
+
+void cpp_output::gen_with_end()
+{
+	out << tab << "}}; static_cast<with&>(m)();" << endl;
+}
+	
 void cpp_output::gen_actions()
 {
 	const scxml_parser::state_list &states = sc.sc().states;
@@ -722,9 +732,11 @@ void cpp_output::gen_actions()
 		if(s->get()->entry_actions.size()) {
 			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::enter(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
+			gen_with_begin();
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->entry_actions.begin(); i != s->get()->entry_actions.end(); ++i) {
 				gen_action_part(*i->get());
 			}
+			gen_with_end();
 			out << '}' << endl;
 			out << endl;
 		}
@@ -733,9 +745,11 @@ void cpp_output::gen_actions()
 		if(s->get()->exit_actions.size()) {
 			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::exit(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
+			gen_with_begin();
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->exit_actions.begin(); i != s->get()->exit_actions.end(); ++i) {
 				gen_action_part(*i->get());
 			}
+			gen_with_end();
 			out << '}' << endl;
 			out << endl;
 		}
@@ -748,9 +762,11 @@ void cpp_output::gen_actions()
 			}
 		       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
+			gen_with_begin();
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->initial.actions.begin(); i != s->get()->initial.actions.end(); ++i) {
 				gen_action_part(*i->get());
 			}
+			gen_with_end();
 			out << '}' << endl;
 			out << endl;
 		}
@@ -765,9 +781,11 @@ void cpp_output::gen_actions()
 				}
 			       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
 				out << '{' << endl;
+				gen_with_begin();
 				for (scxml_parser::plist<scxml_parser::action>::const_iterator i = itrans->get()->actions.begin(); i != itrans->get()->actions.end(); ++i) {
 					gen_action_part(*i->get());
 				}
+				gen_with_end();
 				out << '}' << endl;
 				out << endl;
 			}

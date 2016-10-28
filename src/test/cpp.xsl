@@ -76,7 +76,7 @@
 
 <!-- incrementID. -->
 <xsl:template match="conf:incrementID">
-	<script>++m.Var<xsl:value-of select="@id"/>;</script>
+	<script>++Var<xsl:value-of select="@id"/>;</script>
 </xsl:template>
 
 <!-- transition condition - value -->
