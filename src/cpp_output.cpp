@@ -730,9 +730,9 @@ void cpp_output::gen_with_end(bool cond)
 {
 	string ret;
 	if (cond) {
-		ret = "return";
+		ret = " return";
 	}
-	out << tab << "}}; " << ret << " static_cast<with&>(m)();" << endl;
+	out << tab << "}};" << ret << " static_cast<with&>(m)();" << endl;
 }
 	
 void cpp_output::gen_actions()
@@ -787,8 +787,8 @@ void cpp_output::gen_actions()
 		// todo support multiple events. create an action for each event which calls a common action? - this would work only for the last transition if multiple transitions because of the call priority.
 		for (scxml_parser::transition_list::const_iterator itrans = s->get()->transitions.begin(); itrans != s->get()->transitions.end(); ++itrans) {
 			if(itrans->get()->actions.size()) {
-				if(itrans->get()->event.size() == 0) continue; // todo how to handle?
-				string event = event_name(itrans->get()->event.front());
+				string event = "unconditional";
+				if(itrans->get()->event.size()) event = event_name(itrans->get()->event.front());
 
 				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::" << event << ", " << classname() << "::state_" << s->get()->id;
 				for(scxml_parser::slist::const_iterator iaction = itrans->get()->target.begin(); iaction != itrans->get()->target.end(); ++iaction) {
@@ -805,8 +805,8 @@ void cpp_output::gen_actions()
 				out << endl;
 			}
 			if (itrans->get()->condition) {
-				if(itrans->get()->event.size() == 0) continue; // todo how to handle?
-				string event = event_name(itrans->get()->event.front());
+				string event = "unconditional";
+				if(itrans->get()->event.size()) event = event_name(itrans->get()->event.front());
 
 				out << "template<> bool " << classname() << "::transition_actions<&" << classname() << "::state::" << event << ", " << classname() << "::state_" << s->get()->id;
 				for(scxml_parser::slist::const_iterator iaction = itrans->get()->target.begin(); iaction != itrans->get()->target.end(); ++iaction) {
