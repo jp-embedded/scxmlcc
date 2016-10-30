@@ -51,6 +51,7 @@ class scxml_parser
 			slist event;
 			plist<action> actions;
 			boost::optional<std::string> type;
+			boost::optional<std::string> condition;
 		};
 		typedef plist<transition> transition_list;
 

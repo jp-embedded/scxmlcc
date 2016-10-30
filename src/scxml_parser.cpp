@@ -382,6 +382,7 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 			boost::optional<string> event = xmlattr->get_optional<string>("event");
 			if(event) split(tr->event, *event, is_any_of(" "), token_compress_on);
 			tr->type = xmlattr->get_optional<string>("type");
+			tr->condition = xmlattr->get_optional<string>("cond");
 		}
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {

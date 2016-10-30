@@ -26,6 +26,15 @@
 
 using namespace std;
 
+
+string event_name(string event)
+{
+	string name = "event";
+	if (event != "*") name += '_' + event;
+	replace(name.begin(), name.end(), '.', '_'); // replace '.' with '_'
+	return name;
+}
+
 //todo set private/public/protected 
 
 string cpp_output::classname()		{ return "sc_" + sc.sc().name; }
@@ -514,10 +523,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			event_map["unconditional"].push_back(*itrans);
 		}
 		else for (scxml_parser::slist::const_iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
-                        string event = "event";
-                        if (*ievent != "*") event += '_' + *ievent;
-                        replace(event.begin(), event.end(), '.', '_'); // replace '.' with '_'
-			event_map[event].push_back(*itrans);
+			event_map[event_name(*ievent)].push_back(*itrans);
 		}
 	}
 	
@@ -670,7 +676,7 @@ void cpp_output::gen_action_part_log(scxml_parser::action &a)
 	const string label = a.attr["label"];
 	const string expr = a.attr["expr"];
 
-	out << tab << tab << "// " << a.type << " label=" << label << " expr=" << expr << endl;
+	//out << tab << tab << "// " << a.type << " label=" << label << " expr=" << expr << endl;
 	out << tab << tab << "std::clog";
 	if(label.size()) out << " << \"[" << label << "] \""; 
 	out << " << \"" << expr << "\" << std::endl;" << endl;
@@ -681,7 +687,7 @@ void cpp_output::gen_action_part_assign(scxml_parser::action &a)
 	const string location = a.attr["location"];
 	const string expr = a.attr["expr"];
 
-	out << tab << tab << "// " << a.type << " location=" << location << " expr=" << expr << endl;
+	//out << tab << tab << "// " << a.type << " location=" << location << " expr=" << expr << endl;
 	out << tab << tab << location << " = " << expr << ';' << endl;
 }
 
@@ -689,7 +695,7 @@ void cpp_output::gen_action_part_script(scxml_parser::action &a)
 {
 	const string expr = a.attr["expr"];
 
-	out << tab << tab << "// " << a.type << " expr=" << expr << endl;
+	//out << tab << tab << "// " << a.type << " expr=" << expr << endl;
 	out << tab << tab << expr << endl;
 }
 
@@ -697,7 +703,7 @@ void cpp_output::gen_action_part_raise(scxml_parser::action &a)
 {
 	const string ev = a.attr["event"];
 
-	out << tab << tab << "// " << a.type << " event=" << ev << endl;
+	//out << tab << tab << "// " << a.type << " event=" << ev << endl;
 	out << tab << tab << "event_queue.push(&" << classname() << "::state::event_" << ev << ");" << endl;
 }
 
@@ -713,14 +719,20 @@ void cpp_output::gen_action_part(scxml_parser::action &a)
 	}
 }
 
-void cpp_output::gen_with_begin()
+void cpp_output::gen_with_begin(bool cond)
 {
-	out << tab << "struct with : " << classname() << "::data_model { void operator ()() { // 'with' construct, to bring model variables in scope" << endl;
+	string ret = "void";
+	if (cond) ret = "bool";
+	out << tab << "struct with : " << classname() << "::data_model { " << ret << " operator ()() { // 'with' construct, to bring model variables in scope" << endl;
 }
 
-void cpp_output::gen_with_end()
+void cpp_output::gen_with_end(bool cond)
 {
-	out << tab << "}}; static_cast<with&>(m)();" << endl;
+	string ret;
+	if (cond) {
+		ret = "return";
+	}
+	out << tab << "}}; " << ret << " static_cast<with&>(m)();" << endl;
 }
 	
 void cpp_output::gen_actions()
@@ -732,11 +744,11 @@ void cpp_output::gen_actions()
 		if(s->get()->entry_actions.size()) {
 			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::enter(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
-			gen_with_begin();
+			gen_with_begin(false);
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->entry_actions.begin(); i != s->get()->entry_actions.end(); ++i) {
 				gen_action_part(*i->get());
 			}
-			gen_with_end();
+			gen_with_end(false);
 			out << '}' << endl;
 			out << endl;
 		}
@@ -745,11 +757,11 @@ void cpp_output::gen_actions()
 		if(s->get()->exit_actions.size()) {
 			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::exit(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
-			gen_with_begin();
+			gen_with_begin(false);
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->exit_actions.begin(); i != s->get()->exit_actions.end(); ++i) {
 				gen_action_part(*i->get());
 			}
-			gen_with_end();
+			gen_with_end(false);
 			out << '}' << endl;
 			out << endl;
 		}
@@ -762,11 +774,11 @@ void cpp_output::gen_actions()
 			}
 		       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
-			gen_with_begin();
+			gen_with_begin(false);
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->initial.actions.begin(); i != s->get()->initial.actions.end(); ++i) {
 				gen_action_part(*i->get());
 			}
-			gen_with_end();
+			gen_with_end(false);
 			out << '}' << endl;
 			out << endl;
 		}
@@ -775,17 +787,36 @@ void cpp_output::gen_actions()
 		// todo support multiple events. create an action for each event which calls a common action? - this would work only for the last transition if multiple transitions because of the call priority.
 		for (scxml_parser::transition_list::const_iterator itrans = s->get()->transitions.begin(); itrans != s->get()->transitions.end(); ++itrans) {
 			if(itrans->get()->actions.size()) {
-				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::event_" << itrans->get()->event.front() << ", " << classname() << "::state_" << s->get()->id;
+				if(itrans->get()->event.size() == 0) continue; // todo how to handle?
+				string event = event_name(itrans->get()->event.front());
+
+				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::" << event << ", " << classname() << "::state_" << s->get()->id;
 				for(scxml_parser::slist::const_iterator iaction = itrans->get()->target.begin(); iaction != itrans->get()->target.end(); ++iaction) {
 					out << ", " << classname() << "::state_" << *iaction;
 				}
 			       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
 				out << '{' << endl;
-				gen_with_begin();
+				gen_with_begin(false);
 				for (scxml_parser::plist<scxml_parser::action>::const_iterator i = itrans->get()->actions.begin(); i != itrans->get()->actions.end(); ++i) {
 					gen_action_part(*i->get());
 				}
-				gen_with_end();
+				gen_with_end(false);
+				out << '}' << endl;
+				out << endl;
+			}
+			if (itrans->get()->condition) {
+				if(itrans->get()->event.size() == 0) continue; // todo how to handle?
+				string event = event_name(itrans->get()->event.front());
+
+				out << "template<> bool " << classname() << "::transition_actions<&" << classname() << "::state::" << event << ", " << classname() << "::state_" << s->get()->id;
+				for(scxml_parser::slist::const_iterator iaction = itrans->get()->target.begin(); iaction != itrans->get()->target.end(); ++iaction) {
+					out << ", " << classname() << "::state_" << *iaction;
+				}
+			       	out << ">::condition(" << classname() << "::data_model &m)" << endl;
+				out << '{' << endl;
+				gen_with_begin(true);
+				out << tab << tab << "return " << *itrans->get()->condition << ';' << endl;
+				gen_with_end(true);
 				out << '}' << endl;
 				out << endl;
 			}
