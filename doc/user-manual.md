@@ -17,7 +17,9 @@ The id of the initial state(s) for the scxml document. If not specified, the def
 #### Children
 
 #### Example
-
+`<scxml initial="hello" version="0.9" xmlns="http://www.w3.org/2005/07/scxml">
+ ...
+</scxml>`
 
 ### State (`<state>`)
 - id
