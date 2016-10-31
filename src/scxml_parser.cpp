@@ -198,6 +198,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
 			else if (it->first == "onexit") state_i->get()->exit_actions = parse_entry(it->second);
 			else if (it->first == "initial") state_i->get()->initial = parse_initial(it->second);
+			else if (it->first == "datamodel") { scxml_parser::data_list m = parse_datamodel(it->second); m_scxml.datamodel.insert(m_scxml.datamodel.end(), m.begin(), m.end()); }
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
 		}
 
