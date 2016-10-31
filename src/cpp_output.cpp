@@ -327,6 +327,8 @@ void cpp_output::gen_model_decl()
 
 void cpp_output::gen_model_base_data()
 {
+	typedef vector<pair<string, string> > pair_vect;
+	pair_vect constructs;
 	using namespace boost::algorithm;
 	const scxml_parser::data_list &datamodel = sc.sc().datamodel;
 	for (scxml_parser::data_list::const_iterator i_data = datamodel.begin(); i_data != datamodel.end(); ++i_data) {
@@ -340,6 +342,17 @@ void cpp_output::gen_model_base_data()
 			id = id_tokens[1];
 		}
 		out << tab << tab << type << ' ' << id << ';' << endl;
+		if (expr_opt) {
+			constructs.push_back(make_pair(id, *expr_opt));
+		}
+	}
+	if (constructs.size()) {
+		out << tab << tab << "data_model() : ";
+		for (pair_vect::const_iterator i_construct = constructs.begin(); i_construct != constructs.end(); ++i_construct) {
+			if (i_construct != constructs.begin()) out << ", ";
+			out << i_construct->first << '(' << i_construct->second << ')';
+		}	
+		out << " {}" << endl;
 	}
 }
 
