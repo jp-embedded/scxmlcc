@@ -8,22 +8,23 @@ This is a description of the supported core constructs and attributes from the s
 ### Machine (`<scxml>`)
 The top-level wrapper element. The actual state machine consists of its children.
 
-#### Attribute `name`
+#### Attributes
+##### `name`
 Specifies the name of the state machine. This name will be used for the class name of the generated state machine code. If omitted, the filename will be used as name.
 
-#### Attribute `initial`
+##### `initial`
 The id of the initial state(s) for the scxml document. If not specified, the default initial state is the first child state in document order.
 
-#### Attribute `xmlns`
+##### `xmlns`
 This attribute is required and must be `"http://www.w3.org/2005/07/scxml"`.
 
-#### Attribute `version`
+##### `version`
 This attribute is required and must be `"1.0"`
 
-#### Attribute `datamodel`
+##### `datamodel`
 The datamodel that this document requires. The current supported datamodels are `"null"` and `"cplusplus"`. For further description of the datamodels, see section "Data Models".
 
-#### Attribute `binding`
+##### `binding`
 This attribute is currently ignored. Only `early` binding is currently supported, which means all data objects are constructed when the state chart is constructed.
 
 #### Valid Children
