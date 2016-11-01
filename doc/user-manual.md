@@ -25,7 +25,7 @@ This attribute is required and must be `"1.0"`
 The datamodel that this document requires. The current supported datamodels are `"null"` and `"cplusplus"`. For further description of the datamodels, see section [Data Models](user-manual.md#data-models).
 
 ##### `binding`
-This attribute is currently ignored. Only `early` binding is currently supported, which means all data objects are constructed when the state chart is constructed.
+This attribute is currently ignored. Only `"early"` binding is currently supported, which means all data objects are constructed when the state chart is constructed.
 
 #### Valid Children
 
