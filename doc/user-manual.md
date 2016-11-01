@@ -29,10 +29,10 @@ This attribute is currently ignored. Only `"early"` binding is currently support
 
 #### Valid Children
 
-- `<state>`
-- `<parallel>`
-- `<final>`
-- `<datamodel>`
+- [`<state>`](user-manual.md#state-state)
+- [`<parallel>`](user-manual.md#parallel-state-parallel)
+- [`<final>`](user-manual.md#final-state-final)
+- [`<datamodel>`](user-manual.md#data-model-datamodel)
 
 #### Example
 ```
@@ -44,6 +44,10 @@ This attribute is currently ignored. Only `"early"` binding is currently support
 ### State (`<state>`)
 - id
 - initial
+
+### Data Model (`<datamodel>`)
+
+### Final State (`<final>`)
 
 ### Enter Action (`<onentry>`)
 
