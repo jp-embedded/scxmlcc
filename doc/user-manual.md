@@ -15,7 +15,16 @@ Specifies the name of the state machine. This name will be used for the class na
 The id of the initial state(s) for the scxml document. If not specified, the default initial state is the first child state in document order.
 
 #### Attribute `xmlns`
-The value must be `"http://www.w3.org/2005/07/scxml"`.
+This attribute is required and must be `"http://www.w3.org/2005/07/scxml"`.
+
+#### Attribute `version`
+This attribute is required and must be `"1.0"`
+
+#### Attribute `datamodel`
+The datamodel that this document requires. The supported datamodels are `"null"` and `"cplusplus"`. For further description of the datamodels, see section "Data Models".
+
+#### Attribute `binding`
+This attribute is currently ignored. Only `early` binding is currently supported, which means all data objects are constructed when the state chart is constructed.
 
 #### Valid Children
 
@@ -26,7 +35,7 @@ The value must be `"http://www.w3.org/2005/07/scxml"`.
 
 #### Example
 ```
-<scxml initial="hello" version="0.9" xmlns="http://www.w3.org/2005/07/scxml">
+<scxml initial="hello" version="1.0" xmlns="http://www.w3.org/2005/07/scxml">
  ...
 </scxml>
 ```
@@ -52,6 +61,12 @@ This construct is currently only partially implemented. Other constructs may not
 ### \<final\>
 - id
 
+## Data Models
+### The `null` datamodel
+todo
+
+### The `cplusplus` datamodel
+todo
 
 ## Invoking scxmlcc
 ## Custom Constructs
