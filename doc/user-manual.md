@@ -14,7 +14,12 @@ Specifies the name of the state machine. This name will be used for the class na
 #### Attribute `initial`
 The id of the initial state(s) for the scxml document. If not specified, the default initial state is the first child state in document order.
 
-#### Children
+#### Valid Children
+
+- `<state>`
+- `<parallel>`
+- `<final>`
+- `<datamodel>`
 
 #### Example
 ```
