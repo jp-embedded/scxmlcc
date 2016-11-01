@@ -21,7 +21,7 @@ This attribute is required and must be `"http://www.w3.org/2005/07/scxml"`.
 This attribute is required and must be `"1.0"`
 
 #### Attribute `datamodel`
-The datamodel that this document requires. The supported datamodels are `"null"` and `"cplusplus"`. For further description of the datamodels, see section "Data Models".
+The datamodel that this document requires. The current supported datamodels are `"null"` and `"cplusplus"`. For further description of the datamodels, see section "Data Models".
 
 #### Attribute `binding`
 This attribute is currently ignored. Only `early` binding is currently supported, which means all data objects are constructed when the state chart is constructed.
