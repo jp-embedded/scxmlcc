@@ -5,7 +5,7 @@ All the following tags from the scxml standard are supported: `<scxml>`, `<state
   
 ## Core Constructs
 This is a description of the supported core constructs and attributes from the scxml standard.
-### Machine (`<scxml>`)
+### State Machine (`<scxml>`)
 The top-level wrapper element. The actual state machine consists of its children.
 
 #### Attributes
