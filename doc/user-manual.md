@@ -42,29 +42,76 @@ This attribute is currently ignored. Only `"early"` binding is currently support
 ```
 
 ### State (`<state>`)
-- id
-- initial
 
-### Data Model (`<datamodel>`)
+#### Attributes
+
+#### Valid Children
+
+#### Example
+
+### Parallel State (`<parallel>`)
+
+This construct is currently only partially implemented. Other constructs may not work correctly in combination with parallel states.
+
+#### Attributes
+
+#### Valid Children
+
+#### Example
+
+### Transition (`<transition>`)
+
+#### Attributes
+
+#### Valid Children
+
+#### Example
+
+### Initial (`<initial>`)
+
+#### Attributes
+
+#### Valid Children
+
+#### Example
 
 ### Final State (`<final>`)
 
+#### Attributes
+
+#### Valid Children
+
+#### Example
+
 ### Enter Action (`<onentry>`)
 
-### Custom Enter Action
+#### Attributes
 
-### Parallel State (`<parallel>`)
-- id
+#### Valid Children
 
+#### Custom Enter Action
 
-This construct is currently only partially implemented. Other constructs may not work correctly in combination with parallel states.
-### \<transition\>
-- event
-- target
+#### Example
 
-### \<initial\>
-### \<final\>
-- id
+### Exit Action (`<onexit>`)
+
+#### Attributes
+
+#### Valid Children
+
+#### Custom Enter Action
+
+#### Example
+
+## Data Model and Data Manipulation
+
+### Data Model (`<datamodel>`)
+
+#### Attributes
+
+#### Valid Children
+
+#### Example
 
 ## Data Models
 ### The `null` datamodel
