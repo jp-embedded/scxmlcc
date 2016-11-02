@@ -155,3 +155,6 @@ template<> void sc::transition_actions<&sc::state::event_N, sc::state_collect_co
 ```
 #### Transition Actions With Multiple Eventes
 ## Including scxmlcc in your makefile
+
+## Performance
+
