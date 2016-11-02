@@ -44,7 +44,7 @@ This attribute is currently ignored. Only `"early"` binding is currently support
 ### State (`<state>`)
 This element represents a state in the state machine. A state can hold child states to form a hierarchical state machine.
 
-A state may specify either an `"initial"` attribute or an `<initial>` child element, but not both. If none of them are present, the state's first child state in document order is used as inital state.
+A state may specify either an `initial` attribute or an `<initial>` child element, but not both. If none of them are present, the state's first child state in document order is used as inital state.
 
 If the state has any child states, any transition which takes this state as its target will result in the state machine also taking the transition to its inital state. 
 
