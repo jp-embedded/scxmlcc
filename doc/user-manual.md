@@ -75,7 +75,9 @@ The id of the default initial child state (or states) for this state. Alternativ
 
 ### Parallel State (`<parallel>`)
 
-This construct is currently only partially implemented. Other constructs may not work correctly in combination with parallel states.
+This construct is currently only partially implemented. Also, other constructs may not work correctly in combination with parallel states.
+
+scxmlcc is made to generate efficient code, so it is worth mentioning that when using parallel states, performance will degrade compared to state machines without parallel states, because the state machine now has to maintain a list of active states instead of a single active state. However if perfomance is not critical this will probaly not be significant.
 
 #### Attributes
 
