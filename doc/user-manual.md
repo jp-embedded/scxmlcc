@@ -56,7 +56,7 @@ An identifier for the state. This attribute is required.
 ##### `initial`
 The id of the default initial child state (or states) for this state. Alternatively, the initial state can be set with the `<initial>` child.
 
-The initial state(s) specified must be descendants of the containing `<state>`.
+The initial state(s) specified must be child(s) of the containing `<state>`.
 
 If multiple states are specified, they must have a `<parallel>` ancestor and they must not be descendants of each other.
 
