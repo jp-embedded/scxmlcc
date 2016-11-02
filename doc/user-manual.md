@@ -67,6 +67,11 @@ The id of the default initial child state (or states) for this state. Alternativ
 - [`<datamodel>`](user-manual.md#data-model-datamodel)
 
 #### Example
+```
+<state id="active" initial="collect_coins">
+  ...
+</state>
+```
 
 ### Parallel State (`<parallel>`)
 
