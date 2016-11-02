@@ -15,6 +15,8 @@ Specifies the name of the state machine. This name will be used for the class na
 ##### `initial`
 The id of the initial state(s) for the scxml document. If not specified, the default initial state is the first child state in document order.
 
+If multiple states are specified, they must have a `<parallel>` ancestor and they must not be descendants of each other.
+
 ##### `xmlns`
 This attribute is required and must be `"http://www.w3.org/2005/07/scxml"`.
 
