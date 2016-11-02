@@ -42,10 +42,29 @@ This attribute is currently ignored. Only `"early"` binding is currently support
 ```
 
 ### State (`<state>`)
+This element represents a state in the state machine. A state can hold child states to form a hierarchical state machine.
+
+A state may specify either an `"initial"` attribute or an `<initial>` child element, but not both. If none of them are present, the state's first child state in document order is used as inital state.
+
+If the state has any child states, any transition which takes this state as its target will result in the state machine also taking the transition to its inital state. 
 
 #### Attributes
 
+##### `id`
+An identifier for the state. This attribute is required.
+
+##### `initial`
+The id of the default initial child state (or states) for this state. Alternatively, the initial state can be set with the `<initial>` child. 
+
 #### Valid Children
+- [`<onentry>`](user-manual.md#enter-action-onentry)
+- [`<onexit>`](user-manual.md#exit-action-onexit)
+- [`<transition>`](user-manual.md#transition-transition)
+- [`<initial>`](user-manual.md#initial-initial)
+- [`<state>`](user-manual.md#state-state)
+- [`<parallel>`](user-manual.md#parallel-state-parallel)
+- [`<final>`](user-manual.md#final-state-final)
+- [`<datamodel>`](user-manual.md#data-model-datamodel)
 
 #### Example
 
