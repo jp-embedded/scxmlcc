@@ -54,7 +54,11 @@ If the state has any child states, any transition which takes this state as its 
 An identifier for the state. This attribute is required.
 
 ##### `initial`
-The id of the default initial child state (or states) for this state. Alternatively, the initial state can be set with the `<initial>` child. 
+The id of the default initial child state (or states) for this state. Alternatively, the initial state can be set with the `<initial>` child.
+
+The initial state(s) specified must be descendants of the containing `<state>`.
+
+If multiple states are specified, they must have a `<parallel>` ancestor and they must not be descendants of each other.
 
 #### Valid Children
 - [`<onentry>`](user-manual.md#enter-action-onentry)
