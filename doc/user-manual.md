@@ -122,13 +122,13 @@ At least one of the attributes `event`, `cond` or `target` must be specified.
 
 #### Attributes
 
-##### event
+##### `event`
 
-##### cond
+##### `cond`
 
-##### target
+##### `target`
 
-##### type
+##### `type`
 Can be `"internal"` or `"external"`. If omitted, the type is external. If the type is internal and the target state is a descendant of the transitions source state, the transition will not exit and re-enter its source state, while an external one will.
 
 #### Valid Children
