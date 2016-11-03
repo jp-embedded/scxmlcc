@@ -17,6 +17,8 @@ The id of the initial state(s) for the scxml document. If not specified, the def
 
 If multiple states are specified, any two of them must have a `<parallel>` state as their nearest common ancestor and they must not be descendants of each other.
 
+If not all children of a `<paralel>` state is included, the remaining children will enter their initial state.
+
 ##### `xmlns`
 This attribute is required and must be `"http://www.w3.org/2005/07/scxml"`.
 
@@ -61,6 +63,8 @@ The id of the default initial state (or states) for this state. Alternatively, t
 The initial state(s) specified must be descendant(s) of the containing `<state>`.
 
 If multiple states are specified, any two of them must have a `<parallel>` state as their nearest common ancestor and they must not be descendants of each other.
+
+If not all children of a `<paralel>` state is included, the remaining children will enter their initial state.
 
 #### Valid Children
 - [`<onentry>`](user-manual.md#enter-action-onentry)
