@@ -38,3 +38,5 @@ Next todo on the feature list is to complete the core constructs of the scxml st
 * Final states
 
 If you have any suggestions on features to prioritize, please create an [issue](https://github.com/jp-embedded/scxmlcc/issues).
+
+For more information, see [Documentation](doc/index.md) 
