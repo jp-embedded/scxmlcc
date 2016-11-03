@@ -114,7 +114,7 @@ An identifier for the state. This attribute is required.
 ### Transition (`<transition>`)
 This element specifies transitions between states. The transitions are triggered by events, They may contain execute conditions and executeable content.
 
-When a transition is executed, the current state and its parents are exited up to the nearest common ancestor of the current state and the transition target. Then, all states are entered from the ancestor to the transitions target.
+When a transition is executed, the current state and its parents are exited up to the nearest common ancestor of the current state and the transition target. Then, all states are entered from the ancestor to the transition's target.
 
 If a parallel state is exited, the other parallel state's children are exited also.
 
