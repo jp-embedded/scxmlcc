@@ -129,7 +129,7 @@ At least one of the attributes `event`, `cond` or `target` must be specified.
 ##### `target`
 
 ##### `type`
-Can be `"internal"` or `"external"`. If omitted, the type is external. If the type is internal and the target state is a descendant of the transitions source state, the transition will not exit and re-enter its source state, while an external one will. Internal transitions are useful for initial transitions as in [`<initial>`](user-manual.md#initial-initial)
+Can be `"internal"` or `"external"`. If omitted, the type is external. If the type is internal and the target state is a descendant of the transitions source state, the transition will not exit and re-enter its source state, while an external one will. Internal transitions are useful for initial transitions as a child of [`<initial>`](user-manual.md#initial-initial)
 
 #### Valid Children
 
