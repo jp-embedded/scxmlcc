@@ -60,7 +60,7 @@ The id of the default initial state (or states) for this state. Alternatively, t
 
 The initial state(s) specified must be descendant(s) of the containing `<state>`.
 
-If multiple states are specified, they must have a `<parallel>` ancestor and they must not be descendants of each other.
+If multiple states are specified, any two of them must have a `<parallel>` ancestor and they must not be descendants of each other.
 
 #### Valid Children
 - [`<onentry>`](user-manual.md#enter-action-onentry)
