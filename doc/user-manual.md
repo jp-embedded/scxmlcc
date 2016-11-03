@@ -81,16 +81,32 @@ If multiple states are specified, any two of them must have a `<parallel>` state
 
 ### Parallel State (`<parallel>`)
 
-This construct is currently only partially implemented. Also, other constructs may not work correctly in combination with parallel states.
+This construct is currently only partially implemented. Also, other constructs may currently not work correctly in combination with parallel states.
 
 scxmlcc is made to generate efficient code, so it is worth mentioning that when using parallel states, performance will degrade compared to state machines without parallel states, because the state machine now has to maintain a list of active states instead of a single active state. However if perfomance is not critical this will probaly not be significant.
 
+The `<parallel>` element encapsulates a set of child states which are simultaneously active.
+
 #### Attributes
 
+##### `id`
+An identifier for the state. This attribute is required.
+
 #### Valid Children
+- [`<onentry>`](user-manual.md#enter-action-onentry)
+- [`<onexit>`](user-manual.md#exit-action-onexit)
+- [`<transition>`](user-manual.md#transition-transition)
+- [`<state>`](user-manual.md#state-state)
+- [`<parallel>`](user-manual.md#parallel-state-parallel)
+- [`<datamodel>`](user-manual.md#data-model-datamodel)
 
 #### Example
+```
+<parallel id="s11p1">
+  ...
+</parallel>
 
+```
 ### Transition (`<transition>`)
 
 #### Attributes
