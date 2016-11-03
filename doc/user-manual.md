@@ -112,8 +112,24 @@ An identifier for the state. This attribute is required.
 
 ```
 ### Transition (`<transition>`)
+This element specifies transitions between states. The transitions are triggered by events, They may contain execute conditions and executeable content.
+
+When a transition is executed, the current state and its parents are exited up to the nearest common ancestor of the current state and the transition target. Then, all states are entered from the ancestor to the transitions target.
+
+If a parallel state is exited, the other parallel state's children are exited also.
+
+At least one of the attributes `event`, `cond` or `target` must be specified.
 
 #### Attributes
+
+##### event
+
+##### cond
+
+##### target
+
+##### type
+Can be `"internal"` or `"external"`. If omitted, the type is external. If the type is internal and the target state is a descendant of the transitions source state, the transition will not exit and re-enter its source state, while an external one will.
 
 #### Valid Children
 
