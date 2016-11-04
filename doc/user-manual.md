@@ -147,6 +147,32 @@ Can be `"internal"` or `"external"`. If omitted, the type is external. If the ty
 - [`<script>`](user-manual.md#script-script)
 - [`<assign>`](user-manual.md#assign-assign)
 
+#### Custom Actions and Conditions
+
+The transition's executable content can also be defined in C++ code, so the state machine and it's actions can be seperated. To do this the transition must not contain executable content in the document.
+
+Transition actions are implemented in a `transition_actions` template inside the state machine class. This template can be specialized for each transition to implement custom actions. If the state machine is called `sc`, a transition action can be specialized like this:
+
+```
+template<> void sc::transition_actions<E, S, D>::enter(sc::data_model &m)	{ ... }
+```
+Where `E` is the event, `S` is the source state, `D` is the destination state. `D` is omitted if the transition has no target.
+
+The event is a member method in the sc::state struct, and the states are structs defined in the sc class. The data model is passed in the `m` parameter so the data model can be accessed.
+
+So, for example: todo - find better example
+```
+template<> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	
+{
+  m.foo = true;
+}
+
+```
+
+todo same for condition
+
+In the C++ file that includes the generated state machine.
+
 #### Example
 ```
 <transition event="cancel" target="coin_return">
