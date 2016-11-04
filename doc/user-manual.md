@@ -114,6 +114,8 @@ An identifier for the state. This attribute is required.
 ### Transition (`<transition>`)
 This element specifies transitions between states. The transitions are triggered by events, They may contain execute conditions and executeable content.
 
+The source state of the transition is the state in which the transition is a child of.
+
 When a transition is executed, the current state and its parents are exited up to the nearest common ancestor of the current state and the transition target. Then, all states are entered from the ancestor to the transition's target.
 
 If a parallel state is exited, the other parallel state's children are exited also.
@@ -134,14 +136,23 @@ An execute condition. The transition is only executed if the condition evaluates
 
 
 ##### `target`
+The id of the state to transition to.
 
 ##### `type`
 Can be `"internal"` or `"external"`. If omitted, the type is external. If the type is internal and the target state is a descendant of the transitions source state, the transition will not exit and re-enter its source state, while an external one will. Internal transitions are useful for initial transitions as a child of [`<initial>`](user-manual.md#initial-initial)
 
 #### Valid Children
+- [`<raise>`](user-manual.md#raise-raise)
+- [`<log>`](user-manual.md#log-log)
+- [`<script>`](user-manual.md#script-script)
+- [`<assign>`](user-manual.md#assign-assign)
 
 #### Example
-
+```
+<transition event="cancel" target="coin_return">
+  ...
+</transition>
+```
 ### Initial (`<initial>`)
 
 #### Attributes
@@ -177,6 +188,16 @@ Can be `"internal"` or `"external"`. If omitted, the type is external. If the ty
 #### Custom Enter Action
 
 #### Example
+
+## Executable Content
+
+### Raise (`<raise>`)
+
+### Log (`<log>`)
+
+### Script (`<script>`)
+
+### Assign (`<assign>`)
 
 ## Data Model and Data Manipulation
 
