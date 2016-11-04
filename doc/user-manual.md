@@ -154,12 +154,22 @@ Can be `"internal"` or `"external"`. If omitted, the type is external. If the ty
 </transition>
 ```
 ### Initial (`<initial>`)
+This element represents the default initial state for a <state> element.
+
+Note that the child transition must not contain `cond` or `event` attributes, and must specify a `target` whose value is state(s) consisting solely of descendants of the containing state.
 
 #### Attributes
+None.
 
 #### Valid Children
+- [`<transition>`](user-manual.md#transition-transition)
 
 #### Example
+```
+<initial>
+  ...
+</initial>
+```
 
 ### Final State (`<final>`)
 
