@@ -120,9 +120,12 @@ If a parallel state is exited, the other parallel state's children are exited al
 
 At least one of the attributes `event`, `cond` or `target` must be specified.
 
+If multiple transitions may be triggered by an event, one of these transitions are proiritized. If T1 and T2 are two conflicting transitions and their condition evaluates to true, T1 is prioritized if T1's source state is a descendant of T2's source state. Otherwise they are prioritized in document order.
+
 #### Attributes
 
 ##### `event`
+todo: event tokens
 
 ##### `cond`
 
