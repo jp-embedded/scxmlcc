@@ -125,9 +125,13 @@ If multiple transitions may be triggered by an event, one of these transitions a
 #### Attributes
 
 ##### `event`
+A space seperated list of events that trigger this transition.
+
 todo: event tokens
 
 ##### `cond`
+An execute condition. The transition is only executed if the condition evaluates to true. The format of the condition depends on the data model specified in [`<scxml>`](user-manual.md#state-machine-scxml)
+
 
 ##### `target`
 
