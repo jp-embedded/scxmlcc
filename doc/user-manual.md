@@ -147,9 +147,16 @@ Can be `"internal"` or `"external"`. If omitted, the type is external. If the ty
 - [`<script>`](user-manual.md#script-script)
 - [`<assign>`](user-manual.md#assign-assign)
 
+#### Example
+```
+<transition event="cancel" target="coin_return">
+  ...
+</transition>
+```
+
 #### Custom Actions and Conditions
 
-The transition's executable content can also be defined in C++ code, so the state machine and it's actions can be seperated. To do this the transition must not contain executable content in the document.
+The transition's executable content can also be defined in C++ code instead of the scxml document, so the state machine and it's actions can be seperated. To do this the transition must not contain executable content in the document.
 
 Transition actions are implemented in a `transition_actions` template inside the state machine class. This template can be specialized for each transition to implement custom actions. If the state machine is called `sc`, a transition action can be specialized like this:
 
@@ -173,12 +180,6 @@ todo same for condition
 
 In the C++ file that includes the generated state machine.
 
-#### Example
-```
-<transition event="cancel" target="coin_return">
-  ...
-</transition>
-```
 ### Initial (`<initial>`)
 This element represents the default initial state for a <state> element.
 
