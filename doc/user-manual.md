@@ -26,7 +26,7 @@ This attribute is required and must be `"http://www.w3.org/2005/07/scxml"`.
 This attribute is required and must be `"1.0"`
 
 ##### `datamodel`
-The datamodel that this document requires. The current supported datamodels are `"null"` and `"cplusplus"`. For further description of the datamodels, see section [Data Models](user-manual.md#data-models).
+The datamodel that this scxml document requires. The current supported datamodels are `"null"` and `"cplusplus"`. For further description of the datamodels, see section [Data Models](user-manual.md#data-models).
 
 ##### `binding`
 This attribute is currently ignored. Only `"early"` binding is currently supported, which means all data model objects are constructed when the state machine is constructed.
@@ -156,7 +156,7 @@ Can be `"internal"` or `"external"`. If omitted, the type is external. If the ty
 
 #### Custom Actions and Conditions
 
-The transition's executable content can also be defined in C++ code instead of the scxml document, so the state machine and it's actions can be seperated. To do this the transition must not contain executable content in the document.
+The transition's executable content can also be defined in C++ code instead of the scxml document, so the state machine and it's actions can be seperated. To do this the transition must not contain executable content in the scxml document.
 
 Transition actions are implemented in a `transition_actions` template inside the state machine class. This template can be specialized for each transition to implement custom actions. If the state machine is called `sc`, a transition action can be specialized like this:
 
