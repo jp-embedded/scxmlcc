@@ -158,7 +158,7 @@ Can be `"internal"` or `"external"`. If omitted, the type is external. If the ty
 
 The transition's executable content can also be defined in C++ code instead of the scxml document, so the state machine and it's actions can be seperated. To do this the transition must not contain executable content in the scxml document.
 
-Transition actions are implemented in a `transition_actions` template inside the state machine class. This template can be specialized for each transition to implement custom actions. If the state machine is called `sc`, a transition action can be specialized like this:
+Transition actions are implemented in a `transition_actions` template inside the state machine class. This template can be specialized for each transition to implement custom actions. If the state machine is called `sc`, a transition action can be specialized like this in the C++ file that includes the generated state machine:
 
 ```
 template<> void sc::transition_actions<E, S, D>::enter(sc::data_model &m)	{ ... }
@@ -167,18 +167,27 @@ Where `E` is the event, `S` is the source state, `D` is the destination state. `
 
 The event is a member method in the sc::state struct, and the states are structs defined in the sc class. The data model is passed in the `m` parameter so the data model can be accessed.
 
-So, for example: todo - find better example
+So, for example. This is for a transition without target:
 ```
-template<> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	
+template<> void sc::transition_actions<&sc::state::event_timer, sc::state_on>::enter(sc::data_model &m)
 {
-  m.foo = true;
+        ++m.user->timer;
 }
-
 ```
 
-todo same for condition
+Custom transition conditions can be made the same way by specilizing this template:
+```
+template<> bool sc::transition_actions<E, S, D>::condition(sc::data_model &m) { ... }
+```
+Where `E` is the event, `S` is the source state, `D` is the destination state. `D` is omitted if the transition has no target.
 
-In the C++ file that includes the generated state machine.
+For example:
+```
+template<> bool sc::transition_actions<&sc::state::unconditional, sc::state_on, sc::state_off>::condition(sc::data_model &m)
+{
+        return m.user->timer >= 5;
+}
+```
 
 ### Initial (`<initial>`)
 This element represents the default initial state for a <state> element.
