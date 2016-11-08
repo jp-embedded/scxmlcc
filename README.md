@@ -39,4 +39,6 @@ Next todo on the feature list is to complete the core constructs of the scxml st
 
 If you have any suggestions on features to prioritize, please create an [issue](https://github.com/jp-embedded/scxmlcc/issues).
 
+For a chat, you can also write to me on messenger [here](http://m.me/53854747091)
+
 For more information, see [Documentation](doc/index.md) 
