@@ -175,7 +175,7 @@ template<> void sc::transition_actions<&sc::state::event_timer, sc::state_on>::e
 }
 ```
 
-Custom transition conditions can be made the same way by specilizing this template:
+Custom transition conditions can be made the same way by specializing this template:
 ```
 template<> bool sc::transition_actions<E, S, D>::condition(sc::data_model &m) { ... }
 ```
