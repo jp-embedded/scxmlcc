@@ -208,12 +208,27 @@ None.
 ```
 
 ### Final State (`<final>`)
+`<final>` represents a final state of the state machine.
+
+When a final state is entered, a `done.state.ID` event is raised, where ID is the id of the parent state. If this parent state is a child of a `<parallel>` element, and all of the `<parallel>`'s other children are also in final states, a `done.state.ID` event is raised where ID is the id of the `<parallel>` element.
+
+If the entered final state is a child of the `<scxml>` element, the state machine must terminate. This is currently not implemented.
 
 #### Attributes
 
+##### `id`
+An identifier for the state. This attribute is optional.
+
 #### Valid Children
+- [`<onentry>`](user-manual.md#enter-action-onentry)
+- [`<onexit>`](user-manual.md#exit-action-onexit)
 
 #### Example
+```
+<final id="dispense_coke">
+  ...
+</final>
+```
 
 ### Enter Action (`<onentry>`)
 
