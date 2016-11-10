@@ -231,44 +231,64 @@ An identifier for the state. This attribute is optional.
 ```
 
 ### Enter Action (`<onentry>`)
+todo
 
 #### Attributes
+todo
 
 #### Valid Children
+todo
 
 #### Custom Enter Action
+todo
 
 #### Example
+todo
 
 ### Exit Action (`<onexit>`)
+todo
 
 #### Attributes
+todo
 
 #### Valid Children
+todo
 
 #### Custom Enter Action
+todo
 
 #### Example
+todo
 
 ## Executable Content
+todo
 
 ### Raise (`<raise>`)
+todo
 
 ### Log (`<log>`)
+todo
 
 ### Script (`<script>`)
+todo
 
 ### Assign (`<assign>`)
+todo
 
 ## Data Model and Data Manipulation
+todo
 
 ### Data Model (`<datamodel>`)
+todo
 
 #### Attributes
+todo
 
 #### Valid Children
+todo
 
 #### Example
+todo
 
 ## Data Models
 ### The `null` datamodel
@@ -278,14 +298,10 @@ todo
 todo
 
 ## Invoking scxmlcc
-## Custom Constructs
-todo what is this
-### Transition Actions
-```
-template<> void sc::transition_actions<&sc::state::event_N, sc::state_collect_coins, sc::state_collect_coins>::enter(sc::data_model &m)	
-```
-#### Transition Actions With Multiple Eventes
+todo
+
 ## Including scxmlcc in your makefile
+todo
 
 ## Performance
-
+todo
