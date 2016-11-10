@@ -87,7 +87,11 @@ template<class P0 = null_t> class functor
 	template <class FN> functor(const FN& fn) : impl(new functor_handler<FN, P0>(fn)) {};
 	template <class O, class MFN> functor(const O& o, MFN mfn) : impl(new memfun_handler<O, MFN, P0>(o, mfn)) {};
 
+#if __cplusplus > 199711L
+	explicit functor(std::unique_ptr<functor_impl<P0> > f) : impl(std::move(f)) {}
+#else
 	explicit functor(std::auto_ptr<functor_impl<P0> > f) : impl(f) {}
+#endif
 	functor(const functor& f) : impl(f.impl->clone()) {}
 	functor& operator =(const functor &f) {	impl.reset(f.impl->clone()); return *this; }
 
@@ -95,7 +99,11 @@ template<class P0 = null_t> class functor
 	void operator()(P0 p0) { return (*impl)(p0); }
 
 	private:
+#if __cplusplus > 199711L
+	std::unique_ptr<functor_impl<P0> > impl;
+#else
 	std::auto_ptr<functor_impl<P0> > impl;
+#endif
 };
 
 template <class FN, class P0> class bind_handler : public functor_impl<>
@@ -110,7 +118,11 @@ template <class FN, class P0> class bind_handler : public functor_impl<>
 	FN fun;
 	P0 bound_p0;
 };
+#if __cplusplus > 199711L
+template<class FN, class P0> functor<> bind(const FN &fn, P0 p0) { return functor<>(std::unique_ptr<functor_impl<> >(new bind_handler<FN, P0>(fn, p0))); }
+#else
 template<class FN, class P0> functor<> bind(const FN &fn, P0 p0) { return functor<>(std::auto_ptr<functor_impl<> >(new bind_handler<FN, P0>(fn, p0))); }
+#endif
 
 template<class P0 = null_t> class signal : public std::vector<functor<P0> > 
 {
