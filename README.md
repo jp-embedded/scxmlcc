@@ -3,7 +3,7 @@
   Description: scxml state machine to c++ compiler.
   Author: jp@jp-embedded.com
   -->
-[Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](doc/getting-started.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
+[Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](doc/index.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Welcome to scxmlcc.
 The scxml state machine to c++ compiler.
 
@@ -43,3 +43,7 @@ Next todo on the feature list is to complete the core constructs of the scxml st
 * History states
 
 If you have any suggestions on features to prioritize, please create an [issue](https://github.com/jp-embedded/scxmlcc/issues).
+
+For a chat, you can also write to me on messenger [here](http://m.me/53854747091)
+
+For more information, see [Documentation](doc/index.md) 
