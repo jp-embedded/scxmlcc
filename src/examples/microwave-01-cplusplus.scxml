@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <scxml xmlns="http://www.w3.org/2005/07/scxml"
        version="1.0"
-       datamodel="ecmascript"
+       datamodel="cplusplus"
        initial="off">
 
   <!--  trivial 5 second microwave oven example -->
