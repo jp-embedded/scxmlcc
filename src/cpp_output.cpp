@@ -20,10 +20,20 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/make_shared.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <set>
 #include <iostream>
 
 using namespace std;
+
+
+string event_name(string event)
+{
+	string name = "event";
+	if (event != "*") name += '_' + event;
+	replace(name.begin(), name.end(), '.', '_'); // replace '.' with '_'
+	return name;
+}
 
 //todo set private/public/protected 
 
@@ -50,61 +60,51 @@ void cpp_output::gen_transition_base()
 	out << tab << "};" << endl;
 	out << endl;
 
-	// external transition
-	out << tab << "// external transition" << endl;
+	// combined external/internal transition
+	out << tab << "// external/internal transition" << endl;
 	out << tab << "template<event E, class S, class D = no_state, transition_type T = external> class transition : public transition_actions<E, S, D>" << endl;
 	out << tab << "{" << endl;
+	out << tab << tab << "template<transition_type I> struct id { };" << endl;
+	// when exit/enter is called here without parameter, it forces the action to always exit/enter at least current state
+	// for internal transitions, D must be child of S, otherwise, handle as external transition
+	// S is the source state of the transition, not current state
+	out << tab << tab << "void state_enter(D& d, data_model &m, id<internal>, S*) { d.template enter<S>(m, (S*)0); };" << endl;
+	out << tab << tab << "void state_enter(D& d, data_model &m, ...) { d.template enter<S>(m); };" << endl;
+	//out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) { s->template exit<D>(m, (D*)0); };" << endl;
+	out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) {};" << endl;
+	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<D>(m); };" << endl;
 	out << tab << tab << "public:" << endl;
-	// exit/enter is called here without parameter, which forces the action to always exit/enter at least current state
 	out << tab << tab << "state* operator ()(S *s, D &d, " << classname() << " &sc)" << endl;
 	out << tab << tab << "{" << endl;
        	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
 	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
 	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
        	if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
-       	out << tab << tab << tab << "s->template exit<D>(sc.model);" << endl;
+       	out << tab << tab << tab << "state_exit(s, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
        	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
-       	out << tab << tab << tab << "d.template enter<S>(sc.model);" << endl;
+       	out << tab << tab << tab << "state_enter(d, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
        	if(sc.using_parallel) out << tab << tab << tab << "return d.template enter_parallel<S>(sc, &d, s);" << endl;
 	else out << tab << tab << tab << "return &d;" << endl;
        	out << tab << tab << "}" << endl;
 	out << tab << "};" << endl;
 	out << endl;
-	
-	// todo veryfy how these work at down transition
-	out << tab << "// internal transition" << endl;
-	out << tab << "template<event E, class S, class D> class transition<E, S, D, internal> : public transition_actions<E, S, D>" << endl;
-	out << tab << "{" << endl;
-	out << tab << tab << "public:" << endl;
-	out << tab << tab << "state* operator ()(S *s, D &d, " << classname() << " &sc)" << endl; 
-	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
-	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
-	if(sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, &d);" << endl;
-       	if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
-       	out << tab << tab << tab << "s->template exit<D>(sc.model, (D*)0);" << endl;
-       	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
-       	out << tab << tab << tab << "d.template enter<S>(sc.model, (S*)0);" << endl;
-       	if(sc.using_parallel) out << tab << tab << tab << "return d.template enter_parallel<S>(sc, &d, s);" << endl;
-	else out << tab << tab << tab << "return &d;" << endl;
-       	out << tab << tab << "}" << endl;
-	out << tab << "};" << endl;
-	out << endl;
-	
+		
 	// transition without target
-	out << tab << "// transition with no target" << endl;
-	out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
-	out << tab << "{" << endl;
-	out << tab << tab << "public:" << endl;
-	out << tab << tab << "S* operator ()(S *s, " << classname() << " &sc)" << endl;
-       	out << tab << tab << "{" << endl;
-       	out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return 0;" << endl;
-	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << std::endl;" << endl;
-       	out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
-       	out << tab << tab << tab << "return s;" << endl;
-       	out << tab << tab << "}" << endl;
-	out << tab << "};" << endl;
-	out << endl;
+        if (sc.using_transition_no_target) {
+           out << tab << "// transition with no target" << endl;
+           out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
+           out << tab << "{" << endl;
+           out << tab << tab << "public:" << endl;
+           out << tab << tab << "S* operator ()(S *s, " << classname() << " &sc)" << endl;
+           out << tab << tab << "{" << endl;
+           out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return 0;" << endl;
+           if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << std::endl;" << endl;
+           out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
+           out << tab << tab << tab << "return s;" << endl;
+           out << tab << tab << "}" << endl;
+           out << tab << "};" << endl;
+           out << endl;
+        }
 
 	for (set<int>::const_iterator i = sc.parallel_target_sizes.begin(); i != sc.parallel_target_sizes.end(); ++i) {
 		const int sz = *i;
@@ -183,6 +183,7 @@ void cpp_output::gen_state_composite_base()
 
 	// lca calculation
 	out << tab << tab << "public:" << endl;
+	out << tab << tab << "typedef P parent_t;" << endl;
 	out << tab << tab << "// LCA calculation" << endl;
 	out << tab << tab << "template<class T> void enter(data_model&, " << state_composite_t() << "*) {}" << endl;
 
@@ -324,18 +325,52 @@ void cpp_output::gen_model_decl()
 	out << endl;
 }
 
+void cpp_output::gen_model_base_data()
+{
+	typedef vector<pair<string, string> > pair_vect;
+	pair_vect constructs;
+	using namespace boost::algorithm;
+	const scxml_parser::data_list &datamodel = sc.sc().datamodel;
+	for (scxml_parser::data_list::const_iterator i_data = datamodel.begin(); i_data != datamodel.end(); ++i_data) {
+		string id = i_data->get()->id;
+		const boost::optional<string> expr_opt = i_data->get()->expr;
+		vector<string> id_tokens;
+		split(id_tokens, id, is_any_of(" "), token_compress_on);
+		string type = "int"; // default type
+		if (id_tokens.size() == 2) {
+			type = id_tokens[0];
+			id = id_tokens[1];
+		}
+		out << tab << tab << type << ' ' << id << ';' << endl;
+		if (expr_opt) {
+			constructs.push_back(make_pair(id, *expr_opt));
+		}
+	}
+	if (constructs.size()) {
+		out << tab << tab << "data_model() : ";
+		for (pair_vect::const_iterator i_construct = constructs.begin(); i_construct != constructs.end(); ++i_construct) {
+			if (i_construct != constructs.begin()) out << ", ";
+			out << i_construct->first << '(' << i_construct->second << ')';
+		}	
+		out << " {}" << endl;
+	}
+}
+
 void cpp_output::gen_model_base()
 {
 	out << tab << "struct data_model" << endl;
 	out << tab << "{" << endl;
 	if (!opt.bare_metal) out << tab << tab << "std::queue<event> event_queue;" << endl;
 	out << tab << tab << "user_model *user;" << endl;
+	gen_model_base_data();
 	out << tab << "} model;" << endl;
 	out << endl;
 }
 
 void cpp_output::gen_state_base()
 {
+        using namespace boost::algorithm;
+
 	const scxml_parser::state_list &states = sc.sc().states;
 
 	// state actions class
@@ -344,15 +379,69 @@ void cpp_output::gen_state_base()
 	out << tab << tab << "public:" << endl;
 
 	// events
-	// pass through set, to sort out dublicates
-	set<string> event_set;
-	for (scxml_parser::state_list::const_iterator s = states.begin(); s != states.end(); ++s) {
-		for (scxml_parser::transition_list::const_iterator i = s->get()->transitions.begin(); i != s->get()->transitions.end(); ++i) {
-			if(i->get()->event) event_set.insert(*i->get()->event);
+        // generate events for each token, eg:
+        // ev.a.b.c =>
+        // ev        call '*' - if there
+        // ev_a      call ev
+        // ev_a_b    call ev_a
+        // ev_a_b_c  call ev_a_b
+
+	// collect events
+	vector<string> events;
+	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
+		if (i_state->get()->type && *i_state->get()->type == "final") {
+			string event = "done.state." + i_state->get()->parent->id;
+			events.push_back(event);
+		}
+		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
+			for(scxml_parser::slist::const_iterator i_event = i_trans->get()->event.begin(); i_event != i_trans->get()->event.end(); ++i_event) {
+				events.push_back(*i_event);
+			}
 		}
 	}
-	for (set<string>::const_iterator i = event_set.begin(); i != event_set.end(); ++i) {
-		out << tab << tab << "virtual " << state_t() << "* event_" << *i << "(" << classname() << "&) { return 0; }" << endl;
+
+	// pass through set, to filter out dublicates
+        bool use_base_event = false;
+	set<string> event_set;
+	for (vector<string>::const_iterator i_event = events.begin(); i_event != events.end(); ++ i_event) {
+		if (*i_event == "*") {
+			use_base_event = true;
+		}
+		// loop through event tokens 
+		scxml_parser::slist tokens;
+		split(tokens, *i_event, is_any_of("."), token_compress_on);
+		string event;
+		for (scxml_parser::slist::const_iterator i_token = tokens.begin(); i_token != tokens.end(); ++i_token) {
+			if (event.size()) event += '.';
+			event += *i_token;
+			event_set.insert(event);
+		}
+	}
+        (void)use_base_event;
+        for (set<string>::const_iterator i_event = event_set.begin(); i_event != event_set.end(); ++i_event) {
+               
+                // event parent
+                string parent;
+                scxml_parser::slist tokens;
+
+               size_t delim = i_event->rfind(".");
+               if (delim != string::npos) parent = i_event->substr(0, delim);
+
+                // event name
+                string event;
+                if (*i_event != "*") event = "_" + *i_event;
+
+                // replace '.' with '_'
+                replace(event.begin(), event.end(), '.', '_');
+                replace(parent.begin(), parent.end(), '.', '_');
+
+                out << tab << tab << "virtual " << state_t() << "* event" << event << "(" << classname() << '&';
+                if (parent.size() || (event.size() && use_base_event)) out << " sc";
+                out << ") { return ";
+                if (parent.size()) out << "event_" << parent << "(sc)";
+                else if (event.size() && use_base_event) out << "event(sc)";
+                else out << "0";
+                out << "; }" << endl;
 	}
 	out << tab << tab << "virtual " << state_t() << "* unconditional(" << classname() << "&) { return 0; }" << endl;
 	out << tab << tab << "virtual " << state_t() << "* initial(" << classname() << "&) { return 0; }" << endl;
@@ -399,6 +488,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	const bool use_ancestor = sc.using_compound; // call parent if condition is false
 
 	const bool parallel_state = state.type && *state.type == "parallel";
+	const bool final_state = state.type && *state.type == "final";
 	string parent, prefix;
 	if(state.type && *state.type == "inter") prefix = "inter";
 	if(state.parent) parent = "state_" + state.parent->id;
@@ -426,8 +516,12 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	out << tab << "{" << endl;
 
+	if (final_state) {
+		//todo handle final in parallel states
+		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { sc.model.event_queue.push(&state::event_done_" << parent << "); return 0; }" << endl;
+	}
 	//todo there may be multiple targets
-	if(state.initial.target.size()) {
+	else if(state.initial.target.size()) {
 		string target = "sc.m_state_" + state.initial.target.front();
 		string target_classname = "state_" + state.initial.target.front();
 		out << tab << tab << state_t() << "* " << "initial" << "(" << classname() << " &sc) { return transition<&state::initial, " << state_classname << ", " << target_classname << ", internal>()(this, " << target << ", sc); }" << endl;
@@ -437,10 +531,13 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	// build a map with event as key with vector of transitions with this event
 	std::map<std::string, scxml_parser::transition_list> event_map;
-	for (scxml_parser::transition_list::const_iterator ti = state.transitions.begin(); ti != state.transitions.end(); ++ti) {
-		string event = "unconditional";
-		if(ti->get()->event) event = "event_" + *ti->get()->event;
-		event_map[event].push_back(*ti);
+	for (scxml_parser::transition_list::const_iterator itrans = state.transitions.begin(); itrans != state.transitions.end(); ++itrans) {
+		if (itrans->get()->event.size() == 0) {
+			event_map["unconditional"].push_back(*itrans);
+		}
+		else for (scxml_parser::slist::const_iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
+			event_map[event_name(*ievent)].push_back(*itrans);
+		}
 	}
 	
 	for (std::map<std::string, scxml_parser::transition_list>::const_iterator mi = event_map.begin(); mi != event_map.end(); ++mi) {
@@ -453,6 +550,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			const bool first = t == mi->second.begin();
 			const bool multiple = mi->second.size() > 1 || use_ancestor;
 			const bool last = t == mi->second.end() - 1;
+			const bool internal = t->get()->type && *t->get()->type == "internal";
 
 			if(t->get()->target.size()) {
 				target = "sc.m_state_" + t->get()->target.front(); //todo handle multiple targets
@@ -470,7 +568,9 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			if (multiple) out << "(s = ";
 			if(target.size()) {
 				// normal transition
-				out << "transition<&state::" << event << ", " << state_classname << ", " << target_classname << ">()(this, " << target << ", sc)";
+				string type_str;
+				if (internal) type_str = ", internal";
+				out << "transition<&state::" << event << ", " << state_classname << ", " << target_classname << type_str << ">()(this, " << target << ", sc)";
 			}
 			else {
 				// transition without target
@@ -589,30 +689,65 @@ void cpp_output::gen_action_part_log(scxml_parser::action &a)
 	const string label = a.attr["label"];
 	const string expr = a.attr["expr"];
 
-	out << tab << "// " << a.type << " label=" << label << " exrp=" << expr << endl;
-	out << tab << "std::clog";
+	//out << tab << tab << "// " << a.type << " label=" << label << " expr=" << expr << endl;
+	out << tab << tab << "std::clog";
 	if(label.size()) out << " << \"[" << label << "] \""; 
 	out << " << \"" << expr << "\" << std::endl;" << endl;
+}
+
+void cpp_output::gen_action_part_assign(scxml_parser::action &a)
+{
+	const string location = a.attr["location"];
+	const string expr = a.attr["expr"];
+
+	//out << tab << tab << "// " << a.type << " location=" << location << " expr=" << expr << endl;
+	out << tab << tab << location << " = " << expr << ';' << endl;
+}
+
+void cpp_output::gen_action_part_script(scxml_parser::action &a)
+{
+	const string expr = a.attr["expr"];
+
+	//out << tab << tab << "// " << a.type << " expr=" << expr << endl;
+	out << tab << tab << expr << endl;
 }
 
 void cpp_output::gen_action_part_raise(scxml_parser::action &a)
 {
 	const string ev = a.attr["event"];
 
-	out << tab << "// " << a.type << " event=" << ev << endl;
-	out << tab << "m.event_queue.push(&" << classname() << "::state::event_" << ev << ");" << endl;
+	//out << tab << tab << "// " << a.type << " event=" << ev << endl;
+	out << tab << tab << "event_queue.push(&" << classname() << "::state::event_" << ev << ");" << endl;
 }
 
 void cpp_output::gen_action_part(scxml_parser::action &a)
 {
 	if(a.type == "raise") gen_action_part_raise(a);
 	else if(a.type == "log") gen_action_part_log(a);
+	else if(a.type == "assign") gen_action_part_assign(a);
+	else if(a.type == "script") gen_action_part_script(a);
 	else {
-		out << tab << "// warning: unknown action type '" << a.type << "'" << endl;
+		out << tab << tab << "// warning: unknown action type '" << a.type << "'" << endl;
 		cerr << "warning: unknown action type '" << a.type << "'" << endl;
 	}
 }
 
+void cpp_output::gen_with_begin(bool cond)
+{
+	string ret = "void";
+	if (cond) ret = "bool";
+	out << tab << "struct with : " << classname() << "::data_model { " << ret << " operator ()() { // 'with' construct, to bring model variables in scope" << endl;
+}
+
+void cpp_output::gen_with_end(bool cond)
+{
+	string ret;
+	if (cond) {
+		ret = " return";
+	}
+	out << tab << "}};" << ret << " static_cast<with&>(m)();" << endl;
+}
+	
 void cpp_output::gen_actions()
 {
 	const scxml_parser::state_list &states = sc.sc().states;
@@ -622,9 +757,11 @@ void cpp_output::gen_actions()
 		if(s->get()->entry_actions.size()) {
 			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::enter(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
+			gen_with_begin(false);
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->entry_actions.begin(); i != s->get()->entry_actions.end(); ++i) {
 				gen_action_part(*i->get());
 			}
+			gen_with_end(false);
 			out << '}' << endl;
 			out << endl;
 		}
@@ -633,9 +770,11 @@ void cpp_output::gen_actions()
 		if(s->get()->exit_actions.size()) {
 			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::exit(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
+			gen_with_begin(false);
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->exit_actions.begin(); i != s->get()->exit_actions.end(); ++i) {
 				gen_action_part(*i->get());
 			}
+			gen_with_end(false);
 			out << '}' << endl;
 			out << endl;
 		}
@@ -648,25 +787,49 @@ void cpp_output::gen_actions()
 			}
 		       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
+			gen_with_begin(false);
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->initial.actions.begin(); i != s->get()->initial.actions.end(); ++i) {
 				gen_action_part(*i->get());
 			}
+			gen_with_end(false);
 			out << '}' << endl;
 			out << endl;
 		}
 
 		// transition actions
-		for (scxml_parser::transition_list::const_iterator ti = s->get()->transitions.begin(); ti != s->get()->transitions.end(); ++ti) {
-			if(ti->get()->actions.size()) {
-				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::event_" << *ti->get()->event << ", " << classname() << "::state_" << s->get()->id;
-				for(scxml_parser::slist::const_iterator ai = ti->get()->target.begin(); ai != ti->get()->target.end(); ++ai) {
-					out << ", " << classname() << "::state_" << *ai;
+		// todo support multiple events. create an action for each event which calls a common action? - this would work only for the last transition if multiple transitions because of the call priority.
+		for (scxml_parser::transition_list::const_iterator itrans = s->get()->transitions.begin(); itrans != s->get()->transitions.end(); ++itrans) {
+			if(itrans->get()->actions.size()) {
+				string event = "unconditional";
+				if(itrans->get()->event.size()) event = event_name(itrans->get()->event.front());
+
+				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::" << event << ", " << classname() << "::state_" << s->get()->id;
+				for(scxml_parser::slist::const_iterator iaction = itrans->get()->target.begin(); iaction != itrans->get()->target.end(); ++iaction) {
+					out << ", " << classname() << "::state_" << *iaction;
 				}
 			       	out << ">::enter(" << classname() << "::data_model &m)" << endl;
 				out << '{' << endl;
-				for (scxml_parser::plist<scxml_parser::action>::const_iterator i = ti->get()->actions.begin(); i != ti->get()->actions.end(); ++i) {
+				gen_with_begin(false);
+				for (scxml_parser::plist<scxml_parser::action>::const_iterator i = itrans->get()->actions.begin(); i != itrans->get()->actions.end(); ++i) {
 					gen_action_part(*i->get());
 				}
+				gen_with_end(false);
+				out << '}' << endl;
+				out << endl;
+			}
+			if (itrans->get()->condition) {
+				string event = "unconditional";
+				if(itrans->get()->event.size()) event = event_name(itrans->get()->event.front());
+
+				out << "template<> bool " << classname() << "::transition_actions<&" << classname() << "::state::" << event << ", " << classname() << "::state_" << s->get()->id;
+				for(scxml_parser::slist::const_iterator iaction = itrans->get()->target.begin(); iaction != itrans->get()->target.end(); ++iaction) {
+					out << ", " << classname() << "::state_" << *iaction;
+				}
+			       	out << ">::condition(" << classname() << "::data_model &m)" << endl;
+				out << '{' << endl;
+				gen_with_begin(true);
+				out << tab << tab << "return " << *itrans->get()->condition << ';' << endl;
+				gen_with_end(true);
 				out << '}' << endl;
 				out << endl;
 			}
@@ -681,35 +844,31 @@ void cpp_output::trim()
 
 	// replace '-' with '_' in event names
 	// replace '-' with '_' in actions
-	// replace '*' with 'A' in event names, todo: not currently supported
-	// replace '.' with '_' in event names todo: see '3.12.1 event descriptors how to handle event tokens
-	for (scxml_parser::state_list::const_iterator s = states.begin(); s != states.end(); ++s) {
-		for (scxml_parser::transition_list::const_iterator i = s->get()->transitions.begin(); i != s->get()->transitions.end(); ++i) {
-			if(i->get()->event) {
-				if(i->get()->event->find('.') != string::npos) cerr << "warning: event tokens not currently supported" << endl;
-				if(i->get()->event->find('*') != string::npos) cerr << "warning: event asteriks not currently supported" << endl;
-				replace(i->get()->event->begin(), i->get()->event->end(), '.', '_');
-				replace(i->get()->event->begin(), i->get()->event->end(), '-', '_');
-				replace(i->get()->event->begin(), i->get()->event->end(), '*', 'A');
+        // remove '.*' postfix in events
+	for (scxml_parser::state_list::const_iterator istate = states.begin(); istate != states.end(); ++istate) {
+		for (scxml_parser::transition_list::const_iterator itrans = istate->get()->transitions.begin(); itrans != istate->get()->transitions.end(); ++itrans) {
+			for (scxml_parser::slist::iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
+				replace(ievent->begin(), ievent->end(), '-', '_');
+                                if (string(ievent->rbegin(), ievent->rbegin() + 2) == "*.") ievent->erase(ievent->size()-2, 2);
+			}
 
-				// transition actions
-				for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = i->get()->actions.begin(); ai != i->get()->actions.end(); ++ai) {
-					for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
-						replace(attri->second.begin(), attri->second.end(), '-', '_');
-					}
+			// transition actions
+			for (scxml_parser::plist<scxml_parser::action>::const_iterator iaction = itrans->get()->actions.begin(); iaction != itrans->get()->actions.end(); ++iaction) {
+				for (map<string, string>::iterator iattr = iaction->get()->attr.begin(); iattr != iaction->get()->attr.end(); ++iattr) {
+					replace(iattr->second.begin(), iattr->second.end(), '-', '_');
 				}
 			}
 		}
 
 		// entry actions
-		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = s->get()->entry_actions.begin(); ai != s->get()->entry_actions.end(); ++ai) {
+		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = istate->get()->entry_actions.begin(); ai != istate->get()->entry_actions.end(); ++ai) {
 			for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
 				replace(attri->second.begin(), attri->second.end(), '-', '_');
 			}
 		}
 
 		// exit actions
-		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = s->get()->exit_actions.begin(); ai != s->get()->exit_actions.end(); ++ai) {
+		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = istate->get()->exit_actions.begin(); ai != istate->get()->exit_actions.end(); ++ai) {
 			for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
 				replace(attri->second.begin(), attri->second.end(), '-', '_');
 			}
@@ -723,6 +882,10 @@ void cpp_output::gen()
 
 	if (opt.bare_metal && sc.using_parallel) {
 		cerr << "error: parallel states is not supported with bare metal C++" << endl;
+		exit(1);
+	}
+	if (opt.bare_metal && sc.using_final) {
+		cerr << "error: final states is not supported with bare metal C++" << endl;
 		exit(1);
 	}
 	if (opt.bare_metal && sc.using_compound) {

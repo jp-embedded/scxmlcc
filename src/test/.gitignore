@@ -1,0 +1,4 @@
+*.h
+gtest-*
+libgtest.a
+test

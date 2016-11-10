@@ -15,8 +15,13 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+// Note: There is a post-commit hook in ^/hooks which automatically will add a git tag when this file is changed.
+//       This hook can be installed with install_hooks.sh
+
 #ifndef __VERSION
 #define __VERSION
+
+#define VERSION "0.8"
 
 const char* version();
 

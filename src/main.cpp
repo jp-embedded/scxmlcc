@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 		("output,o",	value<string>(),	"Output file.")
 		("debug,d",				"Enable debug output")
 		("baremetal,b",				"Generate code for bare metal C++")
-		("version,v",				"Version information");
+		("version,v",				"Version and copyright information");
 	positional_options_description pdesc;
 	pdesc.add("input", -1);
 	variables_map vm;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 		cout << "scxmlcc version: " << version() << endl;
 		cout << "For more information, see http://scxmlcc.org" << endl;
 		cout << endl; 
-		cout << "  Copyright (C) 2013 Jan Pedersen <jp@jp-embedded.com>" << endl;
+		cout << "  Copyright (C) 2013-2016 Jan Pedersen <jp@jp-embedded.com>" << endl;
 		cout << endl; 
 		cout << "  This program is free software: you can redistribute it and/or modify" << endl;
 		cout << "  it under the terms of the GNU General Public License as published by" << endl;

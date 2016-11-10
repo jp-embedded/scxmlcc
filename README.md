@@ -1,3 +1,8 @@
+<!--
+  Title: scxmlcc
+  Description: scxml state machine to c++ compiler.
+  Author: jp@jp-embedded.com
+  -->
 [Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](doc/index.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Welcome to scxmlcc.
 The scxml state machine to c++ compiler.
@@ -30,12 +35,12 @@ The folowing features are currently implemented:
 * Custom transition actions and conditons.
 * Zero runtime overhead for emtpy actions and conditions.
 * LCA calculation is done (mostly) compile time.
+* Final states
 
 Next todo on the feature list is to complete the core constructs of the scxml standard. Most importantly, this include:
 
 * Parallel states (in progress)
 * History states
-* Final states
 
 If you have any suggestions on features to prioritize, please create an [issue](https://github.com/jp-embedded/scxmlcc/issues).
 

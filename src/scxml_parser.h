@@ -33,9 +33,11 @@ class scxml_parser
 		typedef std::vector<std::string> slist;
 
 		bool using_parallel;
+		bool using_final;
 		bool using_event_queue;
 		bool using_log;
 		bool using_compound;
+		bool using_transition_no_target;
 		std::set<int> parallel_sizes;
 		std::set<int> parallel_target_sizes;
 
@@ -46,8 +48,10 @@ class scxml_parser
 
 		struct transition {
 			slist target;
-			boost::optional<std::string> event;
+			slist event;
 			plist<action> actions;
+			boost::optional<std::string> type;
+			boost::optional<std::string> condition;
 		};
 		typedef plist<transition> transition_list;
 
@@ -62,10 +66,17 @@ class scxml_parser
 		};
 		typedef plist<state> state_list;
 
+		struct data {
+			std::string id;
+			boost::optional<std::string> expr;
+		};
+		typedef plist<data> data_list;
+
 		struct scxml {
 			std::string name;
 			transition initial;
 			state_list states;
+			data_list datamodel;
 		};
 
 		scxml_parser(const char *name, const boost::property_tree::ptree &pt);
@@ -78,12 +89,16 @@ class scxml_parser
 		void parse_scxml(const boost::property_tree::ptree &pt);
 		void parse(const boost::property_tree::ptree &pt);
 		void parse_state(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
+		void parse_final(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
 		void parse_parallel(const boost::property_tree::ptree &pt, const boost::shared_ptr<state> &parent);
+		boost::shared_ptr<data> parse_data(const boost::property_tree::ptree &pt);
+		data_list parse_datamodel(const boost::property_tree::ptree &pt);
 		transition parse_initial(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<transition> parse_transition(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_script(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_log(const boost::property_tree::ptree &pt);
 		boost::shared_ptr<action> parse_raise(const boost::property_tree::ptree &pt);
+		boost::shared_ptr<action> parse_assign(const boost::property_tree::ptree &pt);
 		plist<action> parse_entry(const boost::property_tree::ptree &pt);
 
 };

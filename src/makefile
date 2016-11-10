@@ -16,7 +16,7 @@
 #*************************************************************************
 
 OBJS := main.o cpp_output.o scxml_parser.o version.o
-CPPFLAGS := -Wall -O2 -MD -MP
+CPPFLAGS := -Wall -MD -MP -O2
 
 all: scxmlcc
 
@@ -24,13 +24,10 @@ scxmlcc: $(OBJS)
 	$(CXX) -o $@ $^ -lboost_program_options -lboost_system -lboost_filesystem
 
 clean:
-	rm -f $(OBJS) $(OBJS:.o=.d) scxmlcc autorevision.mk
+	rm -f $(OBJS) $(OBJS:.o=.d) scxmlcc autorevision.mk version_auto.h
 
 autorevision.mk:
-	autorevision -tsh > $@ && sh makerevision.sh || truncate -s0 autorevision_postfix.h
-#	autorevision -th | grep "VCS_BRANCH" > autorevision.h~ || true
-#	test -f autorevision.h~ && diff -q autorevision.h autorevision.h~ || cp autorevision.h~ autorevision.h
-#	rm autorevision.h~
+	autorevision -tsh > $@ && sh makerevision.sh || truncate -s0 version_auto.h
 .PHONY: autorevision.mk
 -include autorevision.mk	
 
