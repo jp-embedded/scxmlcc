@@ -17,10 +17,11 @@
 
 CPPFLAGS := -Wall -O2 -MD -MP
 
-APPS := timer_switch hello_world vending_machine/vending_machine
+APPS := timer_switch hello_world microwave vending_machine/vending_machine
 
 timer_switch.objs := timer_switch.o
 hello_world.objs := hello_world.o
+microwave.objs := microwave.o
 vending_machine/vending_machine.objs := $(patsubst %.cpp,%.o,$(wildcard vending_machine/*.cpp))
 
 all: $(APPS)
@@ -45,4 +46,6 @@ include scxml.mk
 vending_machine/main.cpp: vending_machine/vending_machine.h
 timer_switch.cpp: timer_switch.h
 hello_world.cpp: hello_world.h
+microwave.cpp: microwave-01-cplusplus.h
+
 
