@@ -21,7 +21,7 @@
 #ifndef __VERSION
 #define __VERSION
 
-#define VERSION "0.8"
+#define VERSION "0.8.1"
 
 const char* version();
 
