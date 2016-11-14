@@ -1,3 +1,5 @@
+<!-- This example is taken from the scxml documentation (https://www.w3.org/TR/scxml/#N11619) -->
+
 <?xml version="1.0"?>
 <scxml xmlns="http://www.w3.org/2005/07/scxml"
        version="1.0"
