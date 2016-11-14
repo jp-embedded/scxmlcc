@@ -76,7 +76,6 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 		}
 		st->type.reset("parallel");
 		m_scxml.states.push_back(st);
-		state_list::iterator state_i = --m_scxml.states.end();
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
@@ -84,10 +83,10 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 			else if (it->first == "state") parse_state(it->second, st);
 			else if (it->first == "history") parse_state(it->second, st);
 			else if (it->first == "parallel") parse_parallel(it->second, st);
-			else if (it->first == "transition") state_i->get()->transitions.push_back(parse_transition(it->second));
-			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
-			else if (it->first == "onexit") state_i->get()->exit_actions = parse_entry(it->second);
-			else if (it->first == "initial") state_i->get()->initial = parse_initial(it->second);
+			else if (it->first == "transition") st->transitions.push_back(parse_transition(it->second));
+			else if (it->first == "onentry") st->entry_actions = parse_entry(it->second);
+			else if (it->first == "onexit") st->exit_actions = parse_entry(it->second);
+			else if (it->first == "initial") st->initial = parse_initial(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <parallel>" << endl;
 		}
 
@@ -185,7 +184,6 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 		if(initial) split(st->initial.target, *initial, is_any_of(" "), token_compress_on);
 		if(st->initial.target.size() > 1) parallel_target_sizes.insert(st->initial.target.size());
 		m_scxml.states.push_back(st);
-		state_list::iterator state_i = --m_scxml.states.end();
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
@@ -194,10 +192,10 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			else if (it->first == "history") parse_state(it->second, st);
 			else if (it->first == "final") parse_final(it->second, st);
 			else if (it->first == "parallel") parse_parallel(it->second, st);
-			else if (it->first == "transition") state_i->get()->transitions.push_back(parse_transition(it->second));
-			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
-			else if (it->first == "onexit") state_i->get()->exit_actions = parse_entry(it->second);
-			else if (it->first == "initial") state_i->get()->initial = parse_initial(it->second);
+			else if (it->first == "transition") st->transitions.push_back(parse_transition(it->second));
+			else if (it->first == "onentry") st->entry_actions = parse_entry(it->second);
+			else if (it->first == "onexit") st->exit_actions = parse_entry(it->second);
+			else if (it->first == "initial") st->initial = parse_initial(it->second);
 			else if (it->first == "datamodel") { scxml_parser::data_list m = parse_datamodel(it->second); m_scxml.datamodel.insert(m_scxml.datamodel.end(), m.begin(), m.end()); }
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
 		}
@@ -228,12 +226,11 @@ void scxml_parser::parse_final(const ptree &pt, const boost::shared_ptr<state> &
 		}
 		st->type.reset("final");
 		m_scxml.states.push_back(st);
-		state_list::iterator state_i = --m_scxml.states.end();
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
-			else if (it->first == "onentry") state_i->get()->entry_actions = parse_entry(it->second);
-			else if (it->first == "onexit") state_i->get()->exit_actions = parse_entry(it->second);
+			else if (it->first == "onentry") st->entry_actions = parse_entry(it->second);
+			else if (it->first == "onexit") st->exit_actions = parse_entry(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
 		}
 
