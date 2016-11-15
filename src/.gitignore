@@ -1,6 +1,7 @@
 *.d
 *.o
 scxmlcc
+!scxmlcc/*
 autorevision.mk
 version_auto.h*
 **/.tags
