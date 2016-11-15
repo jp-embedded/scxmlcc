@@ -23,9 +23,9 @@ So if you plan to just use scxmlcc as is for building your state machines, you c
 
 You need to download and compile the boost library. If you already have boost installed, you can also use this.
 
-Download [boost_1_62_0](https://sourceforge.net/projects/boost/files/boost/1.62.0/) and put it under `scxmlcc/src/boost_1_62_0` (after you have optained scxmlcc, see below). You can use another version, use another path or use an existing boost installation. But then you must update the boost include and linker path in the scxml project properties in the visual studio solution, under `Configuration Properties > C/C++ > General > Additional Include Directories` and `Configuration Properties > Linker > Additional Library Directories`.
+Download [boost_1_62_0](https://sourceforge.net/projects/boost/files/boost/1.62.0/) and put it under `scxmlcc/src/boost_1_62_0` (after you have obtained scxmlcc, see below). You can use another version, use another path or use an existing boost installation. But then you must update the boost include and linker path in the scxml project properties in the visual studio solution, under `Configuration Properties > C/C++ > General > Additional Include Directories` and `Configuration Properties > Linker > Additional Library Directories`.
 
-## Optaining And Building scxmlcc
+## Obtaining And Building scxmlcc
 scxmlcc is available as compressed releases or through github. The latest and previous releases is available at [Releases](https://github.com/jp-embedded/scxmlcc/releases).
 
 ### On Ubuntu
