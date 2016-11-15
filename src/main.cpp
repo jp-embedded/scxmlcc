@@ -40,7 +40,7 @@ void scxmlcc(const options &opt)
 {
 	ptree pt;
 	read_xml(opt.input.string(), pt);
-	std::string sc_name = opt.input.stem().c_str();
+    std::string sc_name = opt.input.stem().string();
 	replace_if(sc_name.begin(), sc_name.end(), c_pred, '_');
 	scxml_parser sc(sc_name.c_str(), pt);
 	ofstream ofs(opt.output.string().c_str());
