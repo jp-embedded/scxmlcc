@@ -8,7 +8,7 @@ To build scxmlcc, you will need:
 To build the test suite, you will also need:
  * xsltproc
 
-Note that on windows, there are currently no automated way to build the test suite.
+Note that on windows, there is currently no automated way to build the test suite.
 
 ### On Ubuntu
 Install the prerequisites with e.g. apt-get:
