@@ -8,14 +8,22 @@ To build scxmlcc, you will need:
 To build the test suite, you will also need:
  * xsltproc
 
-On Ubuntu, install these with e.g. apt-get:
+Note that on windows, there are currently no automated way to build the test suite.
+
+### On Ubuntu
+Install the prerequisites with e.g. apt-get:
 ```
 sudo apt-get install build-essential libboost-all-dev autorevision xsltproc
 ```
-
 autorevision is used to update the scxmlcc revision. This can be omitted.
 
 So if you plan to just use scxmlcc as is for building your state machines, you can ommit autorevision and xsltproc.
+
+### On Windows
+
+You need to download and compile the boost library. If you already have boost installed, you can use this.
+
+Download [boost_1_62_0](https://sourceforge.net/projects/boost/files/boost/1.62.0/) and put it under `scxmlcc/src/boost_1_62_0`. You can use another version, use another path or use an existing boost installation. But then you must update the boost include and linker path in the scxml project properties in the visual studio solution, under `Configuration Properties > C/C++ > General > Additional Include Directories` and `Configuration Properties > Linker > Additional Library Directories`.
 
 ## Optaining And Building scxmlcc
 scxmlcc is available as compressed releases or through github. The latest and previous releases is available at [Releases](https://github.com/jp-embedded/scxmlcc/releases).
