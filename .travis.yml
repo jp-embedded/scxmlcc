@@ -4,5 +4,5 @@ compiler:
   - gcc
   - clang
 
-script: cd scxmlcc/src && make
+script: cd jp-embedded/scxmlcc/src && make
 
