@@ -4,5 +4,5 @@ compiler:
   - gcc
   - clang
 
-script: cd jp-embedded/scxmlcc/src && make
+script: make -C src && make -C src/examples && make -C src/test && ./src/test/test
 
