@@ -5,7 +5,6 @@ before_install: sudo apt-get install build-essential libboost-all-dev xsltproc
 
 compiler:
   - gcc
-  - clang
 
 script: make -C src && make -C src/examples && make -C src/test && ./src/test/test
 
