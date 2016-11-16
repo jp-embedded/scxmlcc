@@ -4,5 +4,5 @@ compiler:
   - gcc
   - clang
 
-script: make
+script: cd scxmlcc/src && make
 
