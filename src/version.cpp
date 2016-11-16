@@ -16,7 +16,10 @@
  *************************************************************************/
 
 #include "version.h"
+#ifndef _WIN32
+// auto version info is not supported on windows
 #include "version_auto.h"
+#endif
 
 #ifndef VERSION_POSTFIX
 #define VERSION_POSTFIX ""

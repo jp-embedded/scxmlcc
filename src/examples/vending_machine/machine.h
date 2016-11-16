@@ -15,8 +15,8 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#ifndef __MACHINE
-#define __MACHINE
+#ifndef ___MACHINE
+#define ___MACHINE
 
 #include "vending_machine.h"
 #include "signal.h"

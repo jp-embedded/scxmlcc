@@ -628,7 +628,7 @@ void cpp_output::gen_sc()
 		out << tab << '{' << endl;
 		out << tab << tab << "state *next_state;" << endl;
 		out << tab << tab << "if ((next_state = (cur_state->*e)(*this))) cur_state = next_state;" << endl;
-		out << tab << tab << "return next_state;" << endl;
+		out << tab << tab << "return !!next_state;" << endl;
 		out << tab << '}' << endl;
 	}
 	out << endl;
@@ -638,7 +638,7 @@ void cpp_output::gen_sc()
 	out << tab << tab << "while (cont) {" << endl;
 	out << tab << tab << tab << "if ((cont = dispatch_event(&state::initial)));" << endl;
 	out << tab << tab << tab << "else if ((cont = dispatch_event(&state::unconditional)));" << endl;
-	if(!opt.bare_metal) out << tab << tab << tab << "else if (model.event_queue.size()) cont = dispatch_event(model.event_queue.front()), model.event_queue.pop(), cont |= model.event_queue.size();" << endl;
+	if(!opt.bare_metal) out << tab << tab << tab << "else if (model.event_queue.size()) cont = dispatch_event(model.event_queue.front()), model.event_queue.pop(), cont |= !model.event_queue.empty();" << endl;
 	out << tab << tab << tab << "else break;" << endl;
 	out << tab << tab << "}" << endl;
 	out << tab << "}" << endl;
@@ -849,7 +849,7 @@ void cpp_output::trim()
 		for (scxml_parser::transition_list::const_iterator itrans = istate->get()->transitions.begin(); itrans != istate->get()->transitions.end(); ++itrans) {
 			for (scxml_parser::slist::iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
 				replace(ievent->begin(), ievent->end(), '-', '_');
-                                if (string(ievent->rbegin(), ievent->rbegin() + 2) == "*.") ievent->erase(ievent->size()-2, 2);
+                if (ievent->size() >= 2 && string(ievent->rbegin(), ievent->rbegin() + 2) == "*.") ievent->erase(ievent->size()-2, 2);
 			}
 
 			// transition actions

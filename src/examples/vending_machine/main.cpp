@@ -69,7 +69,7 @@ int main()
 	std::cout << "        3 = light button" << std::endl;
 	std::cout << "        c = cancel button" << std::endl;
 	std::cout << "        n = insert nickel" << std::endl;
-	std::cout << "        d = inserd dime" << std::endl;
+	std::cout << "        d = insert dime" << std::endl;
 	std::cout << "        q = quit" << std::endl;
 
 	sc.init();
