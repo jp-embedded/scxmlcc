@@ -18,38 +18,50 @@
 #ifndef __TERMIO
 #define __TERMIO
 
+#ifndef _WIN32 // not supported on windows
 #include <termios.h>
 #include <unistd.h>
+#endif
 #include <algorithm>
 
 class termio
 {
+#ifndef _WIN32 // not supported on windows
 	termios state, saved_state;
+#endif
 	public:
 
 	termio()		
 	{
+#ifndef _WIN32 // not supported on windows
 	       tcgetattr(STDIN_FILENO, &saved_state); 
 	       std::copy(&saved_state, &saved_state+1, &state); 
+#endif
 	}
 
 	~termio()		
 	{
+#ifndef _WIN32 // not supported on windows
 	       tcsetattr(STDIN_FILENO, TCSANOW, &saved_state); 
+#endif 
 	}
 
 	void echo(bool on)	
 	{ 
+#ifndef _WIN32 // not supported on windows
 		if(on) state.c_lflag |= ECHO; 
 		else state.c_lflag &= ~ECHO; 
 		tcsetattr(STDIN_FILENO, TCSANOW, &state); 
+#endif
 	}
 
 	void canonical(bool on)	
 	{ 
+#ifndef _WIN32 // not supported on windows
 		if(on) state.c_lflag |= ICANON; 
 		else state.c_lflag &= ~ICANON; 
 		tcsetattr(STDIN_FILENO, TCSANOW, &state); 
+#endif
 	}
 };
 
