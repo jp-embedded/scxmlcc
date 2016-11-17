@@ -5,9 +5,9 @@
   -->
 [Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](doc/index.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 # Welcome to scxmlcc.
-(ubuntu_logo.png)[![Build Status](https://travis-ci.org/jp-embedded/scxmlcc.svg?branch=master)](https://travis-ci.org/jp-embedded/scxmlcc)
+![](doc/ubuntu_logo.png)[![Build Status](https://travis-ci.org/jp-embedded/scxmlcc.svg?branch=master)](https://travis-ci.org/jp-embedded/scxmlcc)
 
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/gruntjs/grunt?branch=master&svg=true)](https://ci.appveyor.com/project/jp-embedded/scxmlcc)
+![](doc/windows_logo.png)[![Build Status](https://ci.appveyor.com/api/projects/status/github/gruntjs/grunt?branch=master&svg=true)](https://ci.appveyor.com/project/jp-embedded/scxmlcc)
 
 The scxml state machine to c++ compiler.
 
