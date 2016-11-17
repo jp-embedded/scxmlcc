@@ -6,6 +6,7 @@
 [Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](doc/index.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
 
 # Welcome to scxmlcc.
+The scxml state machine to c++ compiler.
 
 ![](doc/ubuntu_logo.png)[![Build Status](https://travis-ci.org/jp-embedded/scxmlcc.svg?branch=master)](https://travis-ci.org/jp-embedded/scxmlcc)
 
