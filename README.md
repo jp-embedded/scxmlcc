@@ -4,8 +4,13 @@
   Author: jp@jp-embedded.com
   -->
 [Home](https://github.com/jp-embedded/scxmlcc) | [Documentation](doc/index.md) | [Latest Release](https://github.com/jp-embedded/scxmlcc/releases) | [scxmlgui](https://github.com/fmorbini/scxmlgui/)
+
 # Welcome to scxmlcc.
 The scxml state machine to c++ compiler.
+
+[![](doc/ubuntu_logo.png)](https://travis-ci.org/jp-embedded/scxmlcc)[![](https://travis-ci.org/jp-embedded/scxmlcc.svg?branch=master)](https://travis-ci.org/jp-embedded/scxmlcc)
+
+[![](doc/windows_logo.png)](https://ci.appveyor.com/project/jp-embedded/scxmlcc)[![](https://ci.appveyor.com/api/projects/status/github/gruntjs/grunt?branch=master&svg=true)](https://ci.appveyor.com/project/jp-embedded/scxmlcc)
 
 ## What?
 The goal of scxmlcc is to make a Open Source full featured state machine compiler that can gererate simple and effective C++ state machines from scxml state charts.
