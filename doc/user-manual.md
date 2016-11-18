@@ -231,34 +231,79 @@ An identifier for the state. This attribute is optional.
 ```
 
 ### Enter Action (`<onentry>`)
-todo
+A wrapper element containing executable content to be executed when the state is entered
 
 #### Attributes
-todo
+None
 
 #### Valid Children
-todo
-
-#### Custom Enter Action
-todo
+- [`<raise>`](user-manual.md#raise-raise)
+- [`<log>`](user-manual.md#log-log)
+- [`<script>`](user-manual.md#script-script)
+- [`<assign>`](user-manual.md#assign-assign)
 
 #### Example
-todo
+```
+<onentry>
+  <raise event="foo"/>
+  <raise event="bar"/>
+</onentry>
+```
+
+#### Custom Enter Action
+A state's entry action can also be defined in C++ code instead of the scxml document, so the state machine and it's actions can be seperated. To do this the enter action must not contain executable content in the scxml document.
+
+Entry actions are implemented in a `state_actions` template inside the state machine class. This template can be specialized for each state to implement custom actions. If the state machine is called `sc`, an entry action can be specialized like this in the C++ file that includes the generated state machine:
+```
+template<> void sc::state_actions<S>::enter(sc::data_model &m) { ... }
+```
+Where S is the state.
+
+For example:
+```
+template<> void sc::state_actions<sc::state_hello>::enter(sc::data_model &m)
+{
+        cout << "enter hello" << endl;
+}
+```
 
 ### Exit Action (`<onexit>`)
-todo
+A wrapper element containing executable content to be executed when the state is exited.
 
 #### Attributes
-todo
+None
 
 #### Valid Children
-todo
-
-#### Custom Enter Action
-todo
+- [`<raise>`](user-manual.md#raise-raise)
+- [`<log>`](user-manual.md#log-log)
+- [`<script>`](user-manual.md#script-script)
+- [`<assign>`](user-manual.md#assign-assign)
 
 #### Example
-todo
+```
+<onexit>
+  <raise event="foo"/>
+  <raise event="bar"/>
+</onexit>
+```
+
+#### Custom Exit Action
+A state's exit action can also be defined in C++ code instead of the scxml document, so the state machine and it's actions can be seperated. To do this the exit action must not contain executable content in the scxml document.
+
+Exit actions are implemented in a `state_actions` template inside the state machine class. This template can be specialized for each state to implement custom actions. If the state machine is called `sc`, an exit action can be specialized like this in the C++ file that includes the generated state machine:
+```
+template<> void sc::state_actions<S>::exit(sc::data_model &m) { ... }
+```
+Where S is the state.
+
+For example:
+```
+template<> void sc::state_actions<sc::state_hello>::exit(sc::data_model &m)
+{
+        cout << "exit hello" << endl;
+}
+```
+
 
 ## Executable Content
 todo
