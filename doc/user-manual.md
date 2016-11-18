@@ -309,10 +309,39 @@ template<> void sc::state_actions<sc::state_hello>::exit(sc::data_model &m)
 Executable content allows the state machine to do things. It provides the hooks that allow an SCXML session to modify its data model and interact with external entities. Executable content consists of actions that are performed as part of taking transitions. In particular, executable content occurs inside [`<onentry>`](user-manual.md#enter-action-onentry) and [`<onexit>`](user-manual.md#exit-action-onexit) elements as well as inside transitions. When the state machine takes a transition, it executes the [`<onexit>`](user-manual.md#exit-action-onexit) executable content in the states it is leaving, followed by the content in the transition, followed by the [`<onentry>`](user-manual.md#enter-action-onentry) content in the states it is entering.
 
 ### Raise (`<raise>`)
-todo
+The `<raise>` element raises an event in the current SCXML session. Note that the event will not be processed until the current block of executable content has completed and all events that are already in the internal event queue have been processed.
+
+#### attributes
+
+##### event
+Specifies the name of the event. This attribute is required.
+
+#### Valid Children
+None.
+
+#### Example
+```
+<raise event="foo"/>
+```
 
 ### Log (`<log>`)
-todo
+Allows the state machine to generate a logging message. In the generated code these messages are send to std::clog.
+
+#### attributes
+
+##### label
+An optional label. If specified, the log message is prefixed with `[L]`, where L is the label.
+
+##### expr
+The message to log.
+
+#### Valid Children
+None.
+
+#### Example
+```
+<log expr="'leaving s1'"/>
+```
 
 ### Script (`<script>`)
 todo
