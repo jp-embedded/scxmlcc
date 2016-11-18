@@ -306,7 +306,7 @@ template<> void sc::state_actions<sc::state_hello>::exit(sc::data_model &m)
 
 
 ## Executable Content
-todo
+Executable content allows the state machine to do things. It provides the hooks that allow an SCXML session to modify its data model and interact with external entities. Executable content consists of actions that are performed as part of taking transitions. In particular, executable content occurs inside [`<onentry>`](user-manual.md#enter-action-onentry) and [`<onexit>`](user-manual.md#exit-action-onexit) elements as well as inside transitions. When the state machine takes a transition, it executes the [`<onexit>`](user-manual.md#exit-action-onexit) executable content in the states it is leaving, followed by the content in the transition, followed by the [`<onentry>`](user-manual.md#enter-action-onentry) content in the states it is entering.
 
 ### Raise (`<raise>`)
 todo
