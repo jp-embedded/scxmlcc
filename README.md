@@ -22,7 +22,7 @@ This project is developed and professionally supported by [jp-embedded ApS](http
 There are several reasons why this project started.
 
 * Typically, state machine implementations depend on external libraries or specific, often expensive, design tools. The generated state machines from this scxml compiler has no external dependencies. It uses STL only.
-* Instead of inventing yet another standard for describing state machines, scxmlcc uses the [scxml standard](http://www.w3.org/TR/scxml/), so the behavior is well defined, and gives freedom to use any xml editor or statechart design tool which supports scxml.
+* Instead of inventing yet another standard for describing state machines, scxmlcc uses the [scxml standard](http://www.w3.org/TR/scxml/), so the behavior is well defined, and gives freedom to use any xml editor or statechart design tool which supports scxml (or just xml).
 * State machine implementations often lack features to make it usable for real applications. scxmlcc uses the scxml standard which is featured for real applications.
 * From a programming perspective, implementing state machines often lead to using if-else or switch-case constructs, because it seems like the simplest. Most programs start out fairly simple and well structured, but as new features are implemented, this very often leads to deeply nested constructs. Scxmlcc aims at being easy to implement to make it a real alternative.
 
