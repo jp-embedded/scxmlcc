@@ -13,7 +13,7 @@ The scxml state machine to c++ compiler.
 [![](doc/windows_logo.png)](https://ci.appveyor.com/project/jp-embedded/scxmlcc)[![](https://ci.appveyor.com/api/projects/status/github/gruntjs/grunt?branch=master&svg=true)](https://ci.appveyor.com/project/jp-embedded/scxmlcc)
 
 ## What?
-The goal of scxmlcc is to make a Open Source full featured state machine compiler that can gererate simple and effective C++ state machines from scxml state charts.
+The goal of scxmlcc is to make a Open Source full featured state machine compiler that can generate simple and effective C++ state machines from scxml state charts.
 
 This project is developed and professionally supported by [jp-embedded ApS](http://jp-embedded.com) and is released under the [GNU GPL v3](http://www.gnu.org/licenses/gpl.html). However, the generated state machine code is not covered by license.
 
