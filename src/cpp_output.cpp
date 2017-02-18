@@ -45,6 +45,11 @@ string cpp_output::state_actions_t()	{ return "state_actions"; }
 	
 void cpp_output::gen_transition_base()
 {
+	string ret = state_t() + "*";
+	if (sc.using_parallel) ret = state_t() + "::state_list";
+	string empty = "0";
+	if (sc.using_parallel) empty = "state::state_list()";
+
 	out << tab << "class no_state {};" << endl; 
 	out << tab << "enum transition_type { external, internal };" << endl; 
 	out << endl;
@@ -68,49 +73,49 @@ void cpp_output::gen_transition_base()
 	// when exit/enter is called here without parameter, it forces the action to always exit/enter at least current state
 	// for internal transitions, D must be child of S, otherwise, handle as external transition
 	// S is the source state of the transition, not current state
-	out << tab << tab << "void state_enter(D& d, data_model &m, id<internal>, S*) { d.template enter<S>(m, (S*)0); };" << endl;
-	out << tab << tab << "void state_enter(D& d, data_model &m, ...) { d.template enter<S>(m); };" << endl;
+	out << tab << tab << "void state_enter(D* d, data_model &m, id<internal>, S*) { d->template enter<S>(m, (S*)0); };" << endl;
+	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<S>(m); };" << endl;
 	//out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) { s->template exit<D>(m, (D*)0); };" << endl;
 	out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) {};" << endl;
 	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<D>(m); };" << endl;
 	out << tab << tab << "public:" << endl;
-	out << tab << tab << "state* operator ()(S *s, " << classname() << " &sc)" << endl;
-    out << tab << tab << "{" << endl;
-    out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return 0;" << endl;
+	out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc)" << endl;
+	out << tab << tab << "{" << endl;
+	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return " << empty << ';' << endl;
 	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \" << typeid(D).name() << std::endl;" << endl;
-    out << tab << tab << tab << "D *d = sc.new_state<D>();" << endl;
-    if (sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, d);" << endl;
-    if (sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
-    out << tab << tab << tab << "state_exit(s, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
-    out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
-    out << tab << tab << tab << "state_enter(d, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
-    if (sc.using_parallel) {
-        out << tab << tab << tab << state_t() << "::state_list r = d->template enter_parallel<S>(sc, &d, s);" << endl;
-        out << tab << tab << tab << "r.push_back(d);" << endl;
-        out << tab << tab << tab << "return r;" << endl;
-    } else {
-        out << tab << tab << tab << "return d;" << endl;
-    }   
-    out << tab << tab << "}" << endl;
+	out << tab << tab << tab << "D *d = sc.new_state<D>();" << endl;
+	if (sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, d);" << endl;
+	if (sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
+	out << tab << tab << tab << "state_exit(s, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
+	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
+	out << tab << tab << tab << "state_enter(d, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
+	if (sc.using_parallel) {
+		out << tab << tab << tab << state_t() << "::state_list r = d->template enter_parallel<S>(sc, d, s);" << endl;
+		out << tab << tab << tab << "r.push_back(d);" << endl;
+		out << tab << tab << tab << "return r;" << endl;
+	} else {
+		out << tab << tab << tab << "return d;" << endl;
+	}   
+	out << tab << tab << "}" << endl;
 	out << tab << "};" << endl;
 	out << endl;
-		
+
 	// transition without target
-        if (sc.using_transition_no_target) {
-           out << tab << "// transition with no target" << endl;
-           out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
-           out << tab << "{" << endl;
-           out << tab << tab << "public:" << endl;
-           out << tab << tab << "S* operator ()(S *s, " << classname() << " &sc)" << endl;
-           out << tab << tab << "{" << endl;
-           out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return 0;" << endl;
-           if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << std::endl;" << endl;
-           out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
-           out << tab << tab << tab << "return s;" << endl;
-           out << tab << tab << "}" << endl;
-           out << tab << "};" << endl;
-           out << endl;
-        }
+	if (sc.using_transition_no_target) {
+		out << tab << "// transition with no target" << endl;
+		out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
+		out << tab << "{" << endl;
+		out << tab << tab << "public:" << endl;
+		out << tab << tab << "S* operator ()(S *s, " << classname() << " &sc)" << endl;
+		out << tab << tab << "{" << endl;
+		out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return " << empty << ";" << endl;
+		if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << std::endl;" << endl;
+		out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
+		out << tab << tab << tab << "return s;" << endl;
+		out << tab << tab << "}" << endl;
+		out << tab << "};" << endl;
+		out << endl;
+	}
 
 	for (set<int>::const_iterator i = sc.parallel_target_sizes.begin(); i != sc.parallel_target_sizes.end(); ++i) {
 		const int sz = *i;
@@ -118,7 +123,7 @@ void cpp_output::gen_transition_base()
 		out << tab << "template<event E, class S";
 		for(int i = 0; i < sz; ++i) out << ", class D" << i;
 		out << ", transition_type T = external> class transition" << sz << ';' << endl;
-		
+
 		out << tab << "template<event E, class S";
 		for(int i = 0; i < sz; ++i) out << ", class D" << i;
 		out << "> class transition" << sz << "<E, S";
@@ -135,21 +140,21 @@ void cpp_output::gen_transition_base()
 
 		out << tab << tab << tab << "if(!transition_actions<E, S";
 		for(int i = 0; i < sz; ++i) out << ", D" << i;
-		out << ">::condition(sc.model)) return 0;" << endl;
+		out << ">::condition(sc.model)) return " << empty << ";" << endl;
 
 		if(opt.debug) {
 			out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << typeid(S).name() << \" -> \"";
 			for(int i = 0; i < sz; ++i) {
 				if(i) out << " << \", \"";
-		       		out << " << typeid(D" << i << ").name()";
+				out << " << typeid(D" << i << ").name()";
 			}
 			out << " << std::endl;" << endl;
 		}
 
-        for (int i = 0; i < sz; ++i) {
-            out << tab << tab << tab << 'D' << i << "*d" << i << " = sc.new_state<D" << i << ">();" << endl;
-        }
-        out << tab << tab << tab << "s->exit_parallel(sc, s, d0);" << endl;
+		for (int i = 0; i < sz; ++i) {
+			out << tab << tab << tab << 'D' << i << "*d" << i << " = sc.new_state<D" << i << ">();" << endl;
+		}
+		out << tab << tab << tab << "s->exit_parallel(sc, s, d0);" << endl;
 		if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
 		out << tab << tab << tab << "s->template exit<D0>(sc.model, (D0*)0);" << endl;
 
@@ -157,17 +162,17 @@ void cpp_output::gen_transition_base()
 		for(int i = 0; i < sz; ++i) out << ", D" << i;
 		out << ">::enter(sc.model);" << endl;
 
-		out << tab << tab << tab << "d0.template enter<S>(sc.model, (S*)0);" << endl;
-		out << tab << tab << tab << state_t() << "::state_list r = d0.template enter_parallel<S>(sc, d0, s";
+		out << tab << tab << tab << "d0->template enter<S>(sc.model, (S*)0);" << endl;
+		out << tab << tab << tab << state_t() << "::state_list r = d0->template enter_parallel<S>(sc, d0, s";
 		for(int i = 1; i < sz; ++i) out << ", d" << i;
 		out << ");" << endl;
 
-        out << tab << tab << tab << "r.push_back(d0);" << endl;
-        out << tab << tab << tab << "return r;" << endl;
+		out << tab << tab << tab << "r.push_back(d0);" << endl;
+		out << tab << tab << tab << "return r;" << endl;
 
 		out << tab << tab << '}' << endl;
 		out << tab << "};" << endl;
-		
+
 		out << endl;
 	}
 }
@@ -190,11 +195,13 @@ void cpp_output::gen_state_composite_base()
 	if (sc.using_parallel) ret = "state_list";
 	string retp = ret;
 	if (sc.using_parallel) retp = "state::" + ret;
+	string empty = "0";
+	if (sc.using_parallel) empty = "state::state_list()";
 
 	out << tab << "template<class C, class P> class " << state_composite_t() << " : public P, public state_actions<C>" << endl;
 	out << tab << "{" << endl;
 
-	out << tab << tab << "virtual " << retp << " initial(" << classname() << "&) { return 0; }" << endl;
+	out << tab << tab << "virtual " << retp << " initial(" << classname() << "&) { return " << empty << "; }" << endl;
 
 	// lca calculation
 	out << tab << tab << "public:" << endl;
@@ -225,13 +232,13 @@ void cpp_output::gen_state_composite_base()
 void cpp_output::gen_state_parallel_base()
 {
 
-    // todo for now, assume all targets have same parallel parent. Split if multiple?
-    // limit and validate for this. Not easy to handle.
+	// todo for now, assume all targets have same parallel parent. Split if multiple?
+	// limit and validate for this. Not easy to handle.
 
 	if (!sc.using_parallel) return;
 
-    string empty = "state_list()";
-    string ret = "state_list";
+	string empty = state_t() + "::state_list()";
+	string ret = "state_list";
 
 	if(sc.parallel_sizes.size() == 0) {
 		//todo make composite, if children < 2
@@ -277,54 +284,54 @@ void cpp_output::gen_state_parallel_base()
 		for(int c = 1; c < children; ++c) out << ", class D" << c;
 		out << "> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C *d, " << state_t() << '*';
 		for(int c = 1; c < children; ++c) out << ", D" << c << " *d" << c;
-        out << ")" << endl;
-        out << tab << tab << '{' << endl;
+		out << ")" << endl;
+		out << tab << tab << '{' << endl;
 		out << tab << tab << tab << "// handle transition with all children given" << endl;
- 		// from this state and up, all tagets are same path, so only need to follow one of them.
+		// from this state and up, all tagets are same path, so only need to follow one of them.
 		out << tab << tab << tab << state_t() << "::" << ret << " r = P::template enter_parallel<S>(sc, d, (S*)0);" << endl;
-		for(int c = 1; c < children; ++c) out << tab << tab << tab << 'd' << c << "->template enter<C>(sc.model, (C*)0), r.cur_state.push_back(&d" << c << ");" << endl;
+		for(int c = 1; c < children; ++c) out << tab << tab << tab << 'd' << c << "->template enter<C>(sc.model, (C*)0), sc.cur_state.push_back(d" << c << ");" << endl;
 
 		// todo call init_child where Cn is not a child of Dn or *d
 		// if (false) sc.cur_state.push_back(d->init_child(sc, (C0*)0));
 		// if (false) sc.cur_state.push_back(d->init_child(sc, (C1*)0));
-		
-	        out << tab << tab << tab << "return r;" << endl;
-	        out << tab << tab << '}' << endl;
+
+		out << tab << tab << tab << "return r;" << endl;
+		out << tab << tab << '}' << endl;
 		out << endl;
 
 		for(int c = 0; c < children; ++c) {
-			out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C" << c << "*, C*) { return this; }" << endl;
-			out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C" << c << " *d, " << state_t() << "*)" << endl;
+			out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C" << c << "*, C*) { return " << state_t() << "::" << ret << "(); }" << endl;
+			out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C" << c << " *d, " << state_t() << " *s)" << endl;
 			out << tab << tab << '{' << endl;
 			out << tab << tab << tab << "// parallel state entered with C" << c << " or child of as target" << endl;
-            out << tab << tab << tab << "return enter_parallel<S>(sc, d, s";
+			out << tab << tab << tab << "return enter_parallel<S>(sc, d, s";
 			for(int n = 0; n < children; ++n) {
 				if (n == c) continue;
-                out << ", " << "sc.new_state<C" << n << ">()";
+				out << ", " << "sc.new_state<C" << n << ">()";
 			}
-            out << ");" << endl;
+			out << ");" << endl;
 			out << tab << tab << "};" << endl;
 			out << tab << tab << endl;
 
 			//todo to continue
 		}
 
-		out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C*, C*) { return this; }" << endl;
-		out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C *d, " << state_t() << "*)" << endl;
+		out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C*, C*) { return " << state_t() << "::" << ret << "(); }" << endl;
+		out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C*, " << state_t() << " *s)" << endl;
 		out << tab << tab << '{' << endl;
 		out << tab << tab << tab << "// parallel state entered with parallel as target" << endl;
-        out << tab << tab << tab << state_t() << " *d = sc.new_state<C0>();" << endl;
-        out << tab << tab << tab << state_t() << "::" << ret << " r = enter_parallel<S>(sc, d, s";
-        for (int n = 1; n < children; ++n) {
-            out << ", sc.new_state<C" << n << ">()";
-        }
-        out << ");" << endl;
-        out << tab << tab << tab << "r.push_back(d);" << endl;
-        out << tab << tab << tab << "return r;" << endl;
+		out << tab << tab << tab << state_t() << " *d = sc.new_state<C0>();" << endl;
+		out << tab << tab << tab << state_t() << "::" << ret << " r = enter_parallel<S>(sc, d, s";
+		for (int n = 1; n < children; ++n) {
+			out << ", sc.new_state<C" << n << ">()";
+		}
+		out << ");" << endl;
+		out << tab << tab << tab << "r.push_back(d);" << endl;
+		out << tab << tab << tab << "return r;" << endl;
 		out << tab << tab << "};" << endl;
 		out << endl;
 
-        // parallel exit
+		// parallel exit
 		out << tab << tab << "bool parallel_parent(const std::type_info& pti) { return typeid(C) == pti; }" << endl;
 		out << tab << tab << "void exit_parallel(" << classname() << " &sc, C*, C*) {}" << endl;
 		out << tab << tab << "void exit_parallel(" << classname() << " &sc, C *s, state *d)" << endl;
@@ -455,8 +462,7 @@ void cpp_output::gen_state_base()
 	if (sc.using_parallel) ret = "state_list";
 	string retp = ret;
 	if (sc.using_parallel) retp = "state::" + ret;
-
-		string empty = "0";
+	string empty = "0";
 	if (sc.using_parallel) empty = "state_list()";
 
 	(void)use_base_event;
@@ -494,7 +500,7 @@ void cpp_output::gen_state_base()
 	out << tab << tab << "template<class T> void exit(data_model&, ...) {}" << endl;
 	if(sc.using_compound) out << tab << tab << "virtual void exit(data_model&, const std::type_info&) {}" << endl;
 	if(sc.using_parallel) {
-		out << tab << tab << "template<class S> " << retp << " enter_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) { return this; }" << endl;
+		out << tab << tab << "template<class S> " << retp << " enter_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) { return state_list(); }" << endl;
 		out << tab << tab << "virtual void exit_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) {}" << endl;
 		out << tab << tab << "virtual bool parallel_parent(const std::type_info&) { return false; }" << endl;
 	}
@@ -533,6 +539,8 @@ void cpp_output::gen_state(const scxml_parser::state &state)
     	if (sc.using_parallel) ret = "state_list";
 	string retp = ret;
 	if (sc.using_parallel) retp = "state::" + ret;
+	string empty = "0";
+	if (sc.using_parallel) empty = "state_list()";
 
 	string parent, prefix;
 	if(state.type && *state.type == "inter") prefix = "inter";
@@ -562,7 +570,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	if (final_state) {
 		//todo handle final in parallel states
-		out << tab << tab << ret << " initial" << "(" << classname() << " &sc) { sc.model.event_queue.push(&state::event_done_" << parent << "); return 0; }" << endl;
+		out << tab << tab << ret << " initial" << "(" << classname() << " &sc) { sc.model.event_queue.push(&state::event_done_" << parent << "); return " << empty << "; }" << endl;
 	}
 	//todo there may be multiple targets
 	else if(state.initial.target.size()) {
@@ -600,7 +608,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 			if (first) {
 				string s = ret + ' ' + event + "(" + classname() + " &sc) { ";
-				if (multiple) s += state_t() + " *s; ";
+				if (multiple) s += ret + " s; ";
 				s += "return ";
 				out << tab << tab << s;
 				indent = string(s.size() - 3, ' ');
