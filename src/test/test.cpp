@@ -282,8 +282,6 @@ TEST(timer_switch, 0)
 	sc.dispatch(&sc_timer_switch::state::event_timer);
 	EXPECT_EQ(typeid(sc_timer_switch::state_on), typeid(*sc.cur_state));
 	sc.dispatch(&sc_timer_switch::state::event_timer);
-	EXPECT_EQ(typeid(sc_timer_switch::state_on), typeid(*sc.cur_state));
-	sc.dispatch(&sc_timer_switch::state::event_timer);
 	EXPECT_EQ(typeid(sc_timer_switch::state_off), typeid(*sc.cur_state));
 }
 
