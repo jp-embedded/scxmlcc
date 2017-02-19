@@ -601,8 +601,9 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			const bool multiple = mi->second.size() > 1 || use_ancestor;
 			const bool last = t == mi->second.end() - 1;
 			const bool internal = t->get()->type && *t->get()->type == "internal";
+			const bool has_target = t->get()->target.size();
 
-			if(t->get()->target.size()) {
+			if(has_target) {
 				target_classname = "state_" + t->get()->target.front(); //todo handle multiple targets
 			}
 
@@ -615,7 +616,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			}
 			else out << tab << tab << indent << "|| ";
 			if (multiple) out << "(s = ";
-			if(target_classname.size()) {
+			if (has_target) {
 				// normal transition
 				string type_str;
 				if (internal) type_str = ", internal";
