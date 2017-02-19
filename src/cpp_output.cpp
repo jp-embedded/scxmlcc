@@ -289,7 +289,7 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << tab << tab << "// handle transition with all children given" << endl;
 		// from this state and up, all tagets are same path, so only need to follow one of them.
 		out << tab << tab << tab << state_t() << "::" << ret << " r = P::template enter_parallel<S>(sc, d, (S*)0);" << endl;
-		for(int c = 1; c < children; ++c) out << tab << tab << tab << 'd' << c << "->template enter<C>(sc.model, (C*)0), sc.cur_state.push_back(d" << c << ");" << endl;
+		for(int c = 1; c < children; ++c) out << tab << tab << tab << 'd' << c << "->template enter<C>(sc.model, (C*)0), r.push_back(d" << c << ");" << endl;
 
 		// todo call init_child where Cn is not a child of Dn or *d
 		// if (false) sc.cur_state.push_back(d->init_child(sc, (C0*)0));
@@ -551,7 +551,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
         if(parallel_state) {
 		scxml_parser::state_list states = children(state);
 		for(scxml_parser::state_list::const_iterator i = states.begin(); i != states.end(); ++i) {
-			out << tab << "class state_" << (*i)->id << ';' << endl;
+			out << tab << "struct state_" << (*i)->id << ';' << endl;
 		}
 	}
 	out << tab << "struct " << state_classname << " : public ";
