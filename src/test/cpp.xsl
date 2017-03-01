@@ -22,6 +22,8 @@
     xmlns:conf="http://www.w3.org/2005/scxml-conformance"
     version="1.0">
 
+<xsl:output encoding="iso-8859-1"/>
+
 <!-- Copy everything that doesn't match other rules -->
 <xsl:template match="/ | @* | node()">
   <xsl:copy>

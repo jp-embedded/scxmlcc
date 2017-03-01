@@ -67,9 +67,6 @@
     <ClCompile Include="..\..\examples\microwave.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\examples\microwave-01-cplusplus.scxml" />
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="..\..\examples\microwave-01-cplusplus.scxml">
       <SubType>Designer</SubType>
       <FileType>Document</FileType>

@@ -20,8 +20,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\examples\microwave-01-cplusplus.scxml">
+    <CustomBuild Include="..\..\examples\microwave-01-cplusplus.scxml">
       <Filter>Source Files</Filter>
-    </None>
+    </CustomBuild>
   </ItemGroup>
 </Project>
