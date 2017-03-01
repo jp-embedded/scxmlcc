@@ -47,8 +47,14 @@
     <CustomBuild Include="..\..\test\test533.txml">
       <Filter>Source Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\test\conditional.scxml" />
-    <CustomBuild Include="..\..\test\event_list.scxml" />
-    <CustomBuild Include="..\..\test\event_tokens.scxml" />
+    <CustomBuild Include="..\..\test\conditional.scxml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\test\event_list.scxml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\test\event_tokens.scxml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
