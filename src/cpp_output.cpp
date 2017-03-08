@@ -615,7 +615,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 			string ancestor;
 			if (use_ancestor) {
-				ancestor = " || (s = " + parent + "::" + event + "(sc))";
+				ancestor = " || (s = parent_t::" + event + "(sc))";
 			}
 
 			if (multiple && last) out << ")" << ancestor << ", s";
