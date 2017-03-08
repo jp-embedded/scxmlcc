@@ -74,9 +74,9 @@ void cpp_output::gen_transition_base()
 	// for internal transitions, D must be child of S, otherwise, handle as external transition
 	// S is the source state of the transition, not current state
 	out << tab << tab << "void state_enter(D* d, data_model &m, id<internal>, S*) { d->template enter<S>(m, (S*)0); };" << endl;
-	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<S::parent_t>(m); };" << endl;
+	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<typename S::parent_t>(m); };" << endl;
 	out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) {};" << endl;
-	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<D::parent_t>(m); };" << endl;
+	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<typename D::parent_t>(m); };" << endl;
 	out << tab << tab << "public:" << endl;
 	out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc)" << endl;
 	out << tab << tab << "{" << endl;
@@ -89,7 +89,7 @@ void cpp_output::gen_transition_base()
 	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
 	out << tab << tab << tab << "state_enter(d, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
 	if (sc.using_parallel) {
-		out << tab << tab << tab << state_t() << "::state_list r = d->template enter_parallel<S::parent_t>(sc, d, (S::parent_t*)0);" << endl;
+		out << tab << tab << tab << state_t() << "::state_list r = d->template enter_parallel<typename S::parent_t>(sc, d, (typename S::parent_t*)0);" << endl;
 		out << tab << tab << tab << "r.push_back(d);" << endl;
 		out << tab << tab << tab << "return r;" << endl;
 	} else {
