@@ -74,10 +74,9 @@ void cpp_output::gen_transition_base()
 	// for internal transitions, D must be child of S, otherwise, handle as external transition
 	// S is the source state of the transition, not current state
 	out << tab << tab << "void state_enter(D* d, data_model &m, id<internal>, S*) { d->template enter<S>(m, (S*)0); };" << endl;
-	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<S>(m); };" << endl;
-	//out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) { s->template exit<D>(m, (D*)0); };" << endl;
+	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<S::parent_t>(m); };" << endl;
 	out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) {};" << endl;
-	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<D>(m); };" << endl;
+	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<D::parent_t>(m); };" << endl;
 	out << tab << tab << "public:" << endl;
 	out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc)" << endl;
 	out << tab << tab << "{" << endl;
@@ -90,7 +89,7 @@ void cpp_output::gen_transition_base()
 	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
 	out << tab << tab << tab << "state_enter(d, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
 	if (sc.using_parallel) {
-		out << tab << tab << tab << state_t() << "::state_list r = d->template enter_parallel<S>(sc, d, s);" << endl;
+		out << tab << tab << tab << state_t() << "::state_list r = d->template enter_parallel<S::parent_t>(sc, d, (S::parent_t*)0);" << endl;
 		out << tab << tab << tab << "r.push_back(d);" << endl;
 		out << tab << tab << tab << "return r;" << endl;
 	} else {
@@ -290,11 +289,6 @@ void cpp_output::gen_state_parallel_base()
 		// from this state and up, all tagets are same path, so only need to follow one of them.
 		out << tab << tab << tab << state_t() << "::" << ret << " r = P::template enter_parallel<S>(sc, d, (S*)0);" << endl;
 		for(int c = 1; c < children; ++c) out << tab << tab << tab << 'd' << c << "->template enter<C>(sc.model, (C*)0), r.push_back(d" << c << ");" << endl;
-
-		// todo call init_child where Cn is not a child of Dn or *d
-		// if (false) sc.cur_state.push_back(d->init_child(sc, (C0*)0));
-		// if (false) sc.cur_state.push_back(d->init_child(sc, (C1*)0));
-
 		out << tab << tab << tab << "return r;" << endl;
 		out << tab << tab << '}' << endl;
 		out << endl;
@@ -316,24 +310,16 @@ void cpp_output::gen_state_parallel_base()
 			//todo to continue
 		}
 
-		out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C*, C*) { return " << state_t() << "::" << ret << "(); }" << endl;
-		out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << " &sc, C*, " << state_t() << " *s)" << endl;
-		out << tab << tab << '{' << endl;
-		out << tab << tab << tab << "// parallel state entered with parallel as target" << endl;
-		out << tab << tab << tab << state_t() << " *d = sc.new_state<C0>();" << endl;
-		out << tab << tab << tab << state_t() << "::" << ret << " r = enter_parallel<S>(sc, d, s";
-		for (int n = 1; n < children; ++n) {
-			out << ", sc.new_state<C" << n << ">()";
-		}
-		out << ");" << endl;
-		out << tab << tab << tab << "r.push_back(d);" << endl;
-		out << tab << tab << tab << "return r;" << endl;
-		out << tab << tab << "};" << endl;
+        // other cases, eg parallel state as target
+		out << tab << tab << "template<class S> " << state_t() << "::" << ret << " enter_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) { return state::state_list(); }" << endl;
+
 		out << endl;
 
 		// parallel exit
 		out << tab << tab << "bool parallel_parent(const std::type_info& pti) { return typeid(C) == pti; }" << endl;
-		out << tab << tab << "void exit_parallel(" << classname() << " &sc, C*, C*) {}" << endl;
+        for (int n = 0; n < children; ++n) {
+            out << tab << tab << "void exit_parallel(" << classname() << " &sc, C" << n << "*, C*) {}" << endl;
+        }
 		out << tab << tab << "void exit_parallel(" << classname() << " &sc, C *s, state *d)" << endl;
 		out << tab << tab << '{' << endl;
 		out << tab << tab << tab << "// parallel state exited from C or child" << endl;
@@ -600,7 +586,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			const bool first = t == mi->second.begin();
 			const bool multiple = mi->second.size() > 1 || use_ancestor;
 			const bool last = t == mi->second.end() - 1;
-			const bool internal = t->get()->type && *t->get()->type == "internal";
+			const bool internal = !parallel_state && t->get()->type && *t->get()->type == "internal";
 			const bool has_target = t->get()->target.size();
 
 			if(has_target) {

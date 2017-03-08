@@ -2,16 +2,25 @@
 #include "test355.h"
 #include "test372.h"
 #include "test412.h"
-//#include "test504.h"
+#include "test504.h"
 #include "test505.h"
 #include "test506.h"
-//#include "test533.h"
+#include "test533.h"
 #include "test576.h"
 #include "event_list.h"
 #include "event_tokens.h"
 #include "conditional.h"
 #include "../examples/timer_switch.h"
 #include <gtest/gtest.h>
+
+// test that events are inserted into the queue in the order in which they are raised. If
+// foo occurs before bar, success, otherwise failure -->
+TEST(w3c, 144)
+{
+	sc_test144 sc;
+    sc.init();
+    EXPECT_EQ(typeid(sc_test144::state_pass), typeid(*sc.cur_state));
+}
 
 // test that default initial state is first in document order.  If we enter s0 first we succeed, if s1, failure.
 TEST(w3c, 355)
@@ -35,14 +44,17 @@ TEST(w3c, 372)
 TEST(w3c, 412)
 {
 	sc_test412 sc;
-        sc.init();
-	EXPECT_EQ(typeid(sc_test412::state_pass), typeid(*sc.cur_state));
+    sc.init();
+    EXPECT_EQ(typeid(sc_test412::state_pass), typeid(*sc.cur_state));
 }
 
 // if [a transition's] 'type' is "external", its exit set consists of all active states that are proper descendents of the Least Common Compound Ancestor (LCCA) of the source and target states.
 TEST(w3c, 504)
 {
-	// todo
+    sc_test504 sc;
+    sc.init();
+	EXPECT_EQ(1, sc.cur_state.size());
+	EXPECT_EQ(typeid(sc_test504::state_pass), typeid(*sc.cur_state.front()));
 }
 
 // Otherwise, if the transition has 'type' "internal", its source state is a compound state and all its target states are proper descendents of its source state, the target set consists of all active states that are proper descendents of its source state.
@@ -65,7 +77,10 @@ TEST(w3c, 506)
 // If a transition has 'type' of "internal", but its source state is not a compound state, its exit set is defined as if it had 'type' of "external".
 TEST(w3c, 533)
 {
-	// todo
+    sc_test533 sc;
+    sc.init();
+	EXPECT_EQ(1, sc.cur_state.size());
+	EXPECT_EQ(typeid(sc_test533::state_pass), typeid(*sc.cur_state.front()));
 }
 
 // test that the 'initial' value of scxml is respected.  We set the value to deeply nested non-default parallel siblings and
