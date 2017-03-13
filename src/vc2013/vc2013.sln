@@ -27,8 +27,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vending_machine", "vending_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{8D5AB561-7C2D-430C-A5BD-6E156F005B86}"
 	ProjectSection(ProjectDependencies) = postProject
+		{BB9FD26B-FA51-4137-A90B-AE7161560B54} = {BB9FD26B-FA51-4137-A90B-AE7161560B54}
 		{5C63C1CA-F1D4-4BAB-A920-7A1CD875E744} = {5C63C1CA-F1D4-4BAB-A920-7A1CD875E744}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtest", "gtest\gtest.vcxproj", "{BB9FD26B-FA51-4137-A90B-AE7161560B54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,6 +63,10 @@ Global
 		{8D5AB561-7C2D-430C-A5BD-6E156F005B86}.Debug|Win32.Build.0 = Debug|Win32
 		{8D5AB561-7C2D-430C-A5BD-6E156F005B86}.Release|Win32.ActiveCfg = Release|Win32
 		{8D5AB561-7C2D-430C-A5BD-6E156F005B86}.Release|Win32.Build.0 = Release|Win32
+		{BB9FD26B-FA51-4137-A90B-AE7161560B54}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BB9FD26B-FA51-4137-A90B-AE7161560B54}.Debug|Win32.Build.0 = Debug|Win32
+		{BB9FD26B-FA51-4137-A90B-AE7161560B54}.Release|Win32.ActiveCfg = Release|Win32
+		{BB9FD26B-FA51-4137-A90B-AE7161560B54}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
