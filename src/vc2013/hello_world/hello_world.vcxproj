@@ -67,9 +67,6 @@
     <ClCompile Include="..\..\examples\hello_world.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\examples\hello_world.scxml" />
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="..\..\examples\hello_world.scxml">
       <SubType>Designer</SubType>
       <FileType>Document</FileType>

@@ -5,4 +5,5 @@ scxmlcc
 autorevision.mk
 version_auto.h*
 **/.tags
+boost*
 

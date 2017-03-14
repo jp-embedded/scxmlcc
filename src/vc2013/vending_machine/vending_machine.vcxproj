@@ -73,9 +73,6 @@
     <ClCompile Include="..\..\examples\vending_machine\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\examples\vending_machine\vending_machine.scxml" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\examples\vending_machine\coin_refund.h" />
     <ClInclude Include="..\..\examples\vending_machine\coin_sensor.h" />
     <ClInclude Include="..\..\examples\vending_machine\dispenser.h" />

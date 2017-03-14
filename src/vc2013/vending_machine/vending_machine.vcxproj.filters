@@ -38,11 +38,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\examples\vending_machine\vending_machine.scxml">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\examples\vending_machine\coin_refund.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -67,5 +62,10 @@
     <ClInclude Include="..\..\examples\vending_machine\signal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\examples\vending_machine\vending_machine.scxml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
