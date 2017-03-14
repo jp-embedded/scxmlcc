@@ -26,4 +26,3 @@
 const char* version();
 
 #endif
-
