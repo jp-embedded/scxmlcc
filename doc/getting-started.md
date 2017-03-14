@@ -17,6 +17,8 @@ sudo apt-get install build-essential libboost-all-dev autorevision xsltproc
 ```
 autorevision is used to update the scxmlcc revision. This can be omitted.
 
+xsltproc is used to build the unit tests. This can also be omitted.
+
 So if you plan to just use scxmlcc as is for building your state machines, you can ommit autorevision and xsltproc.
 
 ### On Windows
@@ -30,6 +32,7 @@ To build the boost library open a cmd prompt at the directory where boost was un
 bootstrap
 .\b2
 ```
+If you want to build the unit tests, you must download [msxsl.exe](http://download.microsoft.com/download/f/2/6/f263ac46-1fe9-4ae9-8fd3-21102100ebf5/msxsl.exe) from microsoft and put it in your path.
 
 ## Obtaining And Building scxmlcc
 scxmlcc is available as compressed releases or through github. The latest and previous releases is available at [Releases](https://github.com/jp-embedded/scxmlcc/releases).
