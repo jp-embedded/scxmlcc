@@ -56,5 +56,8 @@
     <CustomBuild Include="..\..\test\event_tokens.scxml">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\test\test364.txml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

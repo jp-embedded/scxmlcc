@@ -1,5 +1,6 @@
 #include "test144.h"
 #include "test355.h"
+#include "test364.h"
 #include "test372.h"
 #include "test412.h"
 #include "test504.h"
@@ -28,6 +29,17 @@ TEST(w3c, 355)
 	sc_test355 sc;
         sc.init();
 	EXPECT_EQ(typeid(sc_test355::state_pass), typeid(*sc.cur_state));
+}
+
+// test that default initial states are entered when a compound state is entered.  First we test
+// the 'initial' attribute, then the initial element, then default to the first child in document order.  
+// If we get to s01111 we succeed, if any other state, failure.
+TEST(w3c, 364)
+{
+    sc_test364 sc;
+    sc.init();
+	EXPECT_EQ(1, sc.cur_state.size());
+	EXPECT_EQ(typeid(sc_test364::state_pass), typeid(*sc.cur_state.front()));
 }
 
 // test that entering a final state generates done.state.parentid after executing the onentry elements.  
