@@ -38,7 +38,6 @@ class scxml_parser
 		bool using_log;
 		bool using_compound;
 		bool using_transition_no_target;
-		std::set<int> parallel_sizes;
 		std::set<int> parallel_target_sizes;
 
 		struct action {

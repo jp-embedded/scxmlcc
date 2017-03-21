@@ -230,6 +230,7 @@ void cpp_output::gen_state_composite_base()
 
 void cpp_output::gen_state_parallel_base()
 {
+	const scxml_parser::state_list &states = sc.sc().states;
 
 	// todo for now, assume all targets have same parallel parent. Split if multiple?
 	// limit and validate for this. Not easy to handle.
@@ -239,14 +240,21 @@ void cpp_output::gen_state_parallel_base()
 	string empty = state_t() + "::state_list()";
 	string ret = "state_list";
 
-	if(sc.parallel_sizes.size() == 0) {
+	std::set<int> parallel_sizes;
+	for (scxml_parser::state_list::const_iterator istate = states.begin(); istate != states.end(); ++istate) {
+		if (istate->get()->type && *istate->get()->type == "parallel") {
+			parallel_sizes.insert(children(*istate->get()).size());
+		}
+	}
+
+	if(parallel_sizes.size() == 0) {
 		//todo make composite, if children < 2
 		cerr << "error: parallel state with < 2 states is currently not supported" << endl;
 		exit(1);
 	}
 
-	const int min_c = *sc.parallel_sizes.begin();
-	const int max_c = *sc.parallel_sizes.rbegin();
+	const int min_c = *parallel_sizes.begin();
+	const int max_c = *parallel_sizes.rbegin();
 	if(min_c < 2) {
 		//todo make composite, if children < 2
 		cerr << "error: parallel state with < 2 states is currently not supported" << endl;
@@ -256,7 +264,7 @@ void cpp_output::gen_state_parallel_base()
 	//todo combine with no_class
 	if(min_c < max_c) out << tab << "class no_class {};" << endl;
 
-	for (set<int>::reverse_iterator i = sc.parallel_sizes.rbegin(); i != sc.parallel_sizes.rend(); ++i) {
+	for (set<int>::reverse_iterator i = parallel_sizes.rbegin(); i != parallel_sizes.rend(); ++i) {
 		const int children = *i;
 		out << tab << "template<class C, class P";
 		for(int c = 0; c < children; ++c) {
@@ -558,10 +566,13 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 		//todo handle final in parallel states
 		out << tab << tab << ret << " initial" << "(" << classname() << " &sc) { sc.model.event_queue.push(&state::event_done_" << parent << "); return " << empty << "; }" << endl;
 	}
-	//todo there may be multiple targets
 	else if(state.initial.target.size()) {
-		string target_classname = "state_" + state.initial.target.front();
-		out << tab << tab << ret << " initial" << "(" << classname() << " &sc) { return transition<&state::initial, " << state_classname << ", " << target_classname << ", internal>()(this, sc); }" << endl;
+		const int sz = state.initial.target.size();
+		out << tab << tab << ret << " initial" << "(" << classname() << " &sc) { return transition";
+		if (sz > 1) out << sz;
+		out << "<&state::initial, " << state_classname;
+		for (int i = 0; i < sz; ++i) out << ", state_" << state.initial.target[i];
+	       	out << ", internal>()(this, sc); }" << endl;
 	}
 
 	//events
