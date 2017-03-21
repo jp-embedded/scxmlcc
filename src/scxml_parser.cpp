@@ -31,7 +31,6 @@ void scxml_parser::parse_scxml(const ptree &pt)
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 		boost::optional<string> initial(xmlattr.get_optional<string>("initial"));
 		if(initial) split(m_scxml.initial.target, *initial, is_any_of(" "), token_compress_on);
-		if(m_scxml.initial.target.size() > 1) parallel_target_sizes.insert(m_scxml.initial.target.size());
 		m_scxml.name = xmlattr.get<string>("name", m_scxml.name);
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
@@ -45,8 +44,10 @@ void scxml_parser::parse_scxml(const ptree &pt)
 			else if (it->first == "datamodel") m_scxml.datamodel = parse_datamodel(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <scxml>" << endl;
 		}
+		if(m_scxml.initial.target.size() > 1) parallel_target_sizes.insert(m_scxml.initial.target.size());
 
 		// if initial state is not set, use first state in document order
+		// also use first state for parallel states. Other children are entered implicit
 		if(m_scxml.initial.target.empty()) {
 			if(m_scxml.states.size()) {
 				m_scxml.initial.target.push_back((*m_scxml.states.begin())->id);
@@ -90,13 +91,11 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 			else cerr << "warning: unknown item '" << it->first << "' in <parallel>" << endl;
 		}
 
-		// if initial state is not set, use first state in document order
-		// if parent is parallel put all states in initial
-		if(parent && (parent->initial.target.empty() || (parent->type && *parent->type == "parallel"))) {
+		// if parent initial state is not set, use first state in document order
+		// if parent is parallel, also use first state. Other children are entered implicit
+		if(parent && parent->initial.target.empty()) {
 			parent->initial.target.push_back(st->id);
 		}
-
-		parallel_sizes.insert(st->initial.target.size());
 	}
 	catch (ptree_error e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
@@ -182,7 +181,6 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 		}
 		boost::optional<string> initial(xmlattr.get_optional<string>("initial"));
 		if(initial) split(st->initial.target, *initial, is_any_of(" "), token_compress_on);
-		if(st->initial.target.size() > 1) parallel_target_sizes.insert(st->initial.target.size());
 		m_scxml.states.push_back(st);
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
@@ -200,9 +198,9 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
 		}
 
-		// if initial state is not set, use first state in document order
-		// if parent is parallel put all states in initial
-		if(parent && (parent->initial.target.empty() || (parent->type && *parent->type == "parallel"))) {
+		// if parent initial state is not set, use first state in document order
+		// if parent is parallel, also use first state. Other children are entered implicit
+		if(parent && parent->initial.target.empty()) {
 			parent->initial.target.push_back(st->id);
 		}
 	}
@@ -234,9 +232,9 @@ void scxml_parser::parse_final(const ptree &pt, const boost::shared_ptr<state> &
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
 		}
 
-		// if initial state is not set, use first state in document order
-		// if parent is parallel put all states in initial
-		if(parent && (parent->initial.target.empty() || (parent->type && *parent->type == "parallel"))) {
+		// if parent initial state is not set, use first state in document order
+		// if parent is parallel, also use first state. Other children are entered implicit
+		if(parent && parent->initial.target.empty()) {
 			parent->initial.target.push_back(st->id);
 		}
 	}
