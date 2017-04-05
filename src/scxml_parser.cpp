@@ -36,10 +36,10 @@ void scxml_parser::parse_scxml(const ptree &pt)
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
-			else if (it->first == "state") parse_state(it->second, boost::shared_ptr<state>());
-			else if (it->first == "history") parse_state(it->second, boost::shared_ptr<state>());
-			else if (it->first == "final") parse_final(it->second, boost::shared_ptr<state>());
-			else if (it->first == "parallel") parse_parallel(it->second, boost::shared_ptr<state>());
+			else if (it->first == "state") parse_state(it->second, boost::shared_ptr<state>(new state));
+			else if (it->first == "history") parse_state(it->second, boost::shared_ptr<state>(new state));
+			else if (it->first == "final") parse_final(it->second, boost::shared_ptr<state>(new state));
+			else if (it->first == "parallel") parse_parallel(it->second, boost::shared_ptr<state>(new state));
 			else if (it->first == "initial") m_scxml.initial = parse_initial(it->second);
 			else if (it->first == "datamodel") m_scxml.datamodel = parse_datamodel(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <scxml>" << endl;
