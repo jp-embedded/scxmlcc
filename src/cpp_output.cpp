@@ -424,6 +424,7 @@ void cpp_output::gen_state_base()
 	vector<string> events;
 	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
 		if (i_state->get()->type && *i_state->get()->type == "final") {
+			if (!i_state->get()->parent) continue;
 			string event = "done.state." + i_state->get()->parent->id;
 			events.push_back(event);
 		}
@@ -564,7 +565,13 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	if (final_state) {
 		//todo handle final in parallel states
-		out << tab << tab << ret << " initial" << "(" << classname() << " &sc) { sc.model.event_queue.push(&state::event_done_" << parent << "); return " << empty << "; }" << endl;
+		if (parent == "scxml") {
+			// todo: how to handle final in scxml:
+			// When the state machine reaches the <final> child of an <scxml> element, it must terminate
+		}
+		else {
+			out << tab << tab << ret << " initial" << "(" << classname() << " &sc) { sc.model.event_queue.push(&state::event_done_" << parent << "); return " << empty << "; }" << endl;
+		}
 	}
 	else if(state.initial.target.size()) {
 		const int sz = state.initial.target.size();
