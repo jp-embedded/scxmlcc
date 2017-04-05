@@ -568,6 +568,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 		if (parent == "scxml") {
 			// todo: how to handle final in scxml:
 			// When the state machine reaches the <final> child of an <scxml> element, it must terminate
+			cerr << "warning: root final states is currently not supported." << endl;
 		}
 		else {
 			out << tab << tab << ret << " initial" << "(" << classname() << " &sc) { sc.model.event_queue.push(&state::event_done_" << parent << "); return " << empty << "; }" << endl;
