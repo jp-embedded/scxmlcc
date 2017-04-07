@@ -7,6 +7,7 @@
 #include "test505.h"
 #include "test506.h"
 #include "test533.h"
+#include "test570.h"
 #include "test576.h"
 #include "event_list.h"
 #include "event_tokens.h"
@@ -93,6 +94,15 @@ TEST(w3c, 533)
     sc.init();
 	EXPECT_EQ(1, sc.cur_state.size());
 	EXPECT_EQ(typeid(sc_test533::state_pass), typeid(*sc.cur_state.front()));
+}
+
+// test that we generate done.state.id when all a parallel state's children are in final states
+TEST(w3c, 570)
+{
+    sc_test570 sc;
+    sc.init();
+	EXPECT_EQ(1, sc.cur_state.size());
+	EXPECT_EQ(typeid(sc_test570::state_pass), typeid(*sc.cur_state.front()));
 }
 
 // test that the 'initial' value of scxml is respected.  We set the value to deeply nested non-default parallel siblings and
