@@ -168,7 +168,7 @@ void cpp_output::gen_transition_base()
         if (sc.using_parallel) {
             out << tab << tab << tab << "if (eval) {" << endl;
             out << tab << tab << tab << tab << "state::state_list sl;" << endl;
-            out << tab << tab << tab << tab << "if(!transition_actions<E, S";
+            out << tab << tab << tab << tab << "if(transition_actions<E, S";
             for (int i = 0; i < sz; ++i) out << ", D" << i;
             out << ">::condition(sc.model)) sl.push_back(sc.new_state<S>());" << endl;
             out << tab << tab << tab << tab << "return sl;" << endl;
