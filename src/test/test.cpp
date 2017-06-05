@@ -8,6 +8,7 @@
 #include "test506.h"
 #include "test533.h"
 #include "test570.h"
+#include "test375.h"
 #include "test576.h"
 #include "event_list.h"
 #include "event_tokens.h"
@@ -50,6 +51,14 @@ TEST(w3c, 372)
 	sc_test372 sc;
         sc.init();
 	EXPECT_EQ(typeid(sc_test372::state_pass), typeid(*sc.cur_state));
+}
+
+// test that onentry handlers are executed in document order.  event1 should be raised before event2
+TEST(w3c, 375)
+{
+	sc_test375 sc;
+        sc.init();
+	EXPECT_EQ(typeid(sc_test375::state_pass), typeid(*sc.cur_state));
 }
 
 // test that executable content in the <initial> transition executes after the onentry handler on the state
