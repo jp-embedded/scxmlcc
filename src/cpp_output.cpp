@@ -516,6 +516,7 @@ void cpp_output::gen_state_base()
 	vector<string> events;
 	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
 		if (i_state->get()->type && *i_state->get()->type == "final") {
+			if (!i_state->get()->parent) continue;
 			string event = "done.state." + i_state->get()->parent->id;
 			events.push_back(event);
 		}
@@ -678,9 +679,16 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	}
 
 	if (final_state) {
-		out << tab << tab << "template<class T> void enter(data_model &m, ...) { final::template enter<T>(m, (T*)0); m.event_queue.push(&state::event_done_" << parent << "); ";
-		if (sc.using_parallel) out << "parallel_enter_final(m); }" << endl;
-		else out << '}' << endl;
+		if (parent == "scxml") {
+			// todo: how to handle final in scxml:
+			// When the state machine reaches the <final> child of an <scxml> element, it must terminate
+			cerr << "warning: root final states is currently not supported." << endl;
+		}
+		else {
+			out << tab << tab << "template<class T> void enter(data_model &m, ...) { final::template enter<T>(m, (T*)0); m.event_queue.push(&state::event_done_" << parent << "); ";
+			if (sc.using_parallel) out << "parallel_enter_final(m); }" << endl;
+			else out << '}' << endl;
+		}
 	}
 
 	//events
