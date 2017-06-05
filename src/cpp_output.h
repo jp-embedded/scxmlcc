@@ -41,12 +41,15 @@ class cpp_output {
 	std::string state_t();
 	std::string state_actions_t();
 	std::string state_composite_t();
+	std::string state_final_t();
 	std::string state_parallel_t();
 	void gen_model_decl();
 	void gen_model_base_data();
+	void gen_model_base_finals();
 	void gen_model_base();
 	void gen_state_base();
 	void gen_state_composite_base();
+	void gen_state_final_base();
 	void gen_state_parallel_base();
 	void gen_state_actions_base();
 	void gen_transition_base();
@@ -64,6 +67,7 @@ class cpp_output {
 
 	private:
 	scxml_parser::state_list children(const scxml_parser::state &state);
+	scxml_parser::state_list states(const std::string &type);
 };
 
 #endif
