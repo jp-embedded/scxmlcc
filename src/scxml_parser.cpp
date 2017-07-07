@@ -24,6 +24,11 @@
 using namespace boost::property_tree;
 using namespace std;
 
+// allow appending vector to vector
+template <typename T> void operator+=(std::vector<T> &v1, const std::vector<T> &v2) {
+    v1.insert(v1.end(), v2.begin(), v2.end());
+}
+
 void scxml_parser::parse_scxml(const ptree &pt)
 {
 	try {
@@ -85,8 +90,8 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 			else if (it->first == "history") parse_state(it->second, st);
 			else if (it->first == "parallel") parse_parallel(it->second, st);
 			else if (it->first == "transition") st->transitions.push_back(parse_transition(it->second));
-			else if (it->first == "onentry") st->entry_actions = parse_entry(it->second);
-			else if (it->first == "onexit") st->exit_actions = parse_entry(it->second);
+			else if (it->first == "onentry") st->entry_actions += parse_entry(it->second);
+			else if (it->first == "onexit") st->exit_actions += parse_entry(it->second);
 			else if (it->first == "initial") st->initial = parse_initial(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <parallel>" << endl;
 		}
@@ -191,8 +196,8 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			else if (it->first == "final") parse_final(it->second, st);
 			else if (it->first == "parallel") parse_parallel(it->second, st);
 			else if (it->first == "transition") st->transitions.push_back(parse_transition(it->second));
-			else if (it->first == "onentry") st->entry_actions = parse_entry(it->second);
-			else if (it->first == "onexit") st->exit_actions = parse_entry(it->second);
+			else if (it->first == "onentry") st->entry_actions += parse_entry(it->second);
+			else if (it->first == "onexit") st->exit_actions += parse_entry(it->second);
 			else if (it->first == "initial") st->initial = parse_initial(it->second);
 			else if (it->first == "datamodel") { scxml_parser::data_list m = parse_datamodel(it->second); m_scxml.datamodel.insert(m_scxml.datamodel.end(), m.begin(), m.end()); }
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
@@ -227,8 +232,8 @@ void scxml_parser::parse_final(const ptree &pt, const boost::shared_ptr<state> &
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
-			else if (it->first == "onentry") st->entry_actions = parse_entry(it->second);
-			else if (it->first == "onexit") st->exit_actions = parse_entry(it->second);
+			else if (it->first == "onentry") st->entry_actions += parse_entry(it->second);
+			else if (it->first == "onexit") st->exit_actions += parse_entry(it->second);
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
 		}
 

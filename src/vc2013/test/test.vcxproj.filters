@@ -62,5 +62,8 @@
     <CustomBuild Include="..\..\test\test570.txml">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\test\test375.txml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
