@@ -9,6 +9,7 @@
 #include "test533.h"
 #include "test570.h"
 #include "test375.h"
+#include "test376.h"
 #include "test576.h"
 #include "event_list.h"
 #include "event_tokens.h"
@@ -59,6 +60,15 @@ TEST(w3c, 375)
 	sc_test375 sc;
         sc.init();
 	EXPECT_EQ(typeid(sc_test375::state_pass), typeid(*sc.cur_state));
+}
+
+// test that each onentry handler is a separate block.The <send> of event1 will cause an error but
+// the increment to var1 should happen anyways
+TEST(w3c, 376)
+{
+	sc_test376 sc;
+    sc.init();
+	EXPECT_EQ(typeid(sc_test376::state_pass), typeid(*sc.cur_state));
 }
 
 // test that executable content in the <initial> transition executes after the onentry handler on the state
