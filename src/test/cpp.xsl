@@ -51,6 +51,11 @@
   </state>
 </xsl:template>
 
+<!-- Illegal target -->
+<xsl:template match="//@conf:illegalTarget">
+	<xsl:attribute name="target">illegal</xsl:attribute>
+</xsl:template>
+
 <!-- datamodel -->
 <xsl:template match="//@conf:datamodel">
 	<xsl:attribute name="datamodel">cplusplus</xsl:attribute>
