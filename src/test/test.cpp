@@ -65,7 +65,7 @@ TEST(w3c, 375)
 // test that each onentry handler is a separate block.The <send> of event1 will cause an error but
 // the increment to var1 should happen anyways
 // todo: must support <send> for this test to work
-// todo: handle invalid target runtime as defined? Or compile error? (or warning)
+// todo: supporting <send> correctly requires implementing an event I/O processor
 TEST(w3c, 376)
 {
   sc_test376 sc;
