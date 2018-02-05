@@ -25,6 +25,8 @@
 
 #include <iostream>
 
+using namespace std::placeholders;
+
 int main()
 {
 	sc::user_model m;
@@ -36,33 +38,31 @@ int main()
 	display display;
 	coin_refund coin_refund;
 
-	functor<sc::event> dispatch(&sc, &sc::dispatch);
-
 	// connect input simulator to coin sensor and keypad
-	input.sig_key.connect(&coin_sensor, &coin_sensor::simulate_input);
-	input.sig_key.connect(&keypad, &keypad::simulate_input);
+	input.sig_key.connect(std::bind(&coin_sensor::simulate_input, &coin_sensor, _1));
+	input.sig_key.connect(std::bind(&keypad::simulate_input, &keypad, _1));
 
 	// connect coin sensor to state machine
-	coin_sensor.sig_dime.connect(bind(dispatch, &sc::state::event_D));
-	coin_sensor.sig_nickel.connect(bind(dispatch, &sc::state::event_N));
+	coin_sensor.sig_dime.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_D));
+	coin_sensor.sig_nickel.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_N));
 
 	// connect keypad to state machine
-	keypad.sig_coke.connect(bind(dispatch, &sc::state::event_coke));
-	keypad.sig_diet.connect(bind(dispatch, &sc::state::event_diet));
-	keypad.sig_zero.connect(bind(dispatch, &sc::state::event_zero));
-	keypad.sig_cancel.connect(bind(dispatch, &sc::state::event_cancel));
+	keypad.sig_coke.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_coke));
+	keypad.sig_diet.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_diet));
+	keypad.sig_zero.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_zero));
+	keypad.sig_cancel.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_cancel));
 
 	// connect dispenser to state machine
-	m.sig_dispense_coke.connect(&dispenser, &dispenser::coke);
-	m.sig_dispense_diet.connect(&dispenser, &dispenser::diet);
-	m.sig_dispense_zero.connect(&dispenser, &dispenser::zero);
+	m.sig_dispense_coke.connect(std::bind(&dispenser::coke, &dispenser));
+	m.sig_dispense_diet.connect(std::bind(&dispenser::diet, &dispenser));
+	m.sig_dispense_zero.connect(std::bind(&dispenser::zero, &dispenser));
 
-	// connect display co state machine
-	m.sig_insert_coins.connect(&display, &display::insert);
+	// connect display to state machine
+	m.sig_insert_coins.connect(std::bind(&display::insert, &display, _1));
 
 	// connect coin refund to state machine
-	m.sig_refund_dime.connect(&coin_refund, &coin_refund::dime);
-	m.sig_refund_nickel.connect(&coin_refund, &coin_refund::nickel);
+	m.sig_refund_dime.connect(std::bind(&coin_refund::dime, &coin_refund));
+	m.sig_refund_nickel.connect(std::bind(&coin_refund::nickel, &coin_refund));
 
 	std::cout << "input:  1 = coke button" << std::endl;
 	std::cout << "        2 = zero button" << std::endl;
