@@ -47,6 +47,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 			else if (it->first == "parallel") parse_parallel(it->second, boost::shared_ptr<state>());
 			else if (it->first == "initial") m_scxml.initial = parse_initial(it->second);
 			else if (it->first == "datamodel") m_scxml.datamodel = parse_datamodel(it->second);
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <scxml>" << endl;
 		}
 		if(m_scxml.initial.target.size() > 1) parallel_target_sizes.insert(m_scxml.initial.target.size());
@@ -93,6 +94,7 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 			else if (it->first == "onentry") st->entry_actions += parse_entry(it->second);
 			else if (it->first == "onexit") st->exit_actions += parse_entry(it->second);
 			else if (it->first == "initial") st->initial = parse_initial(it->second);
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <parallel>" << endl;
 		}
 
@@ -121,6 +123,7 @@ boost::shared_ptr<scxml_parser::data> scxml_parser::parse_data(const ptree &pt)
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <data>" << endl;
 		}
 
@@ -140,6 +143,7 @@ scxml_parser::data_list scxml_parser::parse_datamodel(const ptree &pt)
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "data") datamodel.push_back(parse_data(it->second));
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <datamodel>" << endl;
 		}
 
@@ -161,6 +165,7 @@ scxml_parser::transition scxml_parser::parse_initial(const ptree &pt)
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "transition") initial = *parse_transition(it->second);
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <initial>" << endl;
 		}
 
@@ -200,6 +205,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			else if (it->first == "onexit") st->exit_actions += parse_entry(it->second);
 			else if (it->first == "initial") st->initial = parse_initial(it->second);
 			else if (it->first == "datamodel") { scxml_parser::data_list m = parse_datamodel(it->second); m_scxml.datamodel.insert(m_scxml.datamodel.end(), m.begin(), m.end()); }
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
 		}
 
@@ -234,6 +240,7 @@ void scxml_parser::parse_final(const ptree &pt, const boost::shared_ptr<state> &
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
 			else if (it->first == "onentry") st->entry_actions += parse_entry(it->second);
 			else if (it->first == "onexit") st->exit_actions += parse_entry(it->second);
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <state>" << endl;
 		}
 
@@ -259,6 +266,7 @@ scxml_parser::plist<scxml_parser::action> scxml_parser::parse_entry(const ptree 
 			else if (it->first == "log") l_ac.push_back(parse_log(it->second));
 			else if (it->first == "raise") l_ac.push_back(parse_raise(it->second));
 			else if (it->first == "assign") l_ac.push_back(parse_assign(it->second));
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <onentry> or <onexit>" << endl;
 		}
 	}
@@ -283,6 +291,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_raise(const ptree &p
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <raise>" << endl;
 		}
 	}
@@ -311,6 +320,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_log(const ptree &pt)
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <log>" << endl;
 		}
 	}
@@ -339,6 +349,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_assign(const ptree &
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <assign>" << endl;
 		}
 	}
@@ -360,6 +371,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_script(const ptree &
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <script>" << endl;
 		}
 	}
@@ -393,6 +405,7 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 			else if (it->first == "log") tr->actions.push_back(parse_log(it->second));
 			else if (it->first == "raise") tr->actions.push_back(parse_raise(it->second));
 			else if (it->first == "assign") tr->actions.push_back(parse_assign(it->second));
+			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <transition>" << endl;
 		}
 	}
@@ -409,11 +422,12 @@ void scxml_parser::parse(const ptree &pt)
 	for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 		if (it->first == "<xmlcomment>") ; // ignore comments
 		else if (it->first == "scxml") parse_scxml(it->second);
+		else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 		else cerr << "warning: unknown item '" << it->first << "'" << endl;
 	}
 }
 
-scxml_parser::scxml_parser(const char *name, const ptree &pt) : using_parallel(false), using_final(false), using_event_queue(false), using_log(false), using_compound(false), using_transition_no_target(false)
+scxml_parser::scxml_parser(const char *name, const std::string& ignore_unknown, const ptree &pt) : using_parallel(false), using_final(false), using_event_queue(false), using_log(false), using_compound(false), using_transition_no_target(false), ignore_elements_re(ignore_unknown)
 {
 	m_scxml.name = name;
 	parse(pt);
