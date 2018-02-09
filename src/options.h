@@ -24,6 +24,7 @@ struct options
 {
 	boost::filesystem::path input;
 	boost::filesystem::path output;
+	std::string ignore_unknown;
 	bool debug;
 	bool bare_metal;
 

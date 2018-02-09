@@ -25,6 +25,7 @@
 #include <list>
 #include <set>
 #include <map>
+#include <regex>
 
 class scxml_parser
 {
@@ -39,6 +40,7 @@ class scxml_parser
 		bool using_compound;
 		bool using_transition_no_target;
 		std::set<int> parallel_target_sizes;
+		std::regex ignore_elements_re;
 
 		struct action {
 			std::string type;
@@ -78,7 +80,7 @@ class scxml_parser
 			data_list datamodel;
 		};
 
-		scxml_parser(const char *name, const boost::property_tree::ptree &pt);
+		scxml_parser(const char *name, const std::string& ignore_unknown, const boost::property_tree::ptree &pt);
 
 		const scxml& sc() const { return m_scxml; }
 

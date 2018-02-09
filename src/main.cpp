@@ -40,9 +40,9 @@ void scxmlcc(const options &opt)
 {
 	ptree pt;
 	read_xml(opt.input.string(), pt);
-    std::string sc_name = opt.input.stem().string();
+	std::string sc_name = opt.input.stem().string();
 	replace_if(sc_name.begin(), sc_name.end(), c_pred, '_');
-	scxml_parser sc(sc_name.c_str(), pt);
+	scxml_parser sc(sc_name.c_str(), opt.ignore_unknown, pt);
 	ofstream ofs(opt.output.string().c_str());
 	cpp_output out(ofs, sc, opt);
 	out.gen();
@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
 		("input,i",	value<string>(),	"Input file.")
 		("output,o",	value<string>(),	"Output file.")
 		("debug,d",				"Enable debug output")
+		("ignore-unknown,u",	value<string>(),	"ignore unknown xml elements matching regex")
 		("baremetal,b",				"Generate code for bare metal C++")
 		("version,v",				"Version and copyright information");
 	positional_options_description pdesc;
@@ -76,6 +77,7 @@ int main(int argc, char *argv[])
 
 	if(vm.count("input")) opt.input = vm["input"].as<string>();
 	if(vm.count("output")) opt.output = vm["output"].as<string>();
+	if(vm.count("ignore-unknown")) opt.ignore_unknown = vm["ignore-unknown"].as<string>();
 	if(vm.count("debug")) opt.debug = true;
 	if(vm.count("baremetal")) opt.bare_metal = true;
 
