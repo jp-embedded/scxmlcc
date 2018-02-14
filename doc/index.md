@@ -2,3 +2,4 @@
 # Documentation
  * [Getting Started](getting-started.md)
  * [Users Manual](user-manual.md)
+ * [Implementation Details](implementation-details.md)
