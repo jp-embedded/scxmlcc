@@ -4,7 +4,7 @@
 The design of the generated state machines is based on the [State Pattern](https://en.wikipedia.org/wiki/State_pattern).
 
 From Wikipedia:
->The state pattern is a behavioral software design pattern that implements a state machine in an object-oriented way. With the state >pattern, a state machine is implemented by implementing each individual state as a derived class of the state pattern interface, and >implementing state transitions by invoking methods defined by the pattern's superclass.
+>The state pattern is a behavioral software design pattern that implements a state machine in an object-oriented way. With the state pattern, a state machine is implemented by implementing each individual state as a derived class of the state pattern interface, and implementing state transitions by invoking methods defined by the pattern's superclass.
 
 todo: events 
 
