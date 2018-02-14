@@ -19,7 +19,7 @@ We can translate this into a C++ class hierarchy:
 
 todo: pic state<-s0<-s1<-s2
 
-Now, if the current state is s2 and an event is invoked, it will be automatically by the most derived implementation. If invoking e0 it will be handled by `s2::e0()` and e1 will be handled by `s1::e1()`.
+Now, if the current state is s2 and an event is invoked, it will be handled automatically by the most derived implementation. If invoking e0 it will be handled by `s2::e0()` and e1 will be handled by `s1::e1()`.
 
 todo: describe function
 
