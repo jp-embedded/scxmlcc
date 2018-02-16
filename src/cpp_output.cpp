@@ -79,8 +79,10 @@ void cpp_output::gen_transition_base()
 	out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) {};" << endl;
 	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<typename D::parent_t>(m); };" << endl;
 	out << tab << tab << "public:" << endl;
-	if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, bool eval)" << endl;
-	else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc)" << endl;
+	if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, bool eval";
+	else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc";
+	if (opt.debug) out << ", const char* ename)" << endl;
+	else out << ")" << endl;
 	out << tab << tab << "{" << endl;
     if (sc.using_parallel) {
         out << tab << tab << tab << "if (eval) {" << endl;
@@ -92,7 +94,7 @@ void cpp_output::gen_transition_base()
     else {
         out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return " << empty << ';' << endl;
     }
-	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << demangle(typeid(S).name()) << \" -> \" << demangle(typeid(D).name()) << std::endl;" << endl;
+	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << demangle(typeid(S).name()) << \" -> \" << demangle(typeid(D).name()) << std::endl;" << endl;
 	out << tab << tab << tab << "D *d = sc.new_state<D>();" << endl;
 	if (sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, d);" << endl;
 	if (sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
@@ -116,8 +118,10 @@ void cpp_output::gen_transition_base()
 		out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
 		out << tab << "{" << endl;
 		out << tab << tab << "public:" << endl;
-		if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, bool eval)" << endl;
-		else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc)" << endl;
+		if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, bool eval";
+		else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc";
+		if (opt.debug) out << ", const char* ename)" << endl;
+		else out << ")" << endl;
 		out << tab << tab << "{" << endl;
         if (sc.using_parallel) {
             out << tab << tab << tab << "if (eval) {" << endl;
@@ -129,7 +133,7 @@ void cpp_output::gen_transition_base()
         else {
             out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return " << empty << ";" << endl;
         }
-		if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << demangle(typeid(S).name()) << std::endl;" << endl;
+		if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << demangle(typeid(S).name()) << std::endl;" << endl;
 		out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
         if (sc.using_parallel) {
             out << tab << tab << tab << state_t() << "::state_list r;" << endl;
@@ -161,8 +165,10 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << "public:" << endl;
 
 		//todo: for now, all targets must have same parallel parent
-		if (sc.using_parallel) out << tab << tab << state_t() << "::state_list operator ()(S *s, " << classname() << "&sc, bool eval)" << endl;
-		else out << tab << tab << state_t() << "::state_list operator ()(S *s, " << classname() << "&sc)" << endl;
+		if (sc.using_parallel) out << tab << tab << state_t() << "::state_list operator ()(S *s, " << classname() << "&sc, bool eval";
+		else out << tab << tab << state_t() << "::state_list operator ()(S *s, " << classname() << "&sc";
+		if (opt.debug) out << ", const char* ename)" << endl;
+		else out << ")" << endl;
 
 		out << tab << tab << '{' << endl;
 
@@ -182,7 +188,7 @@ void cpp_output::gen_transition_base()
         }
 
 		if(opt.debug) {
-			out << tab << tab << tab << "std::clog << \"" << classname() << ": transition \" << demangle(typeid(S).name()) << \" -> \"";
+			out << tab << tab << tab << "std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << demangle(typeid(S).name()) << \" -> \"";
 			for(int i = 0; i < sz; ++i) {
 				if(i) out << " << \", \"";
 				out << " << demangle(typeid(D" << i << ").name())";
@@ -674,8 +680,11 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 		if (sz > 1) out << sz;
 		out << "<&state::initial, " << state_classname;
 		for (int i = 0; i < sz; ++i) out << ", state_" << state.initial.target[i];
-	       	if (sc.using_parallel) out << ", internal>()(this, sc, eval); }" << endl;
-	       	else out << ", internal>()(this, sc); }" << endl;
+		string tparams = "(this, sc";
+		if (sc.using_parallel) tparams = "(this, sc, eval";
+		if (opt.debug) tparams += ", __func__";
+		tparams += ")";
+	       	out << ", internal>()" << tparams << "; }" << endl;
 	}
 
 	if (final_state) {
@@ -731,8 +740,10 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			}
 			else out << tab << tab << indent << "|| ";
 			if (multiple) out << "(s = ";
-            string tparams = "(this, sc)";
-            if (sc.using_parallel) tparams = "(this, sc, eval)";
+            string tparams = "(this, sc";
+            if (sc.using_parallel) tparams = "(this, sc, eval";
+	    if (opt.debug) tparams += ", __func__";
+	    tparams += ")";
 			if (has_target) {
 				// normal transition
 				string type_str;
@@ -873,9 +884,11 @@ void cpp_output::gen_sc()
 	if(sz > 1) out << sz;
 	out << "<&state::initial, scxml";
 	for(int i = 0; i < sz; ++i) out << ", state_" << sc.sc().initial.target[i];
-	if (sc.using_parallel) out << ", internal>()(this, sc, eval); }" << endl;
-	else out << ", internal>()(this, sc); }" << endl;
-
+	string tparams = "(this, sc";
+	if (sc.using_parallel) tparams = "(this, sc, eval";
+	if (opt.debug) tparams += ", __func__";
+	tparams += ")";
+	out << ", internal>()" << tparams << "; }" << endl;
 	out << tab << "};" << endl;
 	out << endl;
 	
