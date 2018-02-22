@@ -34,7 +34,7 @@ namespace fs = boost::filesystem;
 bool c_pred(char c)
 {
 	return !isalnum(c);
-};
+}
 
 void scxmlcc(const options &opt)
 {

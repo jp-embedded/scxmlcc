@@ -374,7 +374,7 @@ void cpp_output::gen_state_parallel_base()
 				out << ", " << "sc.new_state<C" << n << ">()";
 			}
 			out << ");" << endl;
-			out << tab << tab << "};" << endl;
+			out << tab << tab << "}" << endl;
 			out << tab << tab << endl;
 
 			//todo to continue

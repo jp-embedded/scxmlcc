@@ -15,7 +15,7 @@
 #** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #*************************************************************************
 
-CPPFLAGS := -Wall -O2 -MD -MP
+CPPFLAGS := -Wall -Wpedantic -O2 -MD -MP
 CPPFLAGS += -isystem gtest-1.7.0/include -pthread
 
 test.objs := test.o

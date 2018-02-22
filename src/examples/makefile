@@ -15,7 +15,7 @@
 #** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #*************************************************************************
 
-CPPFLAGS := -Wall -O2 -MD -MP
+CPPFLAGS := -Wall -Wpedantic -O2 -MD -MP
 CXXFLAGS := -std=c++11
 APPS := timer_switch hello_world microwave vending_machine/vending_machine
 
