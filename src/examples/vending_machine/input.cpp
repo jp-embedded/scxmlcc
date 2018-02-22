@@ -30,7 +30,7 @@ void input::run()
 	while (true) {
 		char c;
 		std::cin >> c;
-		if (c == 'q') break;
+		if (c == 'q' || std::cin.eof()) break;
 		sig_key(c);
 	}
 }
