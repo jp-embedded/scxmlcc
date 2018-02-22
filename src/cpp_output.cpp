@@ -889,7 +889,7 @@ void cpp_output::gen_sc()
 	out << tab << '{' << endl;
 	out << tab << tab << "static T t;" << endl;
 	out << tab << tab << "return &t;" << endl;
-	out << tab << "};" << endl;
+	out << tab << "}" << endl;
 
 	out << "};" << endl;
 	out << endl;
