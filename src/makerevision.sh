@@ -1,12 +1,6 @@
 #!/bin/sh
 . ./autorevision.mk
 
-# Generate version.h - the scxmlcc version
-# This file is stored in version control
-# Could be updated automatically if on a release branch Otherwise, leave it
-#echo '#define VERSION "0.6.2"' > autorevision.h~
-#diff -q version.h~ version.h || cp version.h~ version.h
-
 # Generate version_auto.h
 # This file is NOT stored in vorsion control because it is only valid for current build
 # - if not on version control (code downloaded from zip): no postfix
