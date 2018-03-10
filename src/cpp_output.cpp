@@ -76,7 +76,7 @@ void cpp_output::gen_transition_base()
 	// S is the source state of the transition, not current state
 	out << tab << tab << "void state_enter(D* d, data_model &m, id<internal>, S*) { d->template enter<S>(m, (S*)0); }" << endl;
 	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<typename S::parent_t>(m); }" << endl;
-	out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) {}" << endl;
+	out << tab << tab << "void state_exit(S*, data_model &, id<internal>, S*) {}" << endl;
 	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<typename D::parent_t>(m); }" << endl;
 	out << tab << tab << "public:" << endl;
 	if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, bool eval";
