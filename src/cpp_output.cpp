@@ -93,7 +93,7 @@ void cpp_output::gen_transition_base()
 	} else {
 		out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return " << empty << ';' << endl;
 	}
-	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \" << scxmlcc::demangle(typeid(D).name()) << std::endl;" << endl;
+	if(opt.debug) out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \" << scxmlcc::demangle(typeid(D).name()) << std::endl;" << endl;
 	out << tab << tab << tab << "D *d = sc.new_state<D>();" << endl;
 	if (sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, d);" << endl;
 	if (sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
@@ -131,7 +131,7 @@ void cpp_output::gen_transition_base()
 		} else {
 			out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return " << empty << ";" << endl;
 		}
-		if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << std::endl;" << endl;
+		if(opt.debug) out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << std::endl;" << endl;
 		out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
 		if (sc.using_parallel) {
 			out << tab << tab << tab << state_t() << "::state_list r;" << endl;
@@ -184,7 +184,7 @@ void cpp_output::gen_transition_base()
 		}
 		
 		if (opt.debug) {
-			out << tab << tab << tab << "std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \"";
+			out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \"";
 			for(int i = 0; i < sz; ++i) {
 				if(i) out << " << \", \"";
 				out << " << scxmlcc::demangle(typeid(D" << i << ").name())";
@@ -252,18 +252,18 @@ void cpp_output::gen_state_composite_base()
 	out << tab << tab << "template<class T> void enter(data_model&, " << state_composite_t() << "*) {}" << endl;
 
 	out << tab << tab << "template<class T> void enter(data_model &m, ...) { P::template enter<T>(m, (T*)0);";
-	if(opt.debug) out << " std::clog << \"" << classname() << ": enter \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+	if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": enter \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
 	out << " state_actions<C>::enter(m); }" << endl;
 
 	out << tab << tab << "template<class T> void exit(data_model&, " << state_composite_t() << "*) {}" << endl;
 
 	out << tab << tab << "template<class T> void exit(data_model &m, ...) {";
-	if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+	if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
 	out << " state_actions<C>::exit(m); P::template exit<T>(m, (T*)0); }" << endl;
 
 	if(sc.using_compound) {
 		out << tab << tab << "virtual void exit(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
-		if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+		if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
 		out << " state_actions<C>::exit(m); P::exit(m, sti); }" << endl;
 	}
 	if (sc.using_parallel) {
@@ -283,7 +283,7 @@ void cpp_output::gen_state_final_base()
 
 	if (sc.using_parallel) {
 		out << tab << tab << "virtual void exit(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
-		if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+		if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
 		out << " P::parallel_exit_final(m); state_actions<C>::exit(m); P::exit(m, sti); }" << endl;
 	}
 
@@ -482,6 +482,7 @@ void cpp_output::gen_model_base()
 	out << tab << "{" << endl;
 	if (!opt.bare_metal) out << tab << tab << "std::queue<event> event_queue;" << endl;
 	out << tab << tab << "user_model *user;" << endl;
+	if (opt.debug) out << tab << tab << "bool debug = true;" << endl;
 	gen_model_base_data();
 	gen_model_base_finals();
 	out << tab << "} model;" << endl;
