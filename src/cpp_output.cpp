@@ -498,6 +498,7 @@ void cpp_output::gen_state_base()
 	out << tab << "class " << state_t() << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "public:" << endl;
+	out << tab << tab << "virtual ~" << state_t() << "(){}" << endl;
 
 	if (sc.using_parallel) {
 		out << tab << tab << "struct state_list : public std::vector<" << state_t() << "*>" << endl;
