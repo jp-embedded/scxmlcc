@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
 		("debug,d",				"Enable debug output")
 		("ignore-unknown,u",	value<string>(),	"ignore unknown xml elements matching regex")
 		("baremetal,b",				"Generate code for bare metal C++")
+		("threadsafe,t",			"Generate threadsafe code for event_queue (requires c++17)")
 		("version,v",				"Version and copyright information");
 	positional_options_description pdesc;
 	pdesc.add("input", -1);
@@ -80,6 +81,7 @@ int main(int argc, char *argv[])
 	if(vm.count("ignore-unknown")) opt.ignore_unknown = vm["ignore-unknown"].as<string>();
 	if(vm.count("debug")) opt.debug = true;
 	if(vm.count("baremetal")) opt.bare_metal = true;
+	if(vm.count("threadsafe")) opt.thread_safe = true;
 
 	if(!opt.input.empty() && opt.output.empty()) {
 		opt.output = opt.input;

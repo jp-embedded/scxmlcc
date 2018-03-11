@@ -480,11 +480,51 @@ void cpp_output::gen_model_base()
 {
 	out << tab << "struct data_model" << endl;
 	out << tab << "{" << endl;
-	if (!opt.bare_metal) out << tab << tab << "std::queue<event> event_queue;" << endl;
+	if (!opt.bare_metal && !opt.thread_safe) out << tab << tab << "std::queue<event> event_queue;" << endl;
 	out << tab << tab << "user_model *user;" << endl;
 	if (opt.debug) out << tab << tab << "bool debug = true;" << endl;
 	gen_model_base_data();
 	gen_model_base_finals();
+	if (opt.thread_safe) {
+		out << tab << tab << "void push_event(event&& e)" << endl;
+		out << tab << tab << "{" << endl;
+		out << tab << tab << tab << "std::unique_lock<std::mutex> lock(queue_mutex);" << endl;
+		out << tab << tab << tab << "event_queue.push(std::move(e));" << endl;
+		out << tab << tab << tab << "lock.unlock();" << endl;
+		out << tab << tab << tab << "cv.notify_one();" << endl;
+		out << tab << tab << "}" << endl;
+		out << tab << tab << "std::optional<event> wait_event()" << endl;
+		out << tab << tab << "{" << endl;
+		out << tab << tab << tab << "std::unique_lock<std::mutex> lock(queue_mutex);" << endl;
+		out << tab << tab << tab << "cv.wait(lock, [this]{ return !event_queue.empty() || cancel_wait_; });" << endl;
+		out << tab << tab << tab << "return pop_event_no_lock();" << endl;
+		out << tab << tab << "}" << endl;
+		out << tab << tab << "void cancel_wait()" << endl;
+		out << tab << tab << "{" << endl;
+		out << tab << tab << tab << "cancel_wait_ = true;" << endl;
+		out << tab << tab << tab << "cv.notify_all();" << endl;
+		out << tab << tab << "}" << endl;
+		out << tab << tab << "void uncancel() { cancel_wait_ = false; }" << endl;
+		out << tab << tab << "bool is_canceled() const { return cancel_wait_; }" << endl;
+		out << tab << "private:" << endl;
+		out << tab << tab << "friend void " << classname() << "::dispatch(event);" << endl;
+		out << tab << tab << "std::optional<event> pop_event()" << endl;
+		out << tab << tab << "{" << endl;
+		out << tab << tab << tab << "std::lock_guard<std::mutex> lock(queue_mutex);" << endl;
+		out << tab << tab << tab << "return pop_event_no_lock();" << endl;
+		out << tab << tab << "}" << endl;
+		out << tab << tab << "std::optional<event> pop_event_no_lock()" << endl;
+		out << tab << tab << "{" << endl;
+		out << tab << tab << tab << "if (!event_queue.size()) return std::nullopt;" << endl;
+		out << tab << tab << tab << "event e = std::move(event_queue.front());" << endl;
+		out << tab << tab << tab << "event_queue.pop();" << endl;
+		out << tab << tab << tab << "return e;" << endl;
+		out << tab << tab << "}" << endl;
+		out << tab << tab << "std::condition_variable cv;" << endl;
+		out << tab << tab << "std::mutex queue_mutex;" << endl;
+		out << tab << tab << "std::queue<event> event_queue;" << endl;
+		out << tab << tab << "bool cancel_wait_ = false;" << endl;
+	}
 	out << tab << "} model;" << endl;
 	out << endl;
 }
@@ -790,7 +830,6 @@ void cpp_output::gen_sc()
 
 	gen_model_decl();
 	gen_state_base();
-	gen_model_base();
 	gen_state_actions_base();
 	gen_state_composite_base();
 	gen_state_final_base();
@@ -851,11 +890,24 @@ void cpp_output::gen_sc()
 	out << tab << tab << "while (cont) {" << endl;
 	out << tab << tab << tab << "if ((cont = dispatch_event(&state::initial)));" << endl;
 	out << tab << tab << tab << "else if ((cont = dispatch_event(&state::unconditional)));" << endl;
-	if(!opt.bare_metal) out << tab << tab << tab << "else if (model.event_queue.size()) cont = dispatch_event(model.event_queue.front()), model.event_queue.pop(), cont |= !model.event_queue.empty();" << endl;
+	if(!opt.bare_metal) {
+		if (!opt.thread_safe) out << tab << tab << tab << "else if (model.event_queue.size()) cont = dispatch_event(model.event_queue.front()), model.event_queue.pop(), cont |= !model.event_queue.empty();" << endl;
+		else out << tab << tab << tab << "else if (auto next_e = model.pop_event()) cont = dispatch_event(*next_e), cont |= !model.event_queue.empty();" << endl;
+	}
 	out << tab << tab << tab << "else break;" << endl;
 	out << tab << tab << "}" << endl;
 	out << tab << "}" << endl;
-	out << endl;
+	if (opt.thread_safe) {
+		out << tab << "void dispatch_loop()" << endl;
+		out << tab << "{" << endl;
+		out << tab << tab << "while (!model.is_canceled()) {" << endl;
+		out << tab << tab << tab << "auto e = model.wait_event();" << endl;
+		out << tab << tab << tab << "if (e) dispatch(*e);" << endl;
+		out << tab << tab << "}" << endl;
+		out << tab << "}" << endl;
+		out << endl;
+	}
+	gen_model_base();
 
 	// constructor
 	out << tab << classname() << "(user_model *user = 0)";
@@ -1118,6 +1170,10 @@ void cpp_output::gen()
 		cerr << "error: The debug option is not currenty supported with bare metal C++" << endl;
 		exit(1);
 	}
+	if (opt.bare_metal && opt.thread_safe) {
+		cerr << "error: The threadsafe option is not currenty supported with bare metal C++" << endl;
+		exit(1);
+	}
 
 	// include guard
 	out << "// This file is automatically generated by scxmlcc (version " << version() << ")" << endl;
@@ -1129,6 +1185,10 @@ void cpp_output::gen()
 
 	if(sc.using_compound || opt.debug) out << "#include <typeinfo>" << endl;
 	if(!opt.bare_metal) out << "#include <queue>" << endl;
+	if(opt.thread_safe) {
+		out << "#include <condition_variable>" << endl;
+		out << "#include <optional>" << endl;
+	}
 	if(opt.debug) {
 		out << "#include <iostream>" << endl;
 		out << "#include <memory>" << endl;
