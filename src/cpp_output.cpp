@@ -74,10 +74,10 @@ void cpp_output::gen_transition_base()
 	// when exit/enter is called here without parameter, it forces the action to always exit/enter at least current state
 	// for internal transitions, D must be child of S, otherwise, handle as external transition
 	// S is the source state of the transition, not current state
-	out << tab << tab << "void state_enter(D* d, data_model &m, id<internal>, S*) { d->template enter<S>(m, (S*)0); };" << endl;
-	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<typename S::parent_t>(m); };" << endl;
-	out << tab << tab << "void state_exit(S* s, data_model &m, id<internal>, S*) {};" << endl;
-	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<typename D::parent_t>(m); };" << endl;
+	out << tab << tab << "void state_enter(D* d, data_model &m, id<internal>, S*) { d->template enter<S>(m, (S*)0); }" << endl;
+	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<typename S::parent_t>(m); }" << endl;
+	out << tab << tab << "void state_exit(S*, data_model &, id<internal>, S*) {}" << endl;
+	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<typename D::parent_t>(m); }" << endl;
 	out << tab << tab << "public:" << endl;
 	if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, bool eval";
 	else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc";
@@ -93,7 +93,7 @@ void cpp_output::gen_transition_base()
 	} else {
 		out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return " << empty << ';' << endl;
 	}
-	if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \" << scxmlcc::demangle(typeid(D).name()) << std::endl;" << endl;
+	if(opt.debug) out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \" << scxmlcc::demangle(typeid(D).name()) << std::endl;" << endl;
 	out << tab << tab << tab << "D *d = sc.new_state<D>();" << endl;
 	if (sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, d);" << endl;
 	if (sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
@@ -131,7 +131,7 @@ void cpp_output::gen_transition_base()
 		} else {
 			out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return " << empty << ";" << endl;
 		}
-		if(opt.debug) out << tab << tab << tab << "std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << std::endl;" << endl;
+		if(opt.debug) out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << std::endl;" << endl;
 		out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
 		if (sc.using_parallel) {
 			out << tab << tab << tab << state_t() << "::state_list r;" << endl;
@@ -184,7 +184,7 @@ void cpp_output::gen_transition_base()
 		}
 		
 		if (opt.debug) {
-			out << tab << tab << tab << "std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \"";
+			out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \"";
 			for(int i = 0; i < sz; ++i) {
 				if(i) out << " << \", \"";
 				out << " << scxmlcc::demangle(typeid(D" << i << ").name())";
@@ -252,18 +252,18 @@ void cpp_output::gen_state_composite_base()
 	out << tab << tab << "template<class T> void enter(data_model&, " << state_composite_t() << "*) {}" << endl;
 
 	out << tab << tab << "template<class T> void enter(data_model &m, ...) { P::template enter<T>(m, (T*)0);";
-	if(opt.debug) out << " std::clog << \"" << classname() << ": enter \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+	if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": enter \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
 	out << " state_actions<C>::enter(m); }" << endl;
 
 	out << tab << tab << "template<class T> void exit(data_model&, " << state_composite_t() << "*) {}" << endl;
 
 	out << tab << tab << "template<class T> void exit(data_model &m, ...) {";
-	if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+	if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
 	out << " state_actions<C>::exit(m); P::template exit<T>(m, (T*)0); }" << endl;
 
 	if(sc.using_compound) {
 		out << tab << tab << "virtual void exit(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
-		if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+		if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
 		out << " state_actions<C>::exit(m); P::exit(m, sti); }" << endl;
 	}
 	if (sc.using_parallel) {
@@ -283,7 +283,7 @@ void cpp_output::gen_state_final_base()
 
 	if (sc.using_parallel) {
 		out << tab << tab << "virtual void exit(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
-		if(opt.debug) out << " std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+		if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
 		out << " P::parallel_exit_final(m); state_actions<C>::exit(m); P::exit(m, sti); }" << endl;
 	}
 
@@ -482,6 +482,7 @@ void cpp_output::gen_model_base()
 	out << tab << "{" << endl;
 	if (!opt.bare_metal) out << tab << tab << "std::queue<event> event_queue;" << endl;
 	out << tab << tab << "user_model *user;" << endl;
+	if (opt.debug) out << tab << tab << "bool debug = true;" << endl;
 	gen_model_base_data();
 	gen_model_base_finals();
 	out << tab << "} model;" << endl;
@@ -498,6 +499,7 @@ void cpp_output::gen_state_base()
 	out << tab << "class " << state_t() << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "public:" << endl;
+	out << tab << tab << "virtual ~" << state_t() << "(){}" << endl;
 
 	if (sc.using_parallel) {
 		out << tab << tab << "struct state_list : public std::vector<" << state_t() << "*>" << endl;
