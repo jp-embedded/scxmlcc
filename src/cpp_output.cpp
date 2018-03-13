@@ -493,6 +493,11 @@ void cpp_output::gen_model_base()
 		out << tab << tab << tab << "lock.unlock();" << endl;
 		out << tab << tab << tab << "cv.notify_one();" << endl;
 		out << tab << tab << "}" << endl;
+		out << tab << tab << "std::optional<event> pop_event()" << endl;
+		out << tab << tab << "{" << endl;
+		out << tab << tab << tab << "std::lock_guard<std::mutex> lock(queue_mutex);" << endl;
+		out << tab << tab << tab << "return pop_event_no_lock();" << endl;
+		out << tab << tab << "}" << endl;
 		out << tab << tab << "std::optional<event> wait_event()" << endl;
 		out << tab << tab << "{" << endl;
 		out << tab << tab << tab << "std::unique_lock<std::mutex> lock(queue_mutex);" << endl;
@@ -508,11 +513,6 @@ void cpp_output::gen_model_base()
 		out << tab << tab << "bool is_canceled() const { return cancel_wait_; }" << endl;
 		out << tab << "private:" << endl;
 		out << tab << tab << "friend void " << classname() << "::dispatch(event);" << endl;
-		out << tab << tab << "std::optional<event> pop_event()" << endl;
-		out << tab << tab << "{" << endl;
-		out << tab << tab << tab << "std::lock_guard<std::mutex> lock(queue_mutex);" << endl;
-		out << tab << tab << tab << "return pop_event_no_lock();" << endl;
-		out << tab << tab << "}" << endl;
 		out << tab << tab << "std::optional<event> pop_event_no_lock()" << endl;
 		out << tab << tab << "{" << endl;
 		out << tab << tab << tab << "if (!event_queue.size()) return std::nullopt;" << endl;
