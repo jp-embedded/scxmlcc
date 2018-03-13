@@ -732,7 +732,8 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			cerr << "warning: root final states is currently not supported." << endl;
 		}
 		else {
-			out << tab << tab << "template<class T> void enter(data_model &m, ...) { final::template enter<T>(m, (T*)0); m.event_queue.push(&state::event_done_" << parent << "); ";
+			if (!opt.thread_safe) out << tab << tab << "template<class T> void enter(data_model &m, ...) { final::template enter<T>(m, (T*)0); m.event_queue.push(&state::event_done_" << parent << "); ";
+			else out << tab << tab << "template<class T> void enter(data_model &m, ...) { final::template enter<T>(m, (T*)0); m.push_event(&state::event_done_" << parent << "); ";
 			if (sc.using_parallel) out << "parallel_enter_final(m); }" << endl;
 			else out << '}' << endl;
 		}
@@ -809,7 +810,8 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 	// parallel enter/exit final
 	if (parallel_state && sc.using_final) {
 		scxml_parser::state_list state_children = children(state);
-		out << tab << tab << "void parallel_enter_final(data_model &m) { if (++m.finals." << state.id << " == " << state_children.size() << ") m.event_queue.push(&" << classname() << "::" << state_t() << "::event_done_state_" << state.id << "), parent_t::parallel_enter_final(m); }" << endl;
+		if (!opt.thread_safe) out << tab << tab << "void parallel_enter_final(data_model &m) { if (++m.finals." << state.id << " == " << state_children.size() << ") m.event_queue.push(&" << classname() << "::" << state_t() << "::event_done_state_" << state.id << "), parent_t::parallel_enter_final(m); }" << endl;
+		else out << tab << tab << "void parallel_enter_final(data_model &m) { if (++m.finals." << state.id << " == " << state_children.size() << ") m.push_event(&" << classname() << "::" << state_t() << "::event_done_state_" << state.id << "), parent_t::parallel_enter_final(m); }" << endl;
 		out << tab << tab << "void parallel_exit_final(data_model &m) { if (--m.finals." << state.id << " == " << state_children.size()-1 << ") parent_t::parallel_exit_final(m); }" << endl;
 	}
 
@@ -991,7 +993,8 @@ void cpp_output::gen_action_part_raise(scxml_parser::action &a)
 	const string ev = a.attr["event"];
 
 	//out << tab << tab << "// " << a.type << " event=" << ev << endl;
-	out << tab << tab << "event_queue.push(&" << classname() << "::state::event_" << ev << ");" << endl;
+	if (!opt.thread_safe) out << tab << tab << "event_queue.push(&" << classname() << "::state::event_" << ev << ");" << endl;
+	else out << tab << tab << "push_event(&" << classname() << "::state::event_" << ev << ");" << endl;
 }
 
 void cpp_output::gen_action_part(scxml_parser::action &a)
