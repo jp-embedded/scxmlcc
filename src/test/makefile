@@ -16,7 +16,7 @@
 #*************************************************************************
 
 CPPFLAGS := -Wall -Wpedantic -O2 -MD -MP
-CPPFLAGS += -isystem gtest-1.7.0/include -pthread
+CPPFLAGS += -std=c++17 -isystem gtest-1.7.0/include -pthread
 
 test.objs := test.o
 
@@ -44,5 +44,5 @@ include gtest.mk
 
 # Initial depedency files must be generated to be able to auto generate .h from .scxml
 %.d: %.cpp
-	$(CXX) -MM -MG $^ > $@
+	$(CXX) -std=c++17 -MM -MG $^ > $@
 
