@@ -1221,10 +1221,16 @@ void cpp_output::gen()
 	}
 	out << endl;
 
+	if(!opt.ns.empty()) {
+		out << "namespace " << opt.ns << " {" << endl;
+	}
 	trim();
 	gen_sc();
 	gen_actions();
 
+	if(!opt.ns.empty()) {
+		out << "} //namespace " << opt.ns << endl;
+	}
 	// end of include guard
 	out << "#endif" << endl;
 
