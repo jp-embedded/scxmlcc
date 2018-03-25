@@ -19,6 +19,7 @@ CPPFLAGS := -Wall -Wpedantic -O2 -MD -MP
 CPPFLAGS += -std=c++17 -isystem gtest-1.7.0/include -pthread
 
 test.objs := test.o
+test_t.objs := test_t.o
 
 all: test
 
@@ -26,15 +27,19 @@ clean: gtest.clean
 	rm -f test
 	rm -f $(patsubst %.txml,%.h,$(wildcard *.txml))
 	rm -f $(patsubst %.scxml,%.h,$(wildcard *.scxml))
+	rm -f $(patsubst %.txml,%_t.h,$(wildcard *.txml))
+	rm -f $(patsubst %.scxml,%_t.h,$(wildcard *.scxml))
 	rm -f $(patsubst %.txml,%.scxml,$(wildcard *.txml))
 	rm -f $(test.objs) $(test.objs:.o=.d)
+	rm -f $(test_t.objs) $(test_t.objs:.o=.d)
 
-$(test.objs): libgtest.a
+$(test.objs) $(test_t.objs): libgtest.a
 
-test: $(test.objs)
+test: $(test.objs) $(test_t.objs)
 	$(CXX) -o $@ $^ libgtest.a -lpthread
 
 -include $(test.objs:.o=.d)
+-include $(test_t.objs:.o=.d)
 
 include scxml.mk
 include gtest.mk
