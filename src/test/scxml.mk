@@ -20,3 +20,5 @@ SCXMLCC:=../scxmlcc
 %.h: %.scxml
 	$(SCXMLCC) -o $@ $<
 
+%_t.h: %.scxml
+	$(SCXMLCC) -t -n threadsafe -o $@ $<
