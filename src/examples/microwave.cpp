@@ -15,6 +15,14 @@
  ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+//todo: this currently fails on windows:
+//c:\projects\scxmlcc\src\examples\microwave-01-cplusplus.h(183): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning) [c:\projects\scxmlcc\src\vc2013\microwave\microwave.vcxproj]
+//c:\program files (x86)\microsoft visual studio 12.0\vc\include\algorithm(86): fatal error C1001: An internal error has occurred in the compiler. [c:\projects\scxmlcc\src\vc2013\microwave\microwave.vcxproj]
+
+#ifdef _WIN32
+int main() { return 0; }
+#else
+
 #include "microwave-01-cplusplus.h"
 #include "termio.h"
 #include <iostream>
@@ -80,4 +88,6 @@ int main(int argc, char *argv[])
 	
 	return 0;
 }
+
+#endif
 
