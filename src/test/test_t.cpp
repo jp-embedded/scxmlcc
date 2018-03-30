@@ -21,6 +21,8 @@
 #include <thread>
 #include <chrono>
 
+using namespace std::chrono_literals;
+
 namespace threadsafe {
 
 #include "all-tests.h"
