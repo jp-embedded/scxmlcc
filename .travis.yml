@@ -1,4 +1,5 @@
 language: cpp
+
 sudo: required
 
 matrix:
@@ -22,5 +23,7 @@ before_install:
 compiler:
   - gcc
 
-script: make -C src && make -C src/examples && make -C src/test && ./src/test/test
-
+jobs:
+   include:
+      - script: make -C src && make -C src/examples && make -C src/test && ./src/test/test
+      - script: mkdir build && cd build && cmake .. && make -j4 && ctest -V 
