@@ -13,7 +13,7 @@ Note that on windows, there is currently no automated way to build the test suit
 ### On Ubuntu
 Install the prerequisites with e.g. apt-get:
 ```
-sudo apt-get install build-essential libboost-all-dev autorevision xsltproc
+sudo apt-get install build-essential libboost-all-dev cmake autorevision xsltproc
 ```
 autorevision is used to update the scxmlcc revision. This can be omitted.
 
@@ -38,7 +38,7 @@ If you want to build the unit tests, you must download [msxsl.exe](http://downlo
 scxmlcc is available as compressed releases or through github. The latest and previous releases is available at [Releases](https://github.com/jp-embedded/scxmlcc/releases).
 
 ### On Ubuntu
-To build scxmlcc, simply execute make:
+#### with make
 ```
 cd src
 make
@@ -48,6 +48,17 @@ If you also want to build the examples:
 cd examples
 make
 ```
+#### with cmake 
+```
+mkdir build
+cd build
+cmake ..
+make -j4
+make install
+```
+If you're not familar with cmake have a look at the supported generators for visual studio, eclipse etc- https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html.
+
+To help with auto-generating state-machines in cmake projects, an scxml_generator.cmake module is installed.  The examples demonstrate how this can be used. 
 
 ### On Windows
 The solution file `scxmlcc\src\vc2013\vc2013.sln` contain projects to build the scxml compiler and examples. This is for visual studio 2013.
