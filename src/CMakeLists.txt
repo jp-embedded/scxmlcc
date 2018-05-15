@@ -7,7 +7,7 @@ add_executable( ${PROJECT_NAME}
    cpp_output.cpp
    main.cpp
    scxml_parser.cpp
-   version_git.cpp
+   version.cpp
    )
 
 target_include_directories( ${PROJECT_NAME} PRIVATE 
@@ -29,10 +29,10 @@ install(FILES   ${CMAKE_SOURCE_DIR}/cmake/Modules/scxmlcc_generator.cmake
 # create version header file
 find_package(Git)
 execute_process(
-  COMMAND git describe --first-parent --tags
+  COMMAND git rev-parse HEAD
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_DESCRIBE
+  OUTPUT_VARIABLE GIT_LONG_HASH
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-FILE(WRITE ${CMAKE_BINARY_DIR}/gitversion.h "\#define GITVERSION \"${GIT_DESCRIBE}\"\n")
+FILE(WRITE ${CMAKE_BINARY_DIR}/version_auto.h "\#define VERSION_POSTFIX \"-${GIT_LONG_HASH}\"\n")
 
