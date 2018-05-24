@@ -27,10 +27,13 @@ install(TARGETS ${PROJECT_NAME}
 install(FILES   ${CMAKE_SOURCE_DIR}/cmake/Modules/scxmlcc_generator.cmake 
     DESTINATION share/cmake/Modules )
 
-# create version header - in build folder
-ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_BINARY_DIR}/version_auto.h
-  COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} && autorevision -tsh > ${CMAKE_BINARY_DIR}/autorevision.mk
-  COMMAND cd ${CMAKE_BINARY_DIR} && sh ${CMAKE_CURRENT_SOURCE_DIR}/makerevision.sh || truncate -s0 version_auto.h
-)
-
-
+if(UNIX)
+   # create version header - in build folder
+   ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_BINARY_DIR}/version_auto.h
+     COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} && autorevision -tsh > ${CMAKE_BINARY_DIR}/autorevision.mk
+     COMMAND cd ${CMAKE_BINARY_DIR} && sh ${CMAKE_CURRENT_SOURCE_DIR}/makerevision.sh || truncate -s0 version_auto.h
+   )
+else()
+   # do something useful on windows
+   FILE(WRITE ${CMAKE_BINARY_DIR}/version_auto.h "")
+endif()
