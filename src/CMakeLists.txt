@@ -8,6 +8,7 @@ add_executable( ${PROJECT_NAME}
    main.cpp
    scxml_parser.cpp
    version.cpp
+   ${CMAKE_BINARY_DIR}/version_auto.h
    )
 
 target_include_directories( ${PROJECT_NAME} PRIVATE 
@@ -26,13 +27,10 @@ install(TARGETS ${PROJECT_NAME}
 install(FILES   ${CMAKE_SOURCE_DIR}/cmake/Modules/scxmlcc_generator.cmake 
     DESTINATION share/cmake/Modules )
 
-# create version header file
-find_package(Git)
-execute_process(
-  COMMAND git rev-parse HEAD
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_LONG_HASH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
+# create version header - in build folder
+ADD_CUSTOM_COMMAND( OUTPUT ${CMAKE_BINARY_DIR}/version_auto.h
+  COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} && autorevision -tsh > ${CMAKE_BINARY_DIR}/autorevision.mk
+  COMMAND cd ${CMAKE_BINARY_DIR} && sh ${CMAKE_CURRENT_SOURCE_DIR}/makerevision.sh || truncate -s0 version_auto.h
 )
-FILE(WRITE ${CMAKE_BINARY_DIR}/version_auto.h "\#define VERSION_POSTFIX \"-${GIT_LONG_HASH}\"\n")
+
 
