@@ -55,7 +55,7 @@ The solution file `scxmlcc\src\vc2013\vc2013.sln` contain projects to build the 
 ## The Examples
 This sections describes the examples which can be found at src/examples.
 ### Hello World
-This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [scxmlgui](https://github.com/fmorbini/scxmlgui/), just two states connected with an unconditional transition. 
+This is really not a practical state machine. It is just a simple expample for getting started with scxmlcc. This statechart is drawn in [scxmlgui](https://github.com/fmorbini/scxmlgui/), just two states connected with an eventless transition. 
 
 ![hello_img](hello.png)
 
@@ -117,7 +117,7 @@ This example implements a simple timer switch:
 ![timer_switch](timer_switch.png)
 
 The idea is that the switch can be turned on or off by sending a button event to the state machine. In the on state the state machine also returns to the off state after a timeout. 
-In the on state, a timer event counts up a timer value. The unconditional event from on to off then have a condition, so it will be executed when this timer value is >= 5. Finaly, the off state will reset the timer value to 0.
+In the on state, a timer event counts up a timer value. The eventless transition from on to off then have a condition, so it will be executed when this timer value is >= 5. Finaly, the off state will reset the timer value to 0.
 
 The dotted timer transition means that it is a transition without target. This means that the on state's enter/exit actions won't be executed on timer events, as opposed to if the transition had target.
 
