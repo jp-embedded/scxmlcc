@@ -1202,8 +1202,10 @@ void cpp_output::gen()
 		out << "#include <condition_variable>" << endl;
 		out << "#include <optional>" << endl;
 	}
-	if(opt.debug) {
+	if(sc.using_log || opt.debug) {
 		out << "#include <iostream>" << endl;
+	}
+	if(opt.debug) {
 		out << "#include <memory>" << endl;
 		out << "#include <cxxabi.h>" << endl;
 		out << endl;
