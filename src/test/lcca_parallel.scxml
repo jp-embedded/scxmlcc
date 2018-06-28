@@ -1,0 +1,22 @@
+<!-- test that state p is exited on event e0 + e1 since LCCA does not include parallel states 
+     expected result: P, A, A1, B, B2, C and C1 -->
+<scxml initial="S" version="0.9" xmlns="http://www.w3.org/2005/07/scxml">
+	<state id="S">
+		<parallel id="p"> 
+			<state id="A" initial="A1"> 
+				<state id="A1"> 
+					<transition event="e1" target="B2" /> 
+				</state> <state id="A2" /> 
+			</state> 
+			<state id="B" initial="B1"> 
+				<state id="B1" /> 
+				<state id="B2" /> 
+			</state> 
+			<state id="C" initial="C1"> 
+				<state id="C1" /> 
+					<transition event="e0" target="C2" /> 
+				<state id="C2" /> 
+			</state> 
+		</parallel>
+	</state>
+</scxml>

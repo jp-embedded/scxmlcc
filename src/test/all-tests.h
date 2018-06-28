@@ -1,6 +1,8 @@
 #ifndef ALL_TESTS_H
 #define ALL_TESTS_H
 
+// todo: add test of lcca_parallel.scxml (and fix issue)
+
 // test that events are inserted into the queue in the order in which they are raised. If
 // foo occurs before bar, success, otherwise failure -->
 TEST(w3c, 144)
