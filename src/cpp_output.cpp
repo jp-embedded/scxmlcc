@@ -74,10 +74,19 @@ void cpp_output::gen_transition_base()
 	// when exit/enter is called here without parameter, it forces the action to always exit/enter at least current state
 	// for internal transitions, D must be child of S, otherwise, handle as external transition
 	// S is the source state of the transition, not current state
+
+	// no	type		lca	exit action				enter action
+	//------------------------------------------------------------------------------------------------------------------	
+	// 0	int		src	-					enter from lca to dst (only allowed int) 1-n
+	// 1	int		!src	treat as ext				treat as ext
+	// 2	ext		parent	exit from src to lca 1-n		enter from lca 1-n	
+	// 3	ext		src	force exit lca 1			force enter lca 1, enter from lca to dst 1-n
+	// 4	ext		src,dst	force exit lca 1			force enter lca 1
+	// 5	ext		dst	exit to lca 1-n, force exit lca? 	force enter lca?
 	out << tab << tab << "void state_enter(D* d, data_model &m, id<external>, S *s) { s->template enter<S>(m), d->template enter<S>(m, s); }" << endl;
 	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<S>(m); }" << endl;
-	out << tab << tab << "void state_exit(S*, data_model &, id<internal>, S*) {}" << endl;
-	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<D>(m); }" << endl;
+	out << tab << tab << "void state_exit(S*, data_model &, id<internal>, S*) {}" << endl;				// 0
+	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<D>(m); }" << endl;		// 
 	out << tab << tab << "public:" << endl;
 	if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, bool eval";
 	else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc";
