@@ -362,12 +362,14 @@ void cpp_output::gen_state_parallel_base()
 
 		// force exit when transition dst is child of parallel - parallel child has been exited and parallel child will be entered. So exit from lca to lcca
 		out << tab << tab << "template<class T> void exit(data_model& m, C*) { " << state_composite_t() << "<C, P>::template exit<T>(m); }" << endl;
-		out << tab << tab << "template<class T> void exit(data_model& m, ...) { " << state_composite_t() << "<C, P>::template exit<T>(m, (T*)0); }" << endl;
+		out << tab << tab << "template<class T> void exit(data_model& m, state*) { " << state_composite_t() << "<C, P>::template exit<T>(m, (T*)0); }" << endl;
+		out << tab << tab << "template<class T> void exit(data_model& m) { " << state_composite_t() << "<C, P>::template exit<T>(m); }" << endl;
 		out << endl;
 
 		// force enter when transition src is child of parallel - enter from lcca to lca
 		out << tab << tab << "template<class T> void enter(data_model& m, C*) { " << state_composite_t() << "<C, P>::template enter<T>(m); }" << endl;
-		out << tab << tab << "template<class T> void enter(data_model& m, ...) { " << state_composite_t() << "<C, P>::template enter<T>(m, (T*)0); }" << endl;
+		out << tab << tab << "template<class T> void enter(data_model& m, state*) { " << state_composite_t() << "<C, P>::template enter<T>(m, (T*)0); }" << endl;
+		out << tab << tab << "template<class T> void enter(data_model& m) { " << state_composite_t() << "<C, P>::template enter<T>(m); }" << endl;
 		out << endl;
 
 		// handle transition with all children given
