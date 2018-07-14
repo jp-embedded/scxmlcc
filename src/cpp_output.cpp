@@ -103,9 +103,13 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << tab << tab << "if (transition_actions<E, S, D>::condition(sc.model)) sl.push_back(sc.new_state<S>());" << endl;
 		out << tab << tab << tab << tab << "return sl;" << endl;
 		out << tab << tab << tab << "}" << endl;
-	} else {
-		out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return " << empty << ';' << endl;
 	}
+
+	// todo: it's not optimal to test condition both in eval and execute. Can lead to side effects if eval result differ between the two calls
+	// the test condition in execute is needed because an event may have several transitions with conditions. Without, the first transition will always be executed.
+	// solution could be to return a list of transitions as suggested in scxml. This will require a transition virtual base class
+	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return " << empty << ';' << endl;
+	
 	if(opt.debug) out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \" << scxmlcc::demangle(typeid(D).name()) << std::endl;" << endl;
 	out << tab << tab << tab << "D *d = sc.new_state<D>();" << endl;
 	if (sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, d);" << endl;
