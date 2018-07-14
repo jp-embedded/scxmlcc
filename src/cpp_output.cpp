@@ -75,20 +75,22 @@ void cpp_output::gen_transition_base()
 	// for internal transitions, D must be child of S, otherwise, handle as external transition
 	// S is the source state of the transition, not current state
 
+	// transition types:
 	// no	type		lca	exit action				enter action
 	//------------------------------------------------------------------------------------------------------------------	
 	// 0	int		src	-					enter from lca to dst (only allowed int) 1-n
+	// 1	ext		src	force exit lca 1			force enter lca 1, enter from lca to dst 1-n
 	// 2	int/ext		parent	exit from src to lca 1-n		enter from lca 1-n	
-	// 3	ext		src	force exit lca 1			force enter lca 1, enter from lca to dst 1-n
-	// 4	int/ext		src,dst	force exit lca 1			force enter lca 1
-	// 5	int/ext		dst	exit to lca 1-n, force exit lca 	force enter lca 
+	// 3	int/ext		src,dst	force exit lca 1			force enter lca 1
+	// 4	int/ext		dst	exit to lca 1-n, force exit lca 	force enter lca 
 
-	// todo: handle exit 5
+	// since internal use S instead S::parent_t, use composite instead S, so enter is not forced on parallel states in this case
 
-	out << tab << tab << "void state_enter(D* d, data_model &m, id<external>, S*) { d->template enter<typename S::parent_t>(m); }" << endl; // 3 force enter src
-	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<S>(m); }" << endl;		// 0,2,4,5 force enter dst 
-	out << tab << tab << "void state_exit(S*, data_model &, id<internal>, S*) {}" << endl;				// 0
-	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<D>(m); }" << endl;		// 2,3,4 force exit src
+	out << tab << tab << "void state_enter(D* d, data_model &m, id<internal>, S*) { d->template enter<composite<S, typename S::parent_t> >(m); }" << endl;
+	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<typename S::parent_t>(m); }" << endl;
+	out << tab << tab << "void state_exit(S*, data_model &, id<internal>, S*) {}" << endl;
+	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<typename D::parent_t>(m); }" << endl;
+	
 	out << tab << tab << "public:" << endl;
 	if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, bool eval";
 	else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc";
@@ -107,7 +109,7 @@ void cpp_output::gen_transition_base()
 	if(opt.debug) out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \" << scxmlcc::demangle(typeid(D).name()) << std::endl;" << endl;
 	out << tab << tab << tab << "D *d = sc.new_state<D>();" << endl;
 	if (sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, d);" << endl;
-	if (sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
+	if (sc.using_compound) out << tab << tab << tab << "s->exit_to_src(sc.model, typeid(S));" << endl;
 	out << tab << tab << tab << "state_exit(s, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
 	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
 	out << tab << tab << tab << "state_enter(d, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
@@ -207,7 +209,7 @@ void cpp_output::gen_transition_base()
 			out << tab << tab << tab << 'D' << i << "*d" << i << " = sc.new_state<D" << i << ">();" << endl;
 		}
 		out << tab << tab << tab << "s->exit_parallel(sc, s, d0);" << endl;
-		if(sc.using_compound) out << tab << tab << tab << "s->exit(sc.model, typeid(S));" << endl;
+		if(sc.using_compound) out << tab << tab << tab << "s->exit_to_src(sc.model, typeid(S));" << endl;
 		out << tab << tab << tab << "s->template exit<D0>(sc.model, (D0*)0);" << endl;
 
 		out << tab << tab << tab << "transition_actions<E, S";
@@ -273,9 +275,9 @@ void cpp_output::gen_state_composite_base()
 	out << " state_actions<C>::exit(m); P::template exit<T>(m, (T*)0); }" << endl;
 
 	if(sc.using_compound) {
-		out << tab << tab << "virtual void exit(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
+		out << tab << tab << "virtual void exit_to_src(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
 		if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
-		out << " state_actions<C>::exit(m); P::exit(m, sti); }" << endl;
+		out << " state_actions<C>::exit(m); P::exit_to_src(m, sti); }" << endl;
 	}
 	if (sc.using_parallel) {
 		out << tab << tab << "virtual bool is_parent(state *s) { return !!dynamic_cast<composite*>(s); }" << endl;
@@ -293,9 +295,9 @@ void cpp_output::gen_state_final_base()
 	out << tab << '{' << endl;
 
 	if (sc.using_parallel) {
-		out << tab << tab << "virtual void exit(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
+		out << tab << tab << "virtual void exit_to_src(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
 		if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
-		out << " P::parallel_exit_final(m); state_actions<C>::exit(m); P::exit(m, sti); }" << endl;
+		out << " P::parallel_exit_final(m); state_actions<C>::exit(m); P::exit_to_src(m, sti); }" << endl;
 	}
 
 	out << tab << "};" << endl << endl;
@@ -354,6 +356,16 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << '{' << endl;
 		out << tab << tab << "public:" << endl;
 
+		// force exit when transition dst is child of parallel - parallel child has been exited and parallel child will be entered. So exit from lca to lcca
+		out << tab << tab << "template<class T> void exit(data_model& m, C*) { std::cout << __LINE__ << std::endl; " << state_composite_t() << "<C, P>::template exit<T>(m); }" << endl;
+		out << tab << tab << "template<class T> void exit(data_model& m, ...) { std::cout << '-' << std::endl; " << state_composite_t() << "<C, P>::template exit<T>(m, (T*)0); }" << endl;
+		out << endl;
+
+		// force enter when transition src is child of parallel - enter from lcca to lca
+		out << tab << tab << "template<class T> void enter(data_model& m, C*) { std::cout << __LINE__ << std::endl; " << state_composite_t() << "<C, P>::template enter<T>(m); }" << endl;
+		out << tab << tab << "template<class T> void enter(data_model& m, ...) { std::cout << '-' << std::endl; " << state_composite_t() << "<C, P>::template enter<T>(m, (T*)0); }" << endl;
+		out << endl;
+
 		// handle transition with all children given
 		out << tab << tab << "template<class S";
 		for(int c = 1; c < children; ++c) out << ", class D" << c;
@@ -369,7 +381,10 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << tab << tab << "// handle transition with all children given" << endl;
 		// from this state and up, all tagets are same path, so only need to follow one of them.
 		out << tab << tab << tab << state_t() << "::" << ret << " r = P::template enter_parallel<S>(sc, d, (S*)0);" << endl;
-		for(int c = 1; c < children; ++c) out << tab << tab << tab << 'd' << c << "->template enter<C>(sc.model, (C*)0), r.push_back(d" << c << ");" << endl;
+
+		// use composite instead S to prevent forced parallel enter on initial states. See state_enter generation for more details
+		for(int c = 1; c < children; ++c) out << tab << tab << tab << 'd' << c << "->template enter<composite<C, typename C::parent_t> >(sc.model), r.push_back(d" << c << ");" << endl;
+
 		out << tab << tab << tab << "return r;" << endl;
 		out << tab << tab << '}' << endl;
 		out << endl;
@@ -407,7 +422,7 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << tab << tab << "for(" << classname() << "::" << state_t() << "::" << ret << "::iterator i = sc.cur_state.begin(); (i != sc.cur_state.end()) && *i; ++i) {" << endl;
 		out << tab << tab << tab << tab << "if(typeid(*this) == typeid(**i)) continue;" << endl;
 		out << tab << tab << tab << tab << "if(!(*i)->parallel_parent(typeid(C))) continue;" << endl;
-		out << tab << tab << tab << tab << "(*i)->exit(sc.model, typeid(C));" << endl;
+		out << tab << tab << tab << tab << "(*i)->exit_to_src(sc.model, typeid(C));" << endl;
 		out << tab << tab << tab << tab << "*i = 0;" << endl;
 		out << tab << tab << tab << '}' << endl;
 		out << tab << tab << tab << "P::exit_parallel(sc, s, d);" << endl;
@@ -652,7 +667,7 @@ void cpp_output::gen_state_base()
 
 	out << tab << tab << "template<class T> void enter(data_model&, ...) {}" << endl;
 	out << tab << tab << "template<class T> void exit(data_model&, ...) {}" << endl;
-	if(sc.using_compound) out << tab << tab << "virtual void exit(data_model&, const std::type_info&) {}" << endl;
+	if(sc.using_compound) out << tab << tab << "virtual void exit_to_src(data_model&, const std::type_info&) {}" << endl;
 	if(sc.using_parallel) {
 		out << tab << tab << "template<class S> " << retp << " enter_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) { return state_list(); }" << endl;
 		out << tab << tab << "virtual void exit_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) {}" << endl;
