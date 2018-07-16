@@ -361,7 +361,7 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << tab << "public:" << endl;
 
 		// todo: external transitions where src is child of dst or dst is child of src and src/dst is first child of parallel exits/enters parallel, but
-		// parallel's other childs are not exited/entered
+		// parallel's other childs are not exited/entered. This can be tested with test/lcca_parallel.scxml, with e0 changed to type external
 
 		// force exit when transition dst is child of parallel - parallel child has been exited and parallel child will be entered. So exit from lca to lcca
 		out << tab << tab << "template<class T> void exit(data_model& m, C*) { " << state_composite_t() << "<C, P>::template exit<T>(m); }" << endl;
