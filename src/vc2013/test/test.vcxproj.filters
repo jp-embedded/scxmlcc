@@ -68,5 +68,8 @@
     <CustomBuild Include="..\..\test\test376.txml">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\test\lcca_parallel.scxml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

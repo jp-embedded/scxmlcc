@@ -15,6 +15,7 @@
 #include "event_tokens.h"
 #include "conditional.h"
 #include "../examples/timer_switch.h"
+#include "lcca_parallel.h"
 #include <gtest/gtest.h>
 #include <thread>
 #include <chrono>

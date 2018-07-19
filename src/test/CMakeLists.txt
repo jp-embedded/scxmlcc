@@ -28,6 +28,7 @@ endforeach()
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/event_list.scxml gen_src )
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/event_tokens.scxml gen_src )
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/conditional.scxml gen_src )
+scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/lcca_parallel.scxml gen_src )
 
 add_executable( test_scxml
     ${gen_src}

@@ -281,13 +281,11 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_raise(const ptree &p
 {
 	boost::shared_ptr<action> ac = boost::make_shared<action>();
 	try {
-		ac->type = "raise";
-		using_event_queue = true;
-
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 
 		const string event = xmlattr.get<string>("event");
 
+		ac->type = "raise";
 		ac->attr["event"] = event;
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
@@ -302,6 +300,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_raise(const ptree &p
 		exit(1);
 	}
 
+	using_event_queue = true;
 	return ac;
 }
 
@@ -309,17 +308,14 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_log(const ptree &pt)
 {
 	boost::shared_ptr<action> ac = boost::make_shared<action>();
 	try {
+		const ptree &xmlattr = pt.get_child("<xmlattr>");
+
+		boost::optional<string> label(xmlattr.get_optional<string>("label"));
+		const string expr = xmlattr.get<string>("expr");
+
 		ac->type = "log";
-		using_log = true;
-
-		boost::optional<const ptree&> xmlattr = pt.get_child_optional("<xmlattr>");
-		if (!xmlattr) return ac; // empty log
-
-		boost::optional<string> label(xmlattr->get_optional<string>("label"));
-		boost::optional<string> expr(xmlattr->get_optional<string>("expr"));
-
-		if (label) ac->attr["label"] = *label;
-		if (expr) ac->attr["expr"] = *expr;
+		if(label) ac->attr["label"] = *label;
+		ac->attr["expr"] = expr;
 
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
@@ -333,6 +329,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_log(const ptree &pt)
 		exit(1);
 	}
 
+	using_log = true;
 	return ac;
 }
 
@@ -340,12 +337,12 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_assign(const ptree &
 {
 	boost::shared_ptr<action> ac = boost::make_shared<action>();
 	try {
-		ac->type = "assign";
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
 
 		const string location = xmlattr.get<string>("location");
 		boost::optional<string> expr(xmlattr.get_optional<string>("expr"));
 
+		ac->type = "assign";
 		ac->attr["location"] = location;
 		if(expr) ac->attr["expr"] = *expr;
 

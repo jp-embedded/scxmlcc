@@ -14,7 +14,7 @@
 			</state> 
 			<state id="C" initial="C1"> 
 				<state id="C1" /> 
-					<transition event="e0" target="C2" /> 
+					<transition type="internal" event="e0" target="C2" /> 
 				<state id="C2" /> 
 			</state> 
 		</parallel>

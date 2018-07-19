@@ -1,8 +1,6 @@
 #ifndef ALL_TESTS_H
 #define ALL_TESTS_H
 
-// todo: add test of lcca_parallel.scxml (and fix issue)
-
 // test that events are inserted into the queue in the order in which they are raised. If
 // foo occurs before bar, success, otherwise failure -->
 TEST(w3c, 144)
@@ -328,5 +326,27 @@ TEST(timer_switch, 0)
 	sc.dispatch(&sc_timer_switch::state::event_timer);
 	EXPECT_EQ(typeid(sc_timer_switch::state_off), typeid(*sc.cur_state));
 }
+
+// todo count enter/exit's
+TEST(lcca_parallel, 0)
+{
+	sc_lcca_parallel sc;
+	sc.init();
+	EXPECT_EQ(3, sc.cur_state.size());
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_C1), typeid(*sc.cur_state[0]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[1]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_B1), typeid(*sc.cur_state[2]));
+	sc.dispatch(&sc_lcca_parallel::state::event_e0);
+	EXPECT_EQ(3, sc.cur_state.size());
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_C2), typeid(*sc.cur_state[0]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[1]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_B1), typeid(*sc.cur_state[2]));
+	sc.dispatch(&sc_lcca_parallel::state::event_e1);
+	EXPECT_EQ(3, sc.cur_state.size());
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_C1), typeid(*sc.cur_state[0]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_B2), typeid(*sc.cur_state[1]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[2]));
+}
+
 
 #endif
