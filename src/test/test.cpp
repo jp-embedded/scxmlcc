@@ -10,6 +10,7 @@
 #include "test570.h"
 #include "test375.h"
 #include "test376.h"
+#include "test377.h"
 #include "test576.h"
 #include "event_list.h"
 #include "event_tokens.h"
