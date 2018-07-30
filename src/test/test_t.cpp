@@ -13,6 +13,7 @@
 #include "test375_t.h"
 #include "test376_t.h"
 #include "test377_t.h"
+#include "test378_t.h"
 #include "test576_t.h"
 #include "event_list_t.h"
 #include "event_tokens_t.h"
