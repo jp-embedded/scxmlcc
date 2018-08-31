@@ -195,6 +195,32 @@ $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl/scxmlcc %(FullPath)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">msxsl/scxmlcc %(FullPath)</Message>
     </CustomBuild>
+     <CustomBuild Include="..\..\test\test377.txml">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)cpp.xsl -o %(RelativeDir)%(Filename).scxml
+$(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">msxsl %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)cpp.xsl -o %(RelativeDir)%(Filename).scxml
+$(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RelativeDir)%(Filename).h</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RelativeDir)%(Filename).h</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl/scxmlcc %(FullPath)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">msxsl/scxmlcc %(FullPath)</Message>
+    </CustomBuild>
+     <CustomBuild Include="..\..\test\test378.txml">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)cpp.xsl -o %(RelativeDir)%(Filename).scxml
+$(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">msxsl %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)cpp.xsl -o %(RelativeDir)%(Filename).scxml
+$(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RelativeDir)%(Filename).h</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RelativeDir)%(Filename).h</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl/scxmlcc %(FullPath)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">msxsl/scxmlcc %(FullPath)</Message>
+    </CustomBuild>
     <CustomBuild Include="..\..\test\test412.txml">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)cpp.xsl -o %(RelativeDir)%(Filename).scxml
