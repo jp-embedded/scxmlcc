@@ -57,6 +57,23 @@ TEST(w3c, 376)
   EXPECT_EQ(typeid(sc_test376::state_pass), typeid(*sc.cur_state));
 }
 
+// test that onexit handlers are executed in document order.  event1 should be raised before event2
+TEST(w3c, 377)
+{
+  sc_test377 sc;
+  sc.init();
+  EXPECT_EQ(typeid(sc_test377::state_pass), typeid(*sc.cur_state));
+}
+
+// test that each onexithandler is a separate block. The <send> of event1 will cause an error but
+// the increment to var1 should happen anyways
+TEST(w3c, 378)
+{
+  sc_test378 sc;
+  sc.init();
+  EXPECT_EQ(typeid(sc_test378::state_pass), typeid(*sc.cur_state));
+}
+
 // test that executable content in the <initial> transition executes after the onentry handler on the state
 // and before the onentry handler of the child states.  Event1, event2, and event3 should occur in that order.
 TEST(w3c, 412)
@@ -347,6 +364,5 @@ TEST(lcca_parallel, 0)
 	EXPECT_EQ(typeid(sc_lcca_parallel::state_B2), typeid(*sc.cur_state[1]));
 	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[2]));
 }
-
 
 #endif
