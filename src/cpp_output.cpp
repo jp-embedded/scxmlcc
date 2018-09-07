@@ -1035,8 +1035,8 @@ void cpp_output::gen_action_part_raise(scxml_parser::action &a)
 	const string ev = a.attr["event"];
 
 	//out << tab << tab << "// " << a.type << " event=" << ev << endl;
-	if (!opt.thread_safe) out << tab << tab << "event_queue.emplace_back(&" << classname() << "::state::event_" << ev << ");" << endl;
-	else out << tab << tab << "push_event(&" << classname() << "::state::event_" << ev << ");" << endl;
+	if (!opt.thread_safe) out << tab << tab << "event_queue.emplace_back(&" << classname() << "::state::" <<  event_name(ev)  << ");" << endl;
+	else out << tab << tab << "push_event(&" << classname() << "::state::" <<  event_name(ev) << ");" << endl;
 }
 
 void cpp_output::gen_action_part(scxml_parser::action &a)
