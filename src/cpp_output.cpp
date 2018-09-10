@@ -493,6 +493,43 @@ scxml_parser::state_list cpp_output::states(const std::string &type)
 	return found_states;
 }
 
+std::set<std::string> cpp_output::get_event_names() const
+{
+	// collect events
+	using namespace boost::algorithm;
+
+	const scxml_parser::state_list &states = sc.sc().states;
+	std::vector<string> events;
+
+	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
+		if (i_state->get()->type && *i_state->get()->type == "final") {
+			if (!i_state->get()->parent) continue;
+			string event = "done.state." + i_state->get()->parent->id;
+			events.push_back(event);
+		}
+		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
+			for(scxml_parser::slist::const_iterator i_event = i_trans->get()->event.begin(); i_event != i_trans->get()->event.end(); ++i_event) {
+				events.push_back(*i_event);
+			}
+		}
+	}
+
+	// pass through set, to filter out duplicates
+	set<string> event_set;
+	for (vector<string>::const_iterator i_event = events.begin(); i_event != events.end(); ++ i_event) {
+		// loop through event tokens
+		scxml_parser::slist tokens;
+		split(tokens, *i_event, is_any_of("."), token_compress_on);
+		string event;
+		for (scxml_parser::slist::const_iterator i_token = tokens.begin(); i_token != tokens.end(); ++i_token) {
+			if (event.size()) event += '.';
+			event += *i_token;
+			event_set.insert(event);
+		}
+	}
+	return event_set;
+}
+
 void cpp_output::gen_model_base_finals()
 {
 	if (!(sc.using_final && sc.using_parallel)) return;
@@ -573,10 +610,6 @@ void cpp_output::gen_model_base()
 
 void cpp_output::gen_state_base()
 {
-	using namespace boost::algorithm;
-
-	const scxml_parser::state_list &states = sc.sc().states;
-
 	// state actions class
 	out << tab << "class " << state_t() << endl;
 	out << tab << "{" << endl;
@@ -598,36 +631,12 @@ void cpp_output::gen_state_base()
 	// ev_a_b    call ev_a
 	// ev_a_b_c  call ev_a_b
 
-	// collect events
-	vector<string> events;
-	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
-		if (i_state->get()->type && *i_state->get()->type == "final") {
-			if (!i_state->get()->parent) continue;
-			string event = "done.state." + i_state->get()->parent->id;
-			events.push_back(event);
-		}
-		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
-			for(scxml_parser::slist::const_iterator i_event = i_trans->get()->event.begin(); i_event != i_trans->get()->event.end(); ++i_event) {
-				events.push_back(*i_event);
-			}
-		}
-	}
-
-	// pass through set, to filter out dublicates
 	bool use_base_event = false;
-	set<string> event_set;
-	for (vector<string>::const_iterator i_event = events.begin(); i_event != events.end(); ++ i_event) {
-		if (*i_event == "*") {
+	auto event_set =  get_event_names();
+
+	for(auto evName : event_set) {
+		if(evName == "*"){
 			use_base_event = true;
-		}
-		// loop through event tokens 
-		scxml_parser::slist tokens;
-		split(tokens, *i_event, is_any_of("."), token_compress_on);
-		string event;
-		for (scxml_parser::slist::const_iterator i_token = tokens.begin(); i_token != tokens.end(); ++i_token) {
-			if (event.size()) event += '.';
-			event += *i_token;
-			event_set.insert(event);
 		}
 	}
 
