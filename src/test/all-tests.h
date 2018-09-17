@@ -365,4 +365,10 @@ TEST(lcca_parallel, 0)
 	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[2]));
 }
 
+TEST(issue_69, 0)
+{
+	sc_issue_69 sc;
+	sc.init();
+}
+
 #endif
