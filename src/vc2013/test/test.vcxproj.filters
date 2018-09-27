@@ -71,5 +71,8 @@
     <CustomBuild Include="..\..\test\lcca_parallel.scxml">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\test\issue_69.scxml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
