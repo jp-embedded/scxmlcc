@@ -365,6 +365,8 @@ TEST(lcca_parallel, 0)
 	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[2]));
 }
 
+// This sc could not build because of a missing event in state
+// Just test that this builds and can be instantiated.
 TEST(issue_69, 0)
 {
 	sc_issue_69 sc;
