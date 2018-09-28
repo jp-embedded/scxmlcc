@@ -1284,6 +1284,8 @@ void cpp_output::gen()
 	if(!opt.bare_metal) {
 		out << "#include <deque>" << endl;
 		out << "#include <vector>" << endl;
+		out << "#include <string>" << endl;
+		out << "#include <unordered_map>" << endl;
 	}
 	if(opt.thread_safe) {
 		out << "#include <condition_variable>" << endl;
