@@ -502,11 +502,21 @@ std::set<std::string> cpp_output::get_event_names() const
 	std::vector<string> events;
 
 	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
+
+		// Final state events
 		if (i_state->get()->type && *i_state->get()->type == "final") {
 			if (!i_state->get()->parent) continue;
 			string event = "done.state." + i_state->get()->parent->id;
 			events.push_back(event);
 		}
+
+		// If parallel have a final child, the parallel state must have a done event also
+		if (sc.using_final && sc.using_parallel && i_state->get()->type && *i_state->get()->type == "parallel") {
+			string event = "done.state." + i_state->get()->id;
+			events.push_back(event);
+		}
+
+		// Transition events
 		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
 			for(scxml_parser::slist::const_iterator i_event = i_trans->get()->event.begin(); i_event != i_trans->get()->event.end(); ++i_event) {
 				events.push_back(*i_event);
@@ -1274,7 +1284,6 @@ void cpp_output::gen()
 	if(!opt.bare_metal) {
 		out << "#include <deque>" << endl;
 		out << "#include <vector>" << endl;
-		out << "#include <unordered_map>" << endl;
 	}
 	if(opt.thread_safe) {
 		out << "#include <condition_variable>" << endl;

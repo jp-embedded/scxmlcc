@@ -1,0 +1,30 @@
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early" initial="P1">
+    <parallel id="P1">
+        <state id="P1S1">
+            <onentry/>
+            <onexit/>
+            <state id="P1S11">
+                <onentry/>
+                <transition type="external" event="ev" target="P1S11"/>
+            </state>
+        </state>
+        <state id="P1S2">
+            <onentry/>
+            <state id="P1S21">
+                <onentry/>
+                <onexit/>
+                <transition type="external" event="ev" target="Final"/>
+            </state>
+            <onexit/>
+            <final id="Final">
+            </final>
+        </state>
+        <onentry/>
+        <transition type="external" event="ev2" target="S1">
+        </transition>
+        <onexit/>
+    </parallel>
+    <state id="S1">
+        <onentry/>
+    </state>
+</scxml>
