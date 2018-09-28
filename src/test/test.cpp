@@ -18,6 +18,8 @@
 #include "conditional.h"
 #include "../examples/timer_switch.h"
 #include "lcca_parallel.h"
+#include "issue_69.h"
+
 #include <gtest/gtest.h>
 #include <thread>
 #include <chrono>
