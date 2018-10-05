@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
 		("ignore-unknown,u",	value<string>(),	"ignore unknown xml elements matching regex")
 		("baremetal,b",				"Generate code for bare metal C++")
 		("threadsafe,t",			"Generate threadsafe code for event_queue (requires c++17)")
+		("stringevents,s",			"Enable triggering events by name")
 		("namespace,n",	value<string>(),	"Generate code in given namespace")
 		("version,v",				"Version and copyright information");
 	positional_options_description pdesc;
@@ -83,6 +84,7 @@ int main(int argc, char *argv[])
 	if(vm.count("debug")) opt.debug = true;
 	if(vm.count("baremetal")) opt.bare_metal = true;
 	if(vm.count("threadsafe")) opt.thread_safe = true;
+	if(vm.count("stringevents")) opt.string_events = true;
 	if(vm.count("namespace")) opt.ns = vm["namespace"].as<string>();
 
 	if(!opt.input.empty() && opt.output.empty()) {
