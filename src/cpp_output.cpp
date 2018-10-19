@@ -375,6 +375,7 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << tab << tab << "// handle transition with all children given" << endl;
 		// from this state and up, all tagets are same path, so only need to follow one of them.
 		out << tab << tab << tab << state_t() << "::" << ret << " r = P::template enter_parallel<S>(sc, d, (S*)0);" << endl;
+		out << tab << tab << tab << "r.reserve(" << children << ");" << endl;
 
 		// use composite instead S to prevent forced parallel enter on initial states. See state_enter generation for more details
 		for(int c = 1; c < children; ++c) out << tab << tab << tab << 'd' << c << "->template enter<composite<C, typename C::parent_t> >(sc.model), r.push_back(d" << c << ");" << endl;
