@@ -350,19 +350,19 @@ TEST(lcca_parallel, 0)
 	sc_lcca_parallel sc;
 	sc.init();
 	EXPECT_EQ(3, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_C1), typeid(*sc.cur_state[0]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[1]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_B1), typeid(*sc.cur_state[2]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_B1), typeid(*sc.cur_state[0]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_C1), typeid(*sc.cur_state[1]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[2]));
 	sc.dispatch(&sc_lcca_parallel::state::event_e0);
 	EXPECT_EQ(3, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_C2), typeid(*sc.cur_state[0]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[1]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_B1), typeid(*sc.cur_state[2]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_B1), typeid(*sc.cur_state[0]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_C2), typeid(*sc.cur_state[1]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[2]));
 	sc.dispatch(&sc_lcca_parallel::state::event_e1);
 	EXPECT_EQ(3, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_C1), typeid(*sc.cur_state[0]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_B2), typeid(*sc.cur_state[1]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[2]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[0]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_C1), typeid(*sc.cur_state[1]));
+	EXPECT_EQ(typeid(sc_lcca_parallel::state_B2), typeid(*sc.cur_state[2]));
 }
 
 // This sc could not build because of a missing event in state
