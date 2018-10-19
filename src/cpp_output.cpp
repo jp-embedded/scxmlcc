@@ -92,24 +92,17 @@ void cpp_output::gen_transition_base()
 	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<typename D::parent_t>(m); }" << endl;
 	
 	out << tab << tab << "public:" << endl;
-	if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, bool eval";
+	if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, state::eval_list &eval";
 	else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc";
 	if (opt.debug) out << ", const char* ename)" << endl;
 	else out << ")" << endl;
 	out << tab << tab << "{" << endl;
 	if (sc.using_parallel) {
-		out << tab << tab << tab << "if (eval) {" << endl;
-		out << tab << tab << tab << tab << "state::state_list sl;" << endl;
-		out << tab << tab << tab << tab << "if (transition_actions<E, S, D>::condition(sc.model)) sl.push_back(sc.new_state<S>());" << endl;
-		out << tab << tab << tab << tab << "return sl;" << endl;
+		out << tab << tab << tab << "for (state::eval_list::const_iterator i = eval.begin(); i != eval.end(); ++i) {" << endl;
+		out << tab << tab << tab << "	if (i->get() == typeid(S)) return state::state_list();" << endl;
 		out << tab << tab << tab << "}" << endl;
 	}
-
-	// todo: it's not optimal to test condition both in eval and execute. Can lead to side effects if eval result differ between the two calls
-	// the test condition in execute is needed because an event may have several transitions with conditions. Without, the first transition will always be executed.
-	// solution could be to return a list of transitions as suggested in scxml. This will require a transition virtual base class
 	out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return " << empty << ';' << endl;
-	
 	if(opt.debug) out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \" << scxmlcc::demangle(typeid(D).name()) << std::endl;" << endl;
 	out << tab << tab << tab << "D *d = sc.new_state<D>();" << endl;
 	if (sc.using_parallel) out << tab << tab << tab << "s->exit_parallel(sc, s, d);" << endl;
@@ -119,6 +112,7 @@ void cpp_output::gen_transition_base()
 	out << tab << tab << tab << "state_enter(d, sc.model, id<T>(), (typename D::parent_t*)0);" << endl;
 	if (sc.using_parallel) {
 		out << tab << tab << tab << state_t() << "::state_list r = d->template enter_parallel<S>(sc, d, s);" << endl;
+		out << tab << tab << tab << "eval.push_back(typeid(S));" << endl;
 		out << tab << tab << tab << "r.push_back(d);" << endl;
 		out << tab << tab << tab << "return r;" << endl;
 	} else {
@@ -134,24 +128,22 @@ void cpp_output::gen_transition_base()
 		out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
 		out << tab << "{" << endl;
 		out << tab << tab << "public:" << endl;
-		if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, bool eval";
+		if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, state::eval_list &eval";
 		else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc";
 		if (opt.debug) out << ", const char* ename)" << endl;
 		else out << ")" << endl;
 		out << tab << tab << "{" << endl;
 		if (sc.using_parallel) {
-			out << tab << tab << tab << "if (eval) {" << endl;
-			out << tab << tab << tab << tab << "state::state_list sl;" << endl;
-			out << tab << tab << tab << tab << "if (transition_actions<E, S, no_state>::condition(sc.model)) sl.push_back(sc.new_state<S>());" << endl;
-			out << tab << tab << tab << tab << "return sl;" << endl;
+			out << tab << tab << tab << "for (state::eval_list::const_iterator i = eval.begin(); i != eval.end(); ++i) {" << endl;
+			out << tab << tab << tab << "	if (i->get() == typeid(S)) return state::state_list();" << endl;
 			out << tab << tab << tab << "}" << endl;
-		} else {
-			out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return " << empty << ";" << endl;
 		}
+		out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return " << empty << ";" << endl;
 		if(opt.debug) out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << std::endl;" << endl;
 		out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
 		if (sc.using_parallel) {
 			out << tab << tab << tab << state_t() << "::state_list r;" << endl;
+			out << tab << tab << tab << "eval.push_back(typeid(S));" << endl;
 			out << tab << tab << tab << "r.push_back(s);" << endl;
 			out << tab << tab << tab << "return r;" << endl;
 		} else {
@@ -179,7 +171,7 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << "public:" << endl;
 
 		//todo: for now, all targets must have same parallel parent
-		if (sc.using_parallel) out << tab << tab << state_t() << "::state_list operator ()(S *s, " << classname() << "&sc, bool eval";
+		if (sc.using_parallel) out << tab << tab << state_t() << "::state_list operator ()(S *s, " << classname() << "&sc, state::eval_list &eval";
 		else out << tab << tab << state_t() << "::state_list operator ()(S *s, " << classname() << "&sc";
 		if (opt.debug) out << ", const char* ename)" << endl;
 		else out << ")" << endl;
@@ -187,18 +179,13 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << '{' << endl;
 
 		if (sc.using_parallel) {
-			out << tab << tab << tab << "if (eval) {" << endl;
-			out << tab << tab << tab << tab << "state::state_list sl;" << endl;
-			out << tab << tab << tab << tab << "if(transition_actions<E, S";
-			for (int i = 0; i < sz; ++i) out << ", D" << i;
-			out << ">::condition(sc.model)) sl.push_back(sc.new_state<S>());" << endl;
-			out << tab << tab << tab << tab << "return sl;" << endl;
+			out << tab << tab << tab << "for (state::eval_list::const_iterator i = eval.begin(); i != eval.end(); ++i) {" << endl;
+			out << tab << tab << tab << "	if (i->get() == typeid(S)) return state::state_list();" << endl;
 			out << tab << tab << tab << "}" << endl;
-		} else {
-			out << tab << tab << tab << "if(!transition_actions<E, S";
-			for (int i = 0; i < sz; ++i) out << ", D" << i;
-			out << ">::condition(sc.model)) return " << empty << ";" << endl;
 		}
+		out << tab << tab << tab << "if(!transition_actions<E, S";
+		for (int i = 0; i < sz; ++i) out << ", D" << i;
+		out << ">::condition(sc.model)) return " << empty << ";" << endl;
 		
 		if (opt.debug) {
 			out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \"";
@@ -225,6 +212,7 @@ void cpp_output::gen_transition_base()
 		for(int i = 1; i < sz; ++i) out << ", d" << i;
 		out << ");" << endl;
 
+		out << tab << tab << tab << "eval.push_back(typeid(S));" << endl;
 		out << tab << tab << tab << "r.push_back(d0);" << endl;
 		out << tab << tab << tab << "return r;" << endl;
 
@@ -259,7 +247,7 @@ void cpp_output::gen_state_composite_base()
 	out << tab << "template<class C, class P> class " << state_composite_t() << " : public P, public state_actions<C>" << endl;
 	out << tab << "{" << endl;
 
-	if (sc.using_parallel) out << tab << tab << "virtual " << retp << " initial(" << classname() << "&, bool eval) { return " << empty << "; }" << endl;
+	if (sc.using_parallel) out << tab << tab << "virtual " << retp << " initial(" << classname() << "&, state::eval_list &eval) { return " << empty << "; }" << endl;
 	else out << tab << tab << "virtual " << retp << " initial(" << classname() << "&) { return " << empty << "; }" << endl;
 
 	// lca calculation
@@ -282,9 +270,6 @@ void cpp_output::gen_state_composite_base()
 		out << tab << tab << "virtual void exit_to_src(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
 		if(opt.debug) out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
 		out << " state_actions<C>::exit(m); P::exit_to_src(m, sti); }" << endl;
-	}
-	if (sc.using_parallel) {
-		out << tab << tab << "virtual bool is_parent(state *s) { return !!dynamic_cast<composite*>(s); }" << endl;
 	}
 
 	out << tab << "};" << endl;
@@ -588,6 +573,7 @@ void cpp_output::gen_state_base()
 		out << tab << tab << "{" << endl;
 		out << tab << tab << tab << "operator bool() { return !empty(); }" << endl;
 		out << tab << tab << "};" << endl;
+		out << tab << tab << "typedef std::vector<std::reference_wrapper<const std::type_info> > eval_list;" << endl;
 	}
 
 	// events
@@ -668,7 +654,7 @@ void cpp_output::gen_state_base()
 
 		out << tab << tab << "virtual " << ret << " event" << event << "(" << classname() << '&';
 		if (parent.size() || (event.size() && use_base_event)) out << " sc";
-		if (sc.using_parallel) out << ", bool eval";
+		if (sc.using_parallel) out << ", eval_list &eval";
 		out << ") { return ";
 		string eparams = "(sc)";
 		if (sc.using_parallel) eparams = "(sc, eval)";
@@ -678,7 +664,7 @@ void cpp_output::gen_state_base()
 		out << "; }" << endl;
 	}
 	string uiparams = '(' + classname() + "&)";
-	if (sc.using_parallel) uiparams = '(' + classname() + "&, bool)";
+	if (sc.using_parallel) uiparams = '(' + classname() + "&, eval_list&)";
 	out << tab << tab << "virtual " << ret << " unconditional" << uiparams << " { return " << empty << "; }" << endl;
 	out << tab << tab << "virtual " << ret << " initial" << uiparams << " { return " << empty << "; }" << endl;
 
@@ -691,7 +677,6 @@ void cpp_output::gen_state_base()
 		out << tab << tab << "template<class S> " << retp << " enter_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) { return state_list(); }" << endl;
 		out << tab << tab << "virtual void exit_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) {}" << endl;
 		out << tab << tab << "virtual bool parallel_parent(const std::type_info&) { return false; }" << endl;
-		out << tab << tab << "virtual bool is_parent(state*) = 0;" << endl;
 		if (sc.using_final) {
 			out << tab << tab << "void parallel_enter_final(data_model &m) {}" << endl;
 			out << tab << tab << "void parallel_exit_final(data_model &m) {}" << endl;
@@ -710,7 +695,7 @@ void cpp_output::gen_state_base()
 	else {
 		out << tab << state_t() << " *cur_state;" << endl;
 	}
-	if (sc.using_parallel) out << tab << "typedef " << retp << " (" << state_t() << "::*event)(" << classname() << "&, bool);" << endl;
+	if (sc.using_parallel) out << tab << "typedef " << retp << " (" << state_t() << "::*event)(" << classname() << "&, state::eval_list&);" << endl;
 	else out << tab << "typedef " << retp << " (" << state_t() << "::*event)(" << classname() << "&);" << endl;
 	out << endl;
 }
@@ -765,7 +750,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	if(state.initial.target.size()) {
 		const int sz = state.initial.target.size();
-		if (sc.using_parallel) out << tab << tab << ret << " initial" << "(" << classname() << " &sc, bool eval) { return transition";
+		if (sc.using_parallel) out << tab << tab << ret << " initial" << "(" << classname() << " &sc, eval_list &eval) { return transition";
 		else out << tab << tab << ret << " initial" << "(" << classname() << " &sc) { return transition";
 		if (sz > 1) out << sz;
 		out << "<&state::initial, " << state_classname;
@@ -822,7 +807,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 			if (first) {
 				string s = ret + ' ' + event + "(" + classname() + " &sc";
-				if (sc.using_parallel) s += ", bool eval";
+				if (sc.using_parallel) s += ", eval_list &eval";
 				s += ") { ";
 				if (multiple) s += ret + " s; ";
 				s += "return ";
@@ -895,37 +880,18 @@ void cpp_output::gen_sc()
 		out << tab << "private: bool dispatch_event(event e)" << endl;
 		out << tab << '{' << endl;
 
-		// get enabled transitions
-		out << tab << tab << "state::state_list eval_info;" << endl;
-		out << tab << tab << "eval_info.reserve(cur_state.size());" << endl;
-		out << tab << tab << "for (state::state_list::iterator i_cur = cur_state.begin(); i_cur != cur_state.end();) if (*i_cur) {" << endl;
-		out << tab << tab << tab << "state *s = 0;" << endl;
-		out << tab << tab << tab << "state::state_list sl = ((*i_cur)->*e)(*this, true);" << endl;
-		out << tab << tab << tab << "if (sl.size()) s = sl.front();" << endl;
-		out << tab << tab << tab << "eval_info.push_back(s);" << endl;
-		out << tab << tab << tab << "++i_cur;" << endl;
-		out << tab << tab << "}" << endl;
-		out << tab << tab << "else i_cur = cur_state.erase(i_cur); " << endl;
-		out << endl;
-		
-		// filter enabled transitions
-		// keep first (i_eval) if i_cmp == i_eval or i_cmp is parent of i_eval
-		out << tab << tab << "for (state::state_list::iterator i_eval = eval_info.begin(); i_eval != eval_info.end(); ++i_eval) if (*i_eval) {" << endl;
-		out << tab << tab << tab << "for (state::state_list::iterator i_cmp = i_eval + 1; i_cmp != eval_info.end(); ++i_cmp) if (*i_cmp) {" << endl;
-		out << tab << tab << tab << tab << "if ((*i_eval)->is_parent(*i_cmp)) *i_cmp = 0;" << endl;
-		out << tab << tab << tab << "}" << endl;
-		out << tab << tab << "}" << endl;
-		out << endl;
-		
 		out << tab << tab << "bool cont = false;" << endl;
-		out << tab << tab << "for(state::state_list::iterator i_cur = cur_state.begin(), i_eval = eval_info.begin(); i_cur != cur_state.end(); ++i_cur, ++i_eval) if(*i_cur && *i_eval) {" << endl;
-		out << tab << tab << tab << "if (state::state_list r = ((*i_cur)->*e)(*this, false)) {" << endl;
+		out << tab << tab << "state::eval_list eval_info;" << endl;
+		out << tab << tab << "for(state::state_list::iterator i_cur = cur_state.begin(); i_cur != cur_state.end();) if(*i_cur) {" << endl;
+		out << tab << tab << tab << "if (state::state_list r = ((*i_cur)->*e)(*this, eval_info)) {" << endl;
 		out << tab << tab << tab << tab << "cont = true;" << endl;
 		out << tab << tab << tab << tab << "std::vector<state*>::const_iterator i_new = r.begin();" << endl;
 		out << tab << tab << tab << tab << "*i_cur = *i_new++;" << endl;
-		out << tab << tab << tab << tab << "for(; i_new != r.end(); ++i_new) i_cur = ++cur_state.insert(i_cur, *i_new);" << endl;
+		out << tab << tab << tab << tab << "for(; i_new != r.end(); ++i_new) i_cur = cur_state.insert(++i_cur, *i_new);" << endl;
 		out << tab << tab << tab << '}' << endl;
+		out << tab << tab << tab << "++i_cur;" << endl;
 		out << tab << tab << '}' << endl;
+		out << tab << tab << "else i_cur = cur_state.erase(i_cur);" << endl;
 		out << tab << tab << "return cont;" << endl;
 		out << tab << '}' << endl;
 	}
@@ -983,7 +949,7 @@ void cpp_output::gen_sc()
 	out << tab << "{" << endl;
 
 	const int sz = sc.sc().initial.target.size();
-	if (sc.using_parallel) out << tab << tab << ret << " initial(" << classname() << "&sc, bool eval) { return transition";
+	if (sc.using_parallel) out << tab << tab << ret << " initial(" << classname() << "&sc, eval_list &eval) { return transition";
 	else out << tab << tab << ret << " initial(" << classname() << "&sc) { return transition";
 	if(sz > 1) out << sz;
 	out << "<&state::initial, scxml";
@@ -1238,7 +1204,8 @@ void cpp_output::gen()
 	out << "#define __SC_" << boost::to_upper_copy(sc.sc().name) << endl;
 	out << endl;
 
-	if(sc.using_compound || opt.debug) out << "#include <typeinfo>" << endl;
+	if(sc.using_compound || opt.debug || sc.using_parallel) out << "#include <typeinfo>" << endl;
+	if(sc.using_parallel) out << "#include <functional>" << endl;
 	if(!opt.bare_metal) {
 		out << "#include <deque>" << endl;
 		out << "#include <vector>" << endl;
