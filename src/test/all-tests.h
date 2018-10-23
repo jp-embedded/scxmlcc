@@ -373,4 +373,12 @@ TEST(issue_69, 0)
 	sc.init();
 }
 
+// This sc could not build because of a missing event in state, when raising event with no matching transition
+// Just test that this builds and can be instantiated.
+TEST(issue_72, 0)
+{
+	sc_issue_72 sc;
+	sc.init();
+}
+
 #endif
