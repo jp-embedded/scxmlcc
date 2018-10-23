@@ -608,6 +608,21 @@ void cpp_output::gen_state_base()
 				events.push_back(*i_event);
 			}
 		}
+
+		// Raise events
+		scxml_parser::plist<scxml_parser::action> actions;
+		copy(i_state->get()->entry_actions.begin(), i_state->get()->entry_actions.end(), back_inserter(actions));
+		copy(i_state->get()->exit_actions.begin(), i_state->get()->exit_actions.end(), back_inserter(actions));
+		copy(i_state->get()->initial.actions.begin(), i_state->get()->initial.actions.end(), back_inserter(actions));
+		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
+			copy(i_trans->get()->actions.begin(), i_trans->get()->actions.end(), back_inserter(actions));
+		}
+		for (scxml_parser::plist<scxml_parser::action>::const_iterator i = actions.begin(); i != actions.end(); ++i) {
+			scxml_parser::action &a = *i->get();
+			if (a.type == "raise") {
+				events.push_back(a.attr["event"]);
+			}
+		}
 	}
 
 	// pass through set, to filter out dublicates
