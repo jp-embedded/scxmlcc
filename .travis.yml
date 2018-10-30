@@ -20,7 +20,7 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
 install:
-  - sudo apt-get install build-essential libboost-all-dev xsltproc gcc-7 autorevision
+  - sudo apt-get install build-essential libboost-all-dev xsltproc g++-7 autorevision
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
 
 compiler:
