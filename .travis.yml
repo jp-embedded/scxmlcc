@@ -17,8 +17,11 @@ matrix:
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -q
-  - sudo apt-get install build-essential libboost-all-dev xsltproc gcc-7 autorevision
   - eval "${MATRIX_EVAL}"
+
+install:
+  - sudo apt-get install build-essential libboost-all-dev xsltproc gcc-7 autorevision
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
 
 compiler:
   - gcc
