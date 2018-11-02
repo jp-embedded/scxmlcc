@@ -950,17 +950,19 @@ void cpp_output::gen_sc()
 	if(opt.string_events) {
 		out << tab << "public: void dispatch(std::string ev_name)" << endl;
 		out << tab << "{" << endl;
-		out << tab << tab << "while(ev_name.size()) {" << endl;
+		out << tab << tab << "while(! ev_name.empty()) {" << endl;
 		out << tab << tab << tab << "auto event_it = event_map.find(ev_name);" << endl;
 		out << tab << tab << tab << "if(event_it != event_map.end()) {" << endl;
 		out << tab << tab << tab << tab << "dispatch(event_it->second);" << endl;
-		out << tab << tab << tab << tab << "break;" << endl;
+		out << tab << tab << tab << tab << "return;" << endl;
 		out << tab << tab << tab << "}" << endl;
 		out << tab << tab << tab << "// if the name was not found, remove the last part and try again" << endl;
 		out << tab << tab << tab << "auto last_dot = ev_name.rfind('.');" << endl;
 		out << tab << tab << tab << "if(last_dot == std::string::npos) break;" << endl;
 		out << tab << tab << tab << "ev_name.erase(last_dot);" << endl;
 		out << tab << tab << "}" << endl;
+		out << tab << tab << "// signal name not found or empty" << endl;
+		out << tab << tab << "dispatch(&state::unconditional);" << endl;
 		out << tab << "}" << endl;
 	}
 
