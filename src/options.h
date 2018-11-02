@@ -19,6 +19,7 @@
 #define __OPTIONS
 
 #include <boost/filesystem.hpp>
+#include <vector>
 
 struct options
 {
@@ -29,6 +30,8 @@ struct options
 	bool bare_metal = false;
 	bool thread_safe = false;
 	std::string ns = "";
+	std::vector<std::string> local_includes;
+	std::vector<std::string> global_includes;
 };
 
 #endif

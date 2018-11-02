@@ -1250,6 +1250,14 @@ void cpp_output::gen()
 		out << "#endif" << endl;
 	}
 	out << endl;
+	out << "// User includes" << endl;
+	for(auto& include : opt.global_includes) {
+		out << "#include <" << include << '>' << endl;
+	}
+	for(auto& include : opt.local_includes) {
+		out << "#include \"" << include << '\"' << endl;
+	}
+	out << endl;
 
 	if(!opt.ns.empty()) {
 		out << "namespace " << opt.ns << " {" << endl;

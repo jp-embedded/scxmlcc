@@ -61,6 +61,8 @@ int main(int argc, char *argv[])
 		("baremetal,b",				"Generate code for bare metal C++")
 		("threadsafe,t",			"Generate threadsafe code for event_queue (requires c++17)")
 		("namespace,n",	value<string>(),	"Generate code in given namespace")
+		("include", value<std::vector<std::string> >()->multitoken(), "Add #include(s) surrounded by \" \" --include file1 file2...")
+		("Include", value<std::vector<std::string> >()->multitoken(), "Add #include(s) surrounded by < > --Include file1 file2...")
 		("version,v",				"Version and copyright information");
 	positional_options_description pdesc;
 	pdesc.add("input", -1);
@@ -84,6 +86,8 @@ int main(int argc, char *argv[])
 	if(vm.count("baremetal")) opt.bare_metal = true;
 	if(vm.count("threadsafe")) opt.thread_safe = true;
 	if(vm.count("namespace")) opt.ns = vm["namespace"].as<string>();
+	if(vm.count("include")) opt.local_includes = vm["include"].as<std::vector<std::string> >();
+	if(vm.count("Include")) opt.global_includes = vm["Include"].as<std::vector<std::string> >();
 
 	if(!opt.input.empty() && opt.output.empty()) {
 		opt.output = opt.input;
