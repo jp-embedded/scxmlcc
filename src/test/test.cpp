@@ -20,6 +20,7 @@
 #include "lcca_parallel.h"
 #include "issue_69.h"
 #include "issue_72.h"
+#include "eventless.h"
 
 #include <gtest/gtest.h>
 #include <thread>
