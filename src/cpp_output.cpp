@@ -920,7 +920,7 @@ void cpp_output::gen_sc()
 		out << tab << '}' << endl;
 	}
 	out << endl;
-	out << tab << "public: void dispatch(event e)" << endl;
+	out << tab << "public: void dispatch(event e = &state::unconditional)" << endl;
 	out << tab << "{" << endl;
 	out << tab << tab << "bool cont = dispatch_event(e);" << endl;
 	out << tab << tab << "while (cont) {" << endl;
