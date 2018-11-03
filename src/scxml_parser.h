@@ -78,6 +78,7 @@ class scxml_parser
 			transition initial;
 			state_list states;
 			data_list datamodel;
+			plist<action> scripts;
 		};
 
 		scxml_parser(const char *name, const std::string& ignore_unknown, const boost::property_tree::ptree &pt);
