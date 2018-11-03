@@ -381,4 +381,19 @@ TEST(issue_72, 0)
 	sc.init();
 }
 
+TEST(eventless, 0)
+{
+  sc_eventless sc;
+  sc.init();
+  // send event without matching transition, eventless transition must be executed
+  sc.model.cont = true; // is reset by transition script
+  sc.dispatch(&sc_eventless::state::event_ev1);
+  EXPECT_EQ(typeid(sc_eventless::state_State_2), typeid(*sc.cur_state));
+
+  // Send trigger for eventless transitions
+  sc.model.cont = true; // is reset by transition script
+  sc.dispatch(); // use default param for eventless transition
+  EXPECT_EQ(typeid(sc_eventless::state_State_3), typeid(*sc.cur_state));
+}
+
 #endif

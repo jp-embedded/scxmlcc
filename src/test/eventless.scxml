@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early" name="eventless" datamodel="cplusplus">
+    <state id="State_1">
+        <transition type="external" target="State_2" cond="cont">
+            <script>cont = false;</script>
+        </transition>
+    </state>
+    <state id="State_2">
+        <transition type="external" target="State_3" cond="cont">
+            <script>cont = false;</script>
+        </transition>
+    </state>
+    <datamodel>
+        <data expr="false" id="bool cont"/>
+    </datamodel>
+    <state id="State_3">
+        <transition type="external" event="ev1" target="State_1">
+        </transition>
+    </state>
+</scxml>
