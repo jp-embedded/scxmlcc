@@ -47,6 +47,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 			else if (it->first == "parallel") parse_parallel(it->second, boost::shared_ptr<state>());
 			else if (it->first == "initial") m_scxml.initial = parse_initial(it->second);
 			else if (it->first == "datamodel") m_scxml.datamodel = parse_datamodel(it->second);
+			else if (it->first == "script") m_scxml.scripts.push_back(parse_script(it->second));
 			else if (std::regex_match(it->first, ignore_elements_re)) ; // ignore
 			else cerr << "warning: unknown item '" << it->first << "' in <scxml>" << endl;
 		}
