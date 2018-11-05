@@ -1251,6 +1251,16 @@ void cpp_output::gen()
 	}
 	out << endl;
 
+	if(! sc.sc().scripts.empty()) {
+		out << "// user initialisations" << endl;
+		for(const auto script : sc.sc().scripts) {
+			// this would work, but ugly indention:
+			// gen_action_part(*script);
+			out << script->attr["expr"] << endl;
+		}
+		out << endl;
+	}
+
 	if(!opt.ns.empty()) {
 		out << "namespace " << opt.ns << " {" << endl;
 	}
