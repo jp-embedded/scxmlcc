@@ -1019,14 +1019,15 @@ void cpp_output::gen_sc()
 
 	out << tab << classname() << "(user_model *user = 0)";
 	if(opt.string_events && ! event_names.empty()) {
-		out << "\n" << tab << ": event_map{";
+		out << "\n" << tab << ": ";
+		if(!sc.using_parallel) out << "cur_state(new_state<scxml>())\n" << tab << ", ";
+		out << "event_map{";
 		const char* delim("");
 		for(auto ev_name : event_names) {
 			out << delim << "{\"" << ev_name << "\", &" << classname() << "::state::" << event_name(ev_name) << "}";
 			delim = ", ";
 		}
 		out << "}"; 
-		if(!sc.using_parallel) out << "\n" << tab << ", cur_state(new_state<scxml>())";
 	}
 	else if(!sc.using_parallel) out << " : cur_state(new_state<scxml>())";
 	out << endl;
