@@ -29,4 +29,5 @@ compiler:
 jobs:
    include:
       - script: make -C src && make -C src/examples && make -C src/test && ./src/test/test
-      - script: mkdir build && cd build && cmake .. && make -j4 && ctest -V 
+      - script: mkdir build && cd build && cmake .. && make -j4
+      - script: mkdir build-dev && cd build-dev && cmake -DDEVELOPER=1 .. && make -j4 && ctest -V 

@@ -50,16 +50,25 @@ make
 ```
 #### with cmake 
 ```
-git submodule update --init
 mkdir build
 cd build
 cmake ..
 make -j4
 make install
 ```
+
 If you're not familar with cmake have a look at the supported generators for visual studio, eclipse etc- https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html.
 
 To help with auto-generating state-machines in cmake projects, an scxml_generator.cmake module is installed.  The examples demonstrate how this can be used. 
+
+To build unit tests, and examples run cmake with 
+```
+mkdir build
+cd build
+cmake -DDEVELOPER=1 ..
+make -j4
+make test
+```
 
 ### On Windows
 The solution file `scxmlcc\src\vc2013\vc2013.sln` contain projects to build the scxml compiler and examples. This is for visual studio 2013.
