@@ -68,6 +68,7 @@ class cpp_output {
 	private:
 	scxml_parser::state_list children(const scxml_parser::state &state);
 	scxml_parser::state_list states(const std::string &type);
+	std::set<std::string> get_event_names() const;
 };
 
 #endif

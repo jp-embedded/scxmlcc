@@ -43,14 +43,14 @@ int main()
 	input.sig_key.connect(std::bind(&keypad::simulate_input, &keypad, _1));
 
 	// connect coin sensor to state machine
-	coin_sensor.sig_dime.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_D));
-	coin_sensor.sig_nickel.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_N));
+	coin_sensor.sig_dime.connect([&sc](){sc.dispatch(&sc::state::event_D);});
+	coin_sensor.sig_nickel.connect([&sc](){sc.dispatch(&sc::state::event_N);});
 
 	// connect keypad to state machine
-	keypad.sig_coke.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_coke));
-	keypad.sig_diet.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_diet));
-	keypad.sig_zero.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_zero));
-	keypad.sig_cancel.connect(std::bind(&sc::dispatch, &sc, &sc::state::event_cancel));
+	keypad.sig_coke.connect([&sc](){sc.dispatch(&sc::state::event_coke);});
+	keypad.sig_diet.connect([&sc](){sc.dispatch(&sc::state::event_diet);});
+	keypad.sig_zero.connect([&sc](){sc.dispatch(&sc::state::event_zero);});
+	keypad.sig_cancel.connect([&sc](){sc.dispatch(&sc::state::event_cancel);});
 
 	// connect dispenser to state machine
 	m.sig_dispense_coke.connect(std::bind(&dispenser::coke, &dispenser));

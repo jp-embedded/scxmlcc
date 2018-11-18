@@ -479,6 +479,69 @@ scxml_parser::state_list cpp_output::states(const std::string &type)
 	return found_states;
 }
 
+std::set<std::string> cpp_output::get_event_names() const
+{
+	// collect events
+	using namespace boost::algorithm;
+
+	const scxml_parser::state_list &states = sc.sc().states;
+	std::vector<string> events;
+
+	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
+
+		// Final state events
+		if (i_state->get()->type && *i_state->get()->type == "final") {
+			if (!i_state->get()->parent) continue;
+			string event = "done.state." + i_state->get()->parent->id;
+			events.push_back(event);
+		}
+
+		// If parallel have a final child, the parallel state must have a done event also
+		if (sc.using_final && sc.using_parallel && i_state->get()->type && *i_state->get()->type == "parallel") {
+			string event = "done.state." + i_state->get()->id;
+			events.push_back(event);
+		}
+
+		// Transition events
+		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
+			for(scxml_parser::slist::const_iterator i_event = i_trans->get()->event.begin(); i_event != i_trans->get()->event.end(); ++i_event) {
+				events.push_back(*i_event);
+			}
+		}
+
+		// Raise events
+		scxml_parser::plist<scxml_parser::action> actions;
+		copy(i_state->get()->entry_actions.begin(), i_state->get()->entry_actions.end(), back_inserter(actions));
+		copy(i_state->get()->exit_actions.begin(), i_state->get()->exit_actions.end(), back_inserter(actions));
+		copy(i_state->get()->initial.actions.begin(), i_state->get()->initial.actions.end(), back_inserter(actions));
+		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
+			copy(i_trans->get()->actions.begin(), i_trans->get()->actions.end(), back_inserter(actions));
+		}
+		for (scxml_parser::plist<scxml_parser::action>::const_iterator i = actions.begin(); i != actions.end(); ++i) {
+			scxml_parser::action &a = *i->get();
+			if (a.type == "raise") {
+				events.push_back(a.attr["event"]);
+			}
+		}
+
+	}
+
+	// pass through set, to filter out duplicates
+	set<string> event_set;
+	for (vector<string>::const_iterator i_event = events.begin(); i_event != events.end(); ++ i_event) {
+		// loop through event tokens
+		scxml_parser::slist tokens;
+		split(tokens, *i_event, is_any_of("."), token_compress_on);
+		string event;
+		for (scxml_parser::slist::const_iterator i_token = tokens.begin(); i_token != tokens.end(); ++i_token) {
+			if (event.size()) event += '.';
+			event += *i_token;
+			event_set.insert(event);
+		}
+	}
+	return event_set;
+}
+
 void cpp_output::gen_model_base_finals()
 {
 	if (!(sc.using_final && sc.using_parallel)) return;
@@ -559,10 +622,6 @@ void cpp_output::gen_model_base()
 
 void cpp_output::gen_state_base()
 {
-	using namespace boost::algorithm;
-
-	const scxml_parser::state_list &states = sc.sc().states;
-
 	// state actions class
 	out << tab << "class " << state_t() << endl;
 	out << tab << "{" << endl;
@@ -585,61 +644,12 @@ void cpp_output::gen_state_base()
 	// ev_a_b    call ev_a
 	// ev_a_b_c  call ev_a_b
 
-	// collect events
-	vector<string> events;
-	for (scxml_parser::state_list::const_iterator i_state = states.begin(); i_state != states.end(); ++i_state) {
-
-		// Final state events
-		if (i_state->get()->type && *i_state->get()->type == "final") {
-			if (!i_state->get()->parent) continue;
-			string event = "done.state." + i_state->get()->parent->id;
-			events.push_back(event);
-		}
-
-		// If parallel have a final child, the parallel state must have a done event also
-		if (sc.using_final && sc.using_parallel && i_state->get()->type && *i_state->get()->type == "parallel") {
-			string event = "done.state." + i_state->get()->id;
-			events.push_back(event);
-		}
-
-		// Transition events
-		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
-			for(scxml_parser::slist::const_iterator i_event = i_trans->get()->event.begin(); i_event != i_trans->get()->event.end(); ++i_event) {
-				events.push_back(*i_event);
-			}
-		}
-
-		// Raise events
-		scxml_parser::plist<scxml_parser::action> actions;
-		copy(i_state->get()->entry_actions.begin(), i_state->get()->entry_actions.end(), back_inserter(actions));
-		copy(i_state->get()->exit_actions.begin(), i_state->get()->exit_actions.end(), back_inserter(actions));
-		copy(i_state->get()->initial.actions.begin(), i_state->get()->initial.actions.end(), back_inserter(actions));
-		for (scxml_parser::transition_list::const_iterator i_trans = i_state->get()->transitions.begin(); i_trans != i_state->get()->transitions.end(); ++i_trans) {
-			copy(i_trans->get()->actions.begin(), i_trans->get()->actions.end(), back_inserter(actions));
-		}
-		for (scxml_parser::plist<scxml_parser::action>::const_iterator i = actions.begin(); i != actions.end(); ++i) {
-			scxml_parser::action &a = *i->get();
-			if (a.type == "raise") {
-				events.push_back(a.attr["event"]);
-			}
-		}
-	}
-
-	// pass through set, to filter out dublicates
 	bool use_base_event = false;
-	set<string> event_set;
-	for (vector<string>::const_iterator i_event = events.begin(); i_event != events.end(); ++ i_event) {
-		if (*i_event == "*") {
+	auto event_set =  get_event_names();
+
+	for(auto evName : event_set) {
+		if(evName == "*"){
 			use_base_event = true;
-		}
-		// loop through event tokens 
-		scxml_parser::slist tokens;
-		split(tokens, *i_event, is_any_of("."), token_compress_on);
-		string event;
-		for (scxml_parser::slist::const_iterator i_token = tokens.begin(); i_token != tokens.end(); ++i_token) {
-			if (event.size()) event += '.';
-			event += *i_token;
-			event_set.insert(event);
 		}
 	}
 
@@ -714,6 +724,12 @@ void cpp_output::gen_state_base()
 	if (sc.using_parallel) out << tab << "typedef " << retp << " (" << state_t() << "::*event)(" << classname() << "&, state::eval_list&);" << endl;
 	else out << tab << "typedef " << retp << " (" << state_t() << "::*event)(" << classname() << "&);" << endl;
 	out << endl;
+	if(opt.string_events) {
+		out << tab << "std::unordered_map<std::string, event> event_map;" << endl;
+    if(opt.thread_safe) {
+      out << tab << "mutable std::mutex event_map_mutex;" << endl;
+    }
+	}
 }
 
 scxml_parser::state_list cpp_output::children(const scxml_parser::state &state)
@@ -933,6 +949,59 @@ void cpp_output::gen_sc()
 	out << tab << tab << tab << "else break;" << endl;
 	out << tab << tab << "}" << endl;
 	out << tab << "}" << endl;
+	// dispatch by name
+	if(opt.string_events) {
+		out << tab << "public: void dispatch(const std::string& ev_name)" << endl;
+		out << tab << "{" << endl;
+		if(opt.thread_safe) {
+			out << tab << tab << "event_map_mutex.lock();" << endl;
+		}
+		out << tab << tab << "auto event_it = event_map.find(ev_name);" << endl;
+		out << tab << tab << "if(event_it != event_map.end()) {" << endl;
+		if(opt.thread_safe) {
+			out << tab << tab << tab << "event_map_mutex.unlock();" << endl;
+		}
+		out << tab << tab << tab << "dispatch(event_it->second);" << endl;
+		out << tab << tab << tab << "return;" << endl;
+		out << tab << tab << '}' << endl;
+		if(opt.thread_safe) {
+			out << tab << tab << "event_map_mutex.unlock();" << endl;
+		}
+		out << tab << tab << "std::string name(ev_name);" << endl;
+		out << tab << tab << "do {" << endl;
+		out << tab << tab << tab << "// name not found -> remove the last part and try again" << endl;
+		out << tab << tab << tab << "auto last_dot = name.rfind('.');" << endl;
+		out << tab << tab << tab << "if(last_dot == std::string::npos) break;" << endl;
+		out << tab << tab << tab << "name.erase(last_dot);" << endl;
+		if(opt.thread_safe) {
+			out << tab << tab << tab << "event_map_mutex.lock();" << endl;
+		}
+		out << tab << tab << tab << "event_it = event_map.find(name);" << endl;
+		out << tab << tab << tab << "if(event_it != event_map.end()) {" << endl;
+		out << tab << tab << tab << tab << "auto ev = event_it->second;" << endl;
+		out << tab << tab << tab << tab << "event_map[ev_name] = ev; // cache the event name" << endl;
+		if(opt.thread_safe) {
+			out << tab << tab << tab << tab << "event_map_mutex.unlock();" << endl;
+		}
+		out << tab << tab << tab << tab << "dispatch(ev);" << endl;
+		out << tab << tab << tab << tab << "return;" << endl;
+		out << tab << tab << tab << '}' << endl;
+		if(opt.thread_safe) {
+			out << tab << tab << tab << "event_map_mutex.unlock();" << endl;
+		}
+		out << tab << tab << "} while (! name.empty());" << endl;
+		out << tab << tab << "// signal name not found or empty" << endl;
+		if(opt.thread_safe) {
+			out << tab << tab << "event_map_mutex.lock();" << endl;
+		}
+		out << tab << tab << "event_map[ev_name] = &state::unconditional; // cache the event name" << endl;
+		if(opt.thread_safe) {
+			out << tab << tab << "event_map_mutex.unlock();" << endl;
+		}
+		out << tab << tab << "dispatch(&state::unconditional);" << endl;
+		out << tab << "}" << endl;
+	}
+
 	if (opt.thread_safe) {
 		out << tab << "void dispatch_loop()" << endl;
 		out << tab << "{" << endl;
@@ -946,8 +1015,21 @@ void cpp_output::gen_sc()
 	gen_model_base();
 
 	// constructor
+	auto event_names = get_event_names();
+
 	out << tab << classname() << "(user_model *user = 0)";
-	if(!sc.using_parallel) out << " : cur_state(new_state<scxml>())";
+	if(opt.string_events && ! event_names.empty()) {
+		out << "\n" << tab << ": ";
+		if(!sc.using_parallel) out << "cur_state(new_state<scxml>())\n" << tab << ", ";
+		out << "event_map{";
+		const char* delim("");
+		for(auto ev_name : event_names) {
+			out << delim << "{\"" << ev_name << "\", &" << classname() << "::state::" << event_name(ev_name) << "}";
+			delim = ", ";
+		}
+		out << "}"; 
+	}
+	else if(!sc.using_parallel) out << " : cur_state(new_state<scxml>())";
 	out << endl;
 
 	out << tab << "{" << endl;
@@ -1211,6 +1293,10 @@ void cpp_output::gen()
 		cerr << "error: The threadsafe option is not currenty supported with bare metal C++" << endl;
 		exit(1);
 	}
+	if (opt.bare_metal && opt.string_events) {
+		cerr << "error: String events are not supported with bare metal C++" << endl;
+		exit(1);
+	}
 
 	// include guard
 	out << "// This file is automatically generated by scxmlcc (version " << version() << ")" << endl;
@@ -1225,10 +1311,17 @@ void cpp_output::gen()
 	if(!opt.bare_metal) {
 		out << "#include <deque>" << endl;
 		out << "#include <vector>" << endl;
+		out << "#include <string>" << endl;
 	}
 	if(opt.thread_safe) {
 		out << "#include <condition_variable>" << endl;
 		out << "#include <optional>" << endl;
+	}
+	if(opt.string_events) {
+		out << "#include <unordered_map>" << endl;
+    if(opt.thread_safe) {
+      out << "#include <mutex>" << endl;
+    }
 	}
 	if(sc.using_log || opt.debug) {
 		out << "#include <iostream>" << endl;

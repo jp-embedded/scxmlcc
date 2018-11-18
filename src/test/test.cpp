@@ -21,6 +21,7 @@
 #include "issue_69.h"
 #include "issue_72.h"
 #include "eventless.h"
+#include "stringevents.h"
 
 #include <gtest/gtest.h>
 #include <thread>
