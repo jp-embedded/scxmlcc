@@ -360,7 +360,7 @@ $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">scxmlcc %(FullPath)</Message>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
     </CustomBuild>
-     <CustomBuild Include="..\..\test\stringevents.h.scxml">
+     <CustomBuild Include="..\..\test\stringevents.scxml">
       <SubType>Designer</SubType>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)scxmlcc.exe --stringevents %(RelativeDir)%(Filename)%(Extension)</Command>
