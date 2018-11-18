@@ -28,6 +28,7 @@ struct options
 	bool debug = false;
 	bool bare_metal = false;
 	bool thread_safe = false;
+	bool string_events = false;
 	std::string ns = "";
 };
 

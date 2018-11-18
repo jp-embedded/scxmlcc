@@ -23,6 +23,7 @@
 #include "issue_69_t.h"
 #include "issue_72_t.h"
 #include "eventless_t.h"
+#include "stringevents_t.h"
 
 #include <gtest/gtest.h>
 #include <thread>

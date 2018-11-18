@@ -65,7 +65,7 @@ void scxml_parser::parse_scxml(const ptree &pt)
 			}
 		}
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -105,7 +105,7 @@ void scxml_parser::parse_parallel(const ptree &pt, const boost::shared_ptr<state
 			parent->initial.target.push_back(st->id);
 		}
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -129,7 +129,7 @@ boost::shared_ptr<scxml_parser::data> scxml_parser::parse_data(const ptree &pt)
 		}
 
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -149,7 +149,7 @@ scxml_parser::data_list scxml_parser::parse_datamodel(const ptree &pt)
 		}
 
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -171,7 +171,7 @@ scxml_parser::transition scxml_parser::parse_initial(const ptree &pt)
 		}
 
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -216,7 +216,7 @@ void scxml_parser::parse_state(const ptree &pt, const boost::shared_ptr<state> &
 			parent->initial.target.push_back(st->id);
 		}
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -251,7 +251,7 @@ void scxml_parser::parse_final(const ptree &pt, const boost::shared_ptr<state> &
 			parent->initial.target.push_back(st->id);
 		}
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -271,7 +271,7 @@ scxml_parser::plist<scxml_parser::action> scxml_parser::parse_entry(const ptree 
 			else cerr << "warning: unknown item '" << it->first << "' in <onentry> or <onexit>" << endl;
 		}
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -296,7 +296,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_raise(const ptree &p
 			else cerr << "warning: unknown item '" << it->first << "' in <raise>" << endl;
 		}
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -325,7 +325,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_log(const ptree &pt)
 			else cerr << "warning: unknown item '" << it->first << "' in <log>" << endl;
 		}
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -354,7 +354,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_assign(const ptree &
 			else cerr << "warning: unknown item '" << it->first << "' in <assign>" << endl;
 		}
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -376,7 +376,7 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_script(const ptree &
 			else cerr << "warning: unknown item '" << it->first << "' in <script>" << endl;
 		}
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}
@@ -410,7 +410,7 @@ boost::shared_ptr<scxml_parser::transition> scxml_parser::parse_transition(const
 			else cerr << "warning: unknown item '" << it->first << "' in <transition>" << endl;
 		}
 	}
-	catch (ptree_error e) {
+	catch (ptree_error &e) {
 		cerr << "error: " << __FUNCTION__ << ": " << e.what() << endl;
 		exit(1);
 	}

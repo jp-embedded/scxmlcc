@@ -80,5 +80,8 @@
     <CustomBuild Include="..\..\test\eventless.scxml">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\test\stringevents.scxml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
