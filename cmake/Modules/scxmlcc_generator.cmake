@@ -21,7 +21,7 @@ function (scxmlcc_generator filename gen-list )
    
    add_custom_command(
         OUTPUT ${output}
-        COMMAND ${SCC} -i ${filename}  -o ${output} 
+        COMMAND ${SCC} --stringevents -i ${filename}  -o ${output} 
         DEPENDS ${filename}
    )
 

@@ -396,6 +396,7 @@ TEST(eventless, 0)
 	EXPECT_EQ(typeid(sc_eventless::state_State_3), typeid(*sc.cur_state));
 }
 
+#ifndef _WIN32 // todo: this does not compile on current version of visual studio
 TEST(stringevents, 0)
 {
 	sc_stringevents sc;
@@ -409,6 +410,6 @@ TEST(stringevents, 0)
 	sc.dispatch("ev2.1");
 	EXPECT_EQ(typeid(sc_stringevents::state_State_3), typeid(*sc.cur_state));
 }
-
 #endif
 
+#endif
