@@ -567,9 +567,15 @@ void cpp_output::gen_model_base()
 	if (!opt.bare_metal && !opt.thread_safe) out << tab << tab << "std::deque<event> event_queue;" << endl;
 	if(sc.using_parallel) {
 		out << tab << tab << state_t() << "::state_list cur_state;" << endl;
+		out << tab << tab << "template <class S> bool In()" << endl;
+		out << tab << tab << "{" << endl;
+		out << tab << tab << tab << "for (state::state_list::const_iterator i = cur_state.begin(); i != cur_state.end(); ++i) if (typeid(**i) == typeid(S)) return true;" << endl;
+		out << tab << tab << tab << "return false;" << endl;
+		out << tab << tab << "}" << endl;
 	}
 	else {
 		out << tab << tab << state_t() << " *cur_state;" << endl;
+		out << tab << tab << "template <class S> bool In() { return typeid(*cur_state) == typeid(S); }" << endl;
 	}
 	out << tab << tab << "user_model *user;" << endl;
 	if (opt.debug) out << tab << tab << "bool debug = true;" << endl;
