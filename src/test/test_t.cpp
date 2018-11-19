@@ -23,7 +23,10 @@
 #include "issue_69_t.h"
 #include "issue_72_t.h"
 #include "eventless_t.h"
+
+#ifndef _WIN32 // todo: this does not compile on current version of visual studio
 #include "stringevents_t.h"
+#endif
 
 #include <gtest/gtest.h>
 #include <thread>
