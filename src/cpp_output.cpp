@@ -443,6 +443,8 @@ void cpp_output::gen_model_base_data()
 	const scxml_parser::data_list &datamodel = sc.sc().datamodel;
 
 	if(!opt.bare_metal)  {
+		out << tab << tab << "const std::string _sessionid;\n";
+		constructs.push_back(make_pair("_sessionid", "std::to_string(reinterpret_cast<long long unsigned int>(this))"));
 		out << tab << tab << "const std::string _name;\n";
 		constructs.push_back(make_pair("_name", "\"" + sc.sc().name + "\""));
 	}
