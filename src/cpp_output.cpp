@@ -441,6 +441,11 @@ void cpp_output::gen_model_base_data()
 	pair_vect constructs;
 	using namespace boost::algorithm;
 	const scxml_parser::data_list &datamodel = sc.sc().datamodel;
+
+	if(!opt.bare_metal)  {
+		out << tab << tab << "const std::string _name;\n";
+		constructs.push_back(make_pair("_name", "\"" + sc.sc().name + "\""));
+	}
 	for (scxml_parser::data_list::const_iterator i_data = datamodel.begin(); i_data != datamodel.end(); ++i_data) {
 		string id = i_data->get()->id;
 		const boost::optional<string> expr_opt = i_data->get()->expr;
