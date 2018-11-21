@@ -1130,6 +1130,24 @@ void cpp_output::gen_action_part(scxml_parser::action &a)
 	}
 }
 
+void cpp_output::gen_condition_part_In(string cond)
+{
+	// convert 'In' to C++ syntax
+	string s;
+	size_t n;
+        s = "('", n = 0; 
+	while ((n = cond.find(s, n)) != std::string::npos) cond.replace(n, s.size(), "<state_");
+	s = "')", n = 0; 
+	while ((n = cond.find(s, n)) != std::string::npos) cond.replace(n, s.size(), ">()");
+	out << tab << tab << "return " << cond << ';' << endl;
+}
+
+void cpp_output::gen_condition_part(string cond)
+{
+	if (cond.find("In(") == 0) gen_condition_part_In(cond);
+	else out << tab << tab << "return " << cond << ';' << endl;
+}
+
 void cpp_output::gen_with_begin(bool cond)
 {
 	string ret = "void";
@@ -1226,7 +1244,7 @@ void cpp_output::gen_actions()
 				out << ">::condition(" << classname() << "::data_model &m)" << endl;
 				out << '{' << endl;
 				gen_with_begin(true);
-				out << tab << tab << "return " << *itrans->get()->condition << ';' << endl;
+				gen_condition_part(*itrans->get()->condition);
 				gen_with_end(true);
 				out << '}' << endl;
 				out << endl;
