@@ -8,6 +8,7 @@ set(S ${CMAKE_CURRENT_SOURCE_DIR} )
 scxmlcc_generator( ${S}/hello_world.scxml hello_gen_src )
 scxmlcc_generator( ${S}/timer_switch.scxml timer_gen_src )
 scxmlcc_generator( ${S}/microwave-01-cplusplus.scxml microwave_gen_src )
+scxmlcc_generator( ${S}/microwave-02-cplusplus.scxml microwave_gen_src )
 scxmlcc_generator( ${S}/vending_machine/vending_machine.scxml vending_gen_src )
 
 set (CMAKE_CXX_STANDARD 11)
@@ -22,8 +23,13 @@ add_executable( timer_switch
     ${timer_gen_src}
     )
 
-add_executable( microwave
-    microwave.cpp
+add_executable( microwave-01
+    microwave-01.cpp
+    ${microwave_gen_src}
+    )
+
+add_executable( microwave-02
+    microwave-02.cpp
     ${microwave_gen_src}
     )
 

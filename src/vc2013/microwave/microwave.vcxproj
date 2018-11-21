@@ -64,7 +64,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\examples\microwave.cpp" />
+    <ClCompile Include="..\..\examples\microwave-01.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\examples\microwave-01-cplusplus.scxml">
