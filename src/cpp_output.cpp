@@ -414,7 +414,7 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << tab << "void exit_parallel(" << classname() << " &sc, C *s, state *d)" << endl;
 		out << tab << tab << '{' << endl;
 		out << tab << tab << tab << "// parallel state exited from C or child" << endl;
-		out << tab << tab << tab << "for(" << classname() << "::" << state_t() << "::" << ret << "::iterator i = sc.cur_state.begin(); (i != sc.cur_state.end()) && *i; ++i) {" << endl;
+		out << tab << tab << tab << "for(" << classname() << "::" << state_t() << "::" << ret << "::iterator i = sc.model.cur_state.begin(); (i != sc.model.cur_state.end()) && *i; ++i) {" << endl;
 		out << tab << tab << tab << tab << "if(typeid(*this) == typeid(**i)) continue;" << endl;
 		out << tab << tab << tab << tab << "if(!(*i)->parallel_parent(typeid(C))) continue;" << endl;
 		out << tab << tab << tab << tab << "(*i)->exit_to_src(sc.model, typeid(C));" << endl;
@@ -572,6 +572,18 @@ void cpp_output::gen_model_base()
 	out << tab << "struct data_model" << endl;
 	out << tab << "{" << endl;
 	if (!opt.bare_metal && !opt.thread_safe) out << tab << tab << "std::deque<event> event_queue;" << endl;
+	if(sc.using_parallel) {
+		out << tab << tab << state_t() << "::state_list cur_state;" << endl;
+		out << tab << tab << "template <class S> bool In()" << endl;
+		out << tab << tab << "{" << endl;
+		out << tab << tab << tab << "for (state::state_list::const_iterator i = cur_state.begin(); i != cur_state.end(); ++i) if (typeid(**i) == typeid(S)) return true;" << endl;
+		out << tab << tab << tab << "return false;" << endl;
+		out << tab << tab << "}" << endl;
+	}
+	else {
+		out << tab << tab << state_t() << " *cur_state;" << endl;
+		out << tab << tab << "template <class S> bool In() { return typeid(*cur_state) == typeid(S); }" << endl;
+	}
 	out << tab << tab << "user_model *user;" << endl;
 	if (opt.debug) out << tab << tab << "bool debug = true;" << endl;
 	gen_model_base_data();
@@ -722,12 +734,6 @@ void cpp_output::gen_state_base()
 	out << tab << "};" << endl;
 	out << endl;
 
-	if(sc.using_parallel) {
-		out << tab << state_t() << "::state_list cur_state;" << endl;
-	}
-	else {
-		out << tab << state_t() << " *cur_state;" << endl;
-	}
 	if (sc.using_parallel) out << tab << "typedef " << retp << " (" << state_t() << "::*event)(" << classname() << "&, state::eval_list&);" << endl;
 	else out << tab << "typedef " << retp << " (" << state_t() << "::*event)(" << classname() << "&);" << endl;
 	out << endl;
@@ -921,16 +927,16 @@ void cpp_output::gen_sc()
 
 		out << tab << tab << "bool cont = false;" << endl;
 		out << tab << tab << "state::eval_list eval_info;" << endl;
-		out << tab << tab << "for(state::state_list::iterator i_cur = cur_state.begin(); i_cur != cur_state.end();) if(*i_cur) {" << endl;
+		out << tab << tab << "for(state::state_list::iterator i_cur = model.cur_state.begin(); i_cur != model.cur_state.end();) if(*i_cur) {" << endl;
 		out << tab << tab << tab << "if (state::state_list r = ((*i_cur)->*e)(*this, eval_info)) {" << endl;
 		out << tab << tab << tab << tab << "cont = true;" << endl;
 		out << tab << tab << tab << tab << "std::vector<state*>::const_iterator i_new = r.begin();" << endl;
 		out << tab << tab << tab << tab << "*i_cur = *i_new++;" << endl;
-		out << tab << tab << tab << tab << "for(; i_new != r.end(); ++i_new) i_cur = cur_state.insert(++i_cur, *i_new);" << endl;
+		out << tab << tab << tab << tab << "for(; i_new != r.end(); ++i_new) i_cur = model.cur_state.insert(++i_cur, *i_new);" << endl;
 		out << tab << tab << tab << '}' << endl;
 		out << tab << tab << tab << "++i_cur;" << endl;
 		out << tab << tab << '}' << endl;
-		out << tab << tab << "else i_cur = cur_state.erase(i_cur);" << endl;
+		out << tab << tab << "else i_cur = model.cur_state.erase(i_cur);" << endl;
 		out << tab << tab << "return cont;" << endl;
 		out << tab << '}' << endl;
 	}
@@ -938,7 +944,7 @@ void cpp_output::gen_sc()
 		out << tab << "private: bool dispatch_event(event e)" << endl;
 		out << tab << '{' << endl;
 		out << tab << tab << "state *next_state;" << endl;
-		out << tab << tab << "if ((next_state = (cur_state->*e)(*this))) cur_state = next_state;" << endl;
+		out << tab << tab << "if ((next_state = (model.cur_state->*e)(*this))) model.cur_state = next_state;" << endl;
 		out << tab << tab << "return !!next_state;" << endl;
 		out << tab << '}' << endl;
 	}
@@ -1027,7 +1033,6 @@ void cpp_output::gen_sc()
 	out << tab << classname() << "(user_model *user = 0)";
 	if(opt.string_events && ! event_names.empty()) {
 		out << "\n" << tab << ": ";
-		if(!sc.using_parallel) out << "cur_state(new_state<scxml>())\n" << tab << ", ";
 		out << "event_map{";
 		const char* delim("");
 		for(auto ev_name : event_names) {
@@ -1036,11 +1041,11 @@ void cpp_output::gen_sc()
 		}
 		out << "}"; 
 	}
-	else if(!sc.using_parallel) out << " : cur_state(new_state<scxml>())";
 	out << endl;
 
 	out << tab << "{" << endl;
-	if(sc.using_parallel) out << tab << tab << "cur_state.push_back(new_state<scxml>());" << endl;
+	if(sc.using_parallel) out << tab << tab << "model.cur_state.push_back(new_state<scxml>());" << endl;
+	else out << tab << tab << "model.cur_state = new_state<scxml>();" << endl;
 	out << tab << tab << "model.user = user;" << endl;
 	out << tab << "}" << endl;
 
@@ -1130,6 +1135,24 @@ void cpp_output::gen_action_part(scxml_parser::action &a)
 		out << tab << tab << "// warning: unknown action type '" << a.type << "'" << endl;
 		cerr << "warning: unknown action type '" << a.type << "'" << endl;
 	}
+}
+
+void cpp_output::gen_condition_part_In(string cond)
+{
+	// convert 'In' to C++ syntax
+	string s;
+	size_t n;
+        s = "('", n = 0; 
+	while ((n = cond.find(s, n)) != std::string::npos) cond.replace(n, s.size(), "<state_");
+	s = "')", n = 0; 
+	while ((n = cond.find(s, n)) != std::string::npos) cond.replace(n, s.size(), ">()");
+	out << tab << tab << "return " << cond << ';' << endl;
+}
+
+void cpp_output::gen_condition_part(string cond)
+{
+	if (cond.find("In(") == 0) gen_condition_part_In(cond);
+	else out << tab << tab << "return " << cond << ';' << endl;
 }
 
 void cpp_output::gen_with_begin(bool cond)
@@ -1228,7 +1251,7 @@ void cpp_output::gen_actions()
 				out << ">::condition(" << classname() << "::data_model &m)" << endl;
 				out << '{' << endl;
 				gen_with_begin(true);
-				out << tab << tab << "return " << *itrans->get()->condition << ';' << endl;
+				gen_condition_part(*itrans->get()->condition);
 				gen_with_end(true);
 				out << '}' << endl;
 				out << endl;

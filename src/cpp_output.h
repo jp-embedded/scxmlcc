@@ -61,6 +61,8 @@ class cpp_output {
 	void gen_action_part_assign(scxml_parser::action &a);
 	void gen_action_part_script(scxml_parser::action &a);
 	void gen_action_part(scxml_parser::action &a);
+	void gen_condition_part(std::string cond);
+	void gen_condition_part_In(std::string cond);
 	void gen_actions();
 	void gen_sc();
 	void trim();

@@ -6,8 +6,8 @@
 TEST(w3c, 144)
 {
 	sc_test144 sc;
-    sc.init();
-    EXPECT_EQ(typeid(sc_test144::state_pass), typeid(*sc.cur_state));
+	sc.init();
+	EXPECT_TRUE(sc.model.In<sc_test144::state_pass>());
 }
 
 // test that default initial state is first in document order.  If we enter s0 first we succeed, if s1, failure.
@@ -15,7 +15,7 @@ TEST(w3c, 355)
 {
 	sc_test355 sc;
         sc.init();
-	EXPECT_EQ(typeid(sc_test355::state_pass), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_test355::state_pass>());
 }
 
 // test that default initial states are entered when a compound state is entered.  First we test
@@ -25,8 +25,8 @@ TEST(w3c, 364)
 {
     sc_test364 sc;
     sc.init();
-	EXPECT_EQ(1, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_test364::state_pass), typeid(*sc.cur_state.front()));
+	EXPECT_EQ(1, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_test364::state_pass>());
 }
 
 // test that entering a final state generates done.state.parentid after executing the onentry elements.  
@@ -35,7 +35,7 @@ TEST(w3c, 372)
 {
 	sc_test372 sc;
         sc.init();
-	EXPECT_EQ(typeid(sc_test372::state_pass), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_test372::state_pass>());
 }
 
 // test that onentry handlers are executed in document order.  event1 should be raised before event2
@@ -43,7 +43,7 @@ TEST(w3c, 375)
 {
 	sc_test375 sc;
         sc.init();
-	EXPECT_EQ(typeid(sc_test375::state_pass), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_test375::state_pass>());
 }
 
 // test that each onentry handler is a separate block.The <send> of event1 will cause an error but
@@ -52,26 +52,26 @@ TEST(w3c, 375)
 // todo: supporting <send> correctly requires implementing an event I/O processor
 TEST(w3c, 376)
 {
-  sc_test376 sc;
-  sc.init();
-  EXPECT_EQ(typeid(sc_test376::state_pass), typeid(*sc.cur_state));
+	sc_test376 sc;
+	sc.init();
+	EXPECT_TRUE(sc.model.In<sc_test376::state_pass>());
 }
 
 // test that onexit handlers are executed in document order.  event1 should be raised before event2
 TEST(w3c, 377)
 {
-  sc_test377 sc;
-  sc.init();
-  EXPECT_EQ(typeid(sc_test377::state_pass), typeid(*sc.cur_state));
+	sc_test377 sc;
+	sc.init();
+	EXPECT_TRUE(sc.model.In<sc_test377::state_pass>());
 }
 
 // test that each onexithandler is a separate block. The <send> of event1 will cause an error but
 // the increment to var1 should happen anyways
 TEST(w3c, 378)
 {
-  sc_test378 sc;
-  sc.init();
-  EXPECT_EQ(typeid(sc_test378::state_pass), typeid(*sc.cur_state));
+	sc_test378 sc;
+	sc.init();
+	EXPECT_TRUE(sc.model.In<sc_test378::state_pass>());
 }
 
 // test that executable content in the <initial> transition executes after the onentry handler on the state
@@ -79,17 +79,17 @@ TEST(w3c, 378)
 TEST(w3c, 412)
 {
 	sc_test412 sc;
-    sc.init();
-    EXPECT_EQ(typeid(sc_test412::state_pass), typeid(*sc.cur_state));
+	sc.init();
+	EXPECT_TRUE(sc.model.In<sc_test412::state_pass>());
 }
 
 // if [a transition's] 'type' is "external", its exit set consists of all active states that are proper descendents of the Least Common Compound Ancestor (LCCA) of the source and target states.
 TEST(w3c, 504)
 {
-    sc_test504 sc;
-    sc.init();
-	EXPECT_EQ(1, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_test504::state_pass), typeid(*sc.cur_state.front()));
+	sc_test504 sc;
+	sc.init();
+	EXPECT_EQ(1, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_test504::state_pass>());
 }
 
 // Otherwise, if the transition has 'type' "internal", its source state is a compound state and all its target states are proper descendents of its source state, the target set consists of all active states that are proper descendents of its source state.
@@ -97,7 +97,7 @@ TEST(w3c, 505)
 {
 	sc_test505 sc;
 	sc.init();
-	EXPECT_EQ(typeid(sc_test505::state_pass), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_test505::state_pass>());
 }
 
 // If a transition has 'type' of "internal", but its source state is not a compound state or its target states are not all proper descendents of its source state, its exit set is defined as if it had 'type' of "external".
@@ -105,26 +105,26 @@ TEST(w3c, 506)
 {
 	sc_test506 sc;
 	sc.init();
-	EXPECT_EQ(typeid(sc_test506::state_pass), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_test506::state_pass>());
 	// todo s2 does not exit twice
 }
 
 // If a transition has 'type' of "internal", but its source state is not a compound state, its exit set is defined as if it had 'type' of "external".
 TEST(w3c, 533)
 {
-    sc_test533 sc;
-    sc.init();
-	EXPECT_EQ(1, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_test533::state_pass), typeid(*sc.cur_state.front()));
+	sc_test533 sc;
+	sc.init();
+	EXPECT_EQ(1, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_test533::state_pass>());
 }
 
 // test that we generate done.state.id when all a parallel state's children are in final states
 TEST(w3c, 570)
 {
-    sc_test570 sc;
-    sc.init();
-	EXPECT_EQ(1, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_test570::state_pass), typeid(*sc.cur_state.front()));
+	sc_test570 sc;
+	sc.init();
+	EXPECT_EQ(1, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_test570::state_pass>());
 }
 
 // test that the 'initial' value of scxml is respected.  We set the value to deeply nested non-default parallel siblings and
@@ -133,35 +133,35 @@ TEST(w3c, 576)
 {
 	sc_test576 sc;
         sc.init();
-	EXPECT_EQ(1, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_test576::state_pass), typeid(*sc.cur_state.front()));
+	EXPECT_EQ(1, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_test576::state_pass>());
 }
 
 TEST(event_list, event_a)
 {
 	sc_event_list sc;
 	sc.init();
-	EXPECT_EQ(typeid(sc_event_list::state_init), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_list::state_init>());
 	sc.dispatch(&sc_event_list::state::event_a);
-	EXPECT_EQ(typeid(sc_event_list::state_pass), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_list::state_pass>());
 }
 
 TEST(event_list, event_b)
 {
 	sc_event_list sc;
 	sc.init();
-	EXPECT_EQ(typeid(sc_event_list::state_init), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_list::state_init>());
 	sc.dispatch(&sc_event_list::state::event_b);
-	EXPECT_EQ(typeid(sc_event_list::state_pass), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_list::state_pass>());
 }
 
 TEST(event_list, event_c)
 {
 	sc_event_list sc;
 	sc.init();
-	EXPECT_EQ(typeid(sc_event_list::state_init), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_list::state_init>());
 	sc.dispatch(&sc_event_list::state::event_c);
-	EXPECT_EQ(typeid(sc_event_list::state_pass), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_list::state_pass>());
 }
 
 // test transitions through state a -> b -> c
@@ -169,46 +169,46 @@ TEST(event_tokens, 0)
 {
         sc_event_tokens sc;
         sc.init();
-        EXPECT_EQ(typeid(sc_event_tokens::state_init), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_init>());
         sc.dispatch(&sc_event_tokens::state::event_but_a);
-        EXPECT_EQ(typeid(sc_event_tokens::state_a), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_a>());
         sc.dispatch(&sc_event_tokens::state::event_but_b);
-        EXPECT_EQ(typeid(sc_event_tokens::state_b), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_b>());
         sc.dispatch(&sc_event_tokens::state::event_but_c);
-        EXPECT_EQ(typeid(sc_event_tokens::state_c), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_c>());
 }
 
 TEST(event_tokens, 1)
 {
         sc_event_tokens sc;
         sc.init();
-        EXPECT_EQ(typeid(sc_event_tokens::state_init), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_init>());
         sc.dispatch(&sc_event_tokens::state::event_but_a);
-        EXPECT_EQ(typeid(sc_event_tokens::state_a), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_a>());
         sc.dispatch(&sc_event_tokens::state::event_but);
-        EXPECT_EQ(typeid(sc_event_tokens::state_but), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_but>());
 }
 
 TEST(event_tokens, 2)
 {
         sc_event_tokens sc;
         sc.init();
-        EXPECT_EQ(typeid(sc_event_tokens::state_init), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_init>());
         sc.dispatch(&sc_event_tokens::state::event_but_a);
-        EXPECT_EQ(typeid(sc_event_tokens::state_a), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_a>());
         sc.dispatch(&sc_event_tokens::state::event_but_c);
-        EXPECT_EQ(typeid(sc_event_tokens::state_but), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_but>());
 }
 
 TEST(event_tokens, 3)
 {
         sc_event_tokens sc;
         sc.init();
-        EXPECT_EQ(typeid(sc_event_tokens::state_init), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_init>());
         sc.dispatch(&sc_event_tokens::state::event_but_a);
-        EXPECT_EQ(typeid(sc_event_tokens::state_a), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_a>());
         sc.dispatch(&sc_event_tokens::state::event_dummy0);
-        EXPECT_EQ(typeid(sc_event_tokens::state_default), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_event_tokens::state_default>());
 }
 
 struct sc_conditional::user_model
@@ -237,9 +237,9 @@ TEST(conditional, 0)
 	sc_conditional::user_model m;
 	sc_conditional sc(&m);
 	sc.init();
-	EXPECT_EQ(typeid(sc_conditional::state_ok0), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_ok0>());
 	sc.dispatch(&sc_conditional::state::event_a);
-	EXPECT_EQ(typeid(sc_conditional::state_ok0), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_ok0>());
 }
 
 TEST(conditional, 1)
@@ -247,10 +247,10 @@ TEST(conditional, 1)
 	sc_conditional::user_model m;
 	sc_conditional sc(&m);
 	sc.init();
-	EXPECT_EQ(typeid(sc_conditional::state_ok0), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_ok0>());
 	sc.model.user->e0 = true;
 	sc.dispatch(&sc_conditional::state::event_a);
-	EXPECT_EQ(typeid(sc_conditional::state_end0), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_end0>());
 }
 
 TEST(conditional, 2)
@@ -258,10 +258,10 @@ TEST(conditional, 2)
 	sc_conditional::user_model m;
 	sc_conditional sc(&m);
 	sc.init();
-	EXPECT_EQ(typeid(sc_conditional ::state_ok0), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_ok0>());
 	sc.model.user->e1 = true;
 	sc.dispatch(&sc_conditional::state::event_a);
-	EXPECT_EQ(typeid(sc_conditional::state_end1), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_end1>());
 }
 
 TEST(conditional, 3)
@@ -269,10 +269,10 @@ TEST(conditional, 3)
 	sc_conditional::user_model m;
 	sc_conditional sc(&m);
 	sc.init();
-	EXPECT_EQ(typeid(sc_conditional::state_ok0), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_ok0>());
 	sc.model.user->e2 = true;
 	sc.dispatch(&sc_conditional::state::event_a);
-	EXPECT_EQ(typeid(sc_conditional::state_end2), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_end2>());
 }
 
 TEST(conditional, 4)
@@ -280,12 +280,12 @@ TEST(conditional, 4)
 	sc_conditional::user_model m;
 	sc_conditional sc(&m);
 	sc.init();
-	EXPECT_EQ(typeid(sc_conditional::state_ok0), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_ok0>());
 	sc.model.user->e0 = true;
 	sc.model.user->e1 = true;
 	sc.model.user->e2 = true;
 	sc.dispatch(&sc_conditional::state::event_a);
-	EXPECT_EQ(typeid(sc_conditional::state_end1), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_end1>());
 }
 
 TEST(conditional, 5)
@@ -293,11 +293,11 @@ TEST(conditional, 5)
 	sc_conditional::user_model m;
 	sc_conditional sc(&m);
 	sc.init();
-	EXPECT_EQ(typeid(sc_conditional::state_ok0), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_ok0>());
 	sc.model.user->e0 = true;
 	sc.model.user->e2 = true;
 	sc.dispatch(&sc_conditional::state::event_a);
-	EXPECT_EQ(typeid(sc_conditional::state_end2), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_conditional::state_end2>());
 }
 
 struct sc_timer_switch::user_model 
@@ -325,23 +325,23 @@ TEST(timer_switch, 0)
 	sc_timer_switch::user_model m;
 	sc_timer_switch sc(&m);
 	sc.init();
-	EXPECT_EQ(typeid(sc_timer_switch::state_off), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_timer_switch::state_off>());
 	sc.dispatch(&sc_timer_switch::state::event_button);
-	EXPECT_EQ(typeid(sc_timer_switch::state_on), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_timer_switch::state_on>());
 	sc.dispatch(&sc_timer_switch::state::event_button);
-	EXPECT_EQ(typeid(sc_timer_switch::state_off), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_timer_switch::state_off>());
 	sc.dispatch(&sc_timer_switch::state::event_button);
-	EXPECT_EQ(typeid(sc_timer_switch::state_on), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_timer_switch::state_on>());
 	sc.dispatch(&sc_timer_switch::state::event_timer);
-	EXPECT_EQ(typeid(sc_timer_switch::state_on), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_timer_switch::state_on>());
 	sc.dispatch(&sc_timer_switch::state::event_timer);
-	EXPECT_EQ(typeid(sc_timer_switch::state_on), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_timer_switch::state_on>());
 	sc.dispatch(&sc_timer_switch::state::event_timer);
-	EXPECT_EQ(typeid(sc_timer_switch::state_on), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_timer_switch::state_on>());
 	sc.dispatch(&sc_timer_switch::state::event_timer);
-	EXPECT_EQ(typeid(sc_timer_switch::state_on), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_timer_switch::state_on>());
 	sc.dispatch(&sc_timer_switch::state::event_timer);
-	EXPECT_EQ(typeid(sc_timer_switch::state_off), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_timer_switch::state_off>());
 }
 
 // todo count enter/exit's
@@ -349,20 +349,20 @@ TEST(lcca_parallel, 0)
 {
 	sc_lcca_parallel sc;
 	sc.init();
-	EXPECT_EQ(3, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_B1), typeid(*sc.cur_state[0]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_C1), typeid(*sc.cur_state[1]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[2]));
+	EXPECT_EQ(3, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_lcca_parallel::state_A1>());
+	EXPECT_TRUE(sc.model.In<sc_lcca_parallel::state_B1>());
+	EXPECT_TRUE(sc.model.In<sc_lcca_parallel::state_C1>());
 	sc.dispatch(&sc_lcca_parallel::state::event_e0);
-	EXPECT_EQ(3, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_B1), typeid(*sc.cur_state[0]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_C2), typeid(*sc.cur_state[1]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[2]));
+	EXPECT_EQ(3, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_lcca_parallel::state_A1>());
+	EXPECT_TRUE(sc.model.In<sc_lcca_parallel::state_B1>());
+	EXPECT_TRUE(sc.model.In<sc_lcca_parallel::state_C2>());
 	sc.dispatch(&sc_lcca_parallel::state::event_e1);
-	EXPECT_EQ(3, sc.cur_state.size());
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_A1), typeid(*sc.cur_state[0]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_C1), typeid(*sc.cur_state[1]));
-	EXPECT_EQ(typeid(sc_lcca_parallel::state_B2), typeid(*sc.cur_state[2]));
+	EXPECT_EQ(3, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_lcca_parallel::state_A1>());
+	EXPECT_TRUE(sc.model.In<sc_lcca_parallel::state_B2>());
+	EXPECT_TRUE(sc.model.In<sc_lcca_parallel::state_C1>());
 }
 
 // This sc could not build because of a missing event in state
@@ -388,12 +388,12 @@ TEST(eventless, 0)
 	// send event without matching transition, eventless transition must be executed
 	sc.model.cont = true; // is reset by transition script
 	sc.dispatch(&sc_eventless::state::event_ev1);
-	EXPECT_EQ(typeid(sc_eventless::state_State_2), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_eventless::state_State_2>());
 
 	// Send trigger for eventless transitions
 	sc.model.cont = true; // is reset by transition script
 	sc.dispatch(); // use default param for eventless transition
-	EXPECT_EQ(typeid(sc_eventless::state_State_3), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_eventless::state_State_3>());
 }
 
 #ifndef _WIN32 // todo: this does not compile on current version of visual studio
@@ -404,11 +404,11 @@ TEST(stringevents, 0)
 
 	// must trigger event "ev1"
 	sc.dispatch("ev1.foo");
-	EXPECT_EQ(typeid(sc_stringevents::state_State_2), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_stringevents::state_State_2>());
 
 	// must trigger event "ev2.1", not "ev2"
 	sc.dispatch("ev2.1");
-	EXPECT_EQ(typeid(sc_stringevents::state_State_3), typeid(*sc.cur_state));
+	EXPECT_TRUE(sc.model.In<sc_stringevents::state_State_3>());
 }
 #endif
 
