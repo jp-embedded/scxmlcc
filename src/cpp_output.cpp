@@ -526,7 +526,7 @@ std::set<std::string> cpp_output::get_event_names() const
 		}
 		for (scxml_parser::plist<scxml_parser::action>::const_iterator i = actions.begin(); i != actions.end(); ++i) {
 			scxml_parser::action &a = *i->get();
-			if (a.type == "raise") {
+			if (a.type == "raise" && ! opt.bare_metal) {
 				events.push_back(a.attr["event"]);
 			}
 		}
@@ -1127,7 +1127,10 @@ void cpp_output::gen_action_part_raise(scxml_parser::action &a)
 
 void cpp_output::gen_action_part(scxml_parser::action &a)
 {
-	if(a.type == "raise") gen_action_part_raise(a);
+	if(a.type == "raise") {
+		if(opt.bare_metal) cerr << "warning: raise ignored for bare-metal\n";
+		else gen_action_part_raise(a);
+	}
 	else if(a.type == "log") gen_action_part_log(a);
 	else if(a.type == "assign") gen_action_part_assign(a);
 	else if(a.type == "script") gen_action_part_script(a);
