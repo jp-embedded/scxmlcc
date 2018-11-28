@@ -442,11 +442,19 @@ void cpp_output::gen_model_base_data()
 	using namespace boost::algorithm;
 	const scxml_parser::data_list &datamodel = sc.sc().datamodel;
 
-	if(!opt.bare_metal)  {
+	if(!opt.bare_metal) {
 		out << tab << tab << "const std::string _sessionid;\n";
 		constructs.push_back(make_pair("_sessionid", "std::to_string(reinterpret_cast<long long unsigned int>(this))"));
 		out << tab << tab << "const std::string _name;\n";
 		constructs.push_back(make_pair("_name", "\"" + sc.sc().name + "\""));
+		if(opt.string_events) {
+			// _event
+			out << tab << tab << "struct EventStruct {\n";
+			out << tab << tab << tab << "std::string name;\n";
+			out << tab << tab << tab << "boost::any data;\n";
+			out << tab << tab << tab << "void clear () { name.clear(); data.clear(); };\n";
+			out << tab << tab << "} _event;\n";
+		}
 	}
 	for (scxml_parser::data_list::const_iterator i_data = datamodel.begin(); i_data != datamodel.end(); ++i_data) {
 		string id = i_data->get()->id;
@@ -964,11 +972,14 @@ void cpp_output::gen_sc()
 	out << tab << "}" << endl;
 	// dispatch by name
 	if(opt.string_events) {
-		out << tab << "public: void dispatch(const std::string& ev_name)" << endl;
+		out << tab << "public: void dispatch(const std::string& ev_name, boost::any data = boost::any())" << endl;
 		out << tab << "{" << endl;
 		if(opt.thread_safe) {
 			out << tab << tab << "event_map_mutex.lock();" << endl;
 		}
+		out << tab << tab << "model._event.name = ev_name;\n";
+		out << tab << tab << "model._event.data = data;\n";
+
 		out << tab << tab << "auto event_it = event_map.find(ev_name);" << endl;
 		out << tab << tab << "if(event_it != event_map.end()) {" << endl;
 		if(opt.thread_safe) {
@@ -1352,9 +1363,10 @@ void cpp_output::gen()
 	}
 	if(opt.string_events) {
 		out << "#include <unordered_map>" << endl;
-    if(opt.thread_safe) {
-      out << "#include <mutex>" << endl;
-    }
+		out << "#include <boost/any.hpp>\n";
+		if(opt.thread_safe) {
+			out << "#include <mutex>" << endl;
+		}
 	}
 	if(sc.using_log || opt.debug) {
 		out << "#include <iostream>" << endl;
