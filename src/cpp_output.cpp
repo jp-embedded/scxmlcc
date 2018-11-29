@@ -1341,7 +1341,7 @@ void cpp_output::gen()
 	out << "#define __SC_" << boost::to_upper_copy(sc.sc().name) << endl;
 	out << endl;
 
-	if(sc.using_compound || opt.debug || sc.using_parallel) out << "#include <typeinfo>" << endl;
+	out << "#include <typeinfo>" << endl;
 	if(sc.using_parallel) out << "#include <functional>" << endl;
 	if(!opt.bare_metal) {
 		out << "#include <deque>" << endl;
