@@ -442,6 +442,8 @@ void cpp_output::gen_model_base_data()
 	using namespace boost::algorithm;
 	const scxml_parser::data_list &datamodel = sc.sc().datamodel;
 
+	constructs.push_back(make_pair("user", "user"));
+
 	if(!opt.bare_metal) {
 		out << tab << tab << "const std::string _sessionid;\n";
 		constructs.push_back(make_pair("_sessionid", "std::to_string(reinterpret_cast<long long unsigned int>(this))"));
@@ -471,14 +473,14 @@ void cpp_output::gen_model_base_data()
 			constructs.push_back(make_pair(id, *expr_opt));
 		}
 	}
-	if (constructs.size()) {
-		out << tab << tab << "data_model() : ";
-		for (pair_vect::const_iterator i_construct = constructs.begin(); i_construct != constructs.end(); ++i_construct) {
-			if (i_construct != constructs.begin()) out << ", ";
-			out << i_construct->first << '(' << i_construct->second << ')';
-		}	
-		out << " {}" << endl;
-	}
+	out << tab << tab << "data_model(user_model* user)\n";
+	char delim(':');
+
+	for (pair_vect::const_iterator i_construct = constructs.begin(); i_construct != constructs.end(); ++i_construct) {
+		out << tab << tab << delim << ' ' << i_construct->first << '(' << i_construct->second << ")\n";
+		delim = ',';
+	}	
+	out << tab << tab << "{}\n";
 }
 
 scxml_parser::state_list cpp_output::states(const std::string &type)
@@ -1041,23 +1043,23 @@ void cpp_output::gen_sc()
 	// constructor
 	auto event_names = get_event_names();
 
-	out << tab << classname() << "(user_model *user = 0)";
+	out << tab << classname() << "(user_model *user = nullptr)\n";
+	out << tab << ": ";
 	if(opt.string_events && ! event_names.empty()) {
-		out << "\n" << tab << ": ";
 		out << "event_map{";
 		const char* delim("");
 		for(auto ev_name : event_names) {
 			out << delim << "{\"" << ev_name << "\", &" << classname() << "::state::" << event_name(ev_name) << "}";
 			delim = ", ";
 		}
-		out << "}"; 
+		out << "}\n"; 
+		out << tab << ", ";
 	}
-	out << endl;
+	out << "model(user)\n";
 
 	out << tab << "{" << endl;
 	if(sc.using_parallel) out << tab << tab << "model.cur_state.push_back(new_state<scxml>());" << endl;
 	else out << tab << tab << "model.cur_state = new_state<scxml>();" << endl;
-	out << tab << tab << "model.user = user;" << endl;
 	out << tab << "}" << endl;
 
 	// init
@@ -1350,7 +1352,7 @@ void cpp_output::gen()
 	out << "#define __SC_" << boost::to_upper_copy(sc.sc().name) << endl;
 	out << endl;
 
-	if(sc.using_compound || opt.debug || sc.using_parallel) out << "#include <typeinfo>" << endl;
+	out << "#include <typeinfo>" << endl;
 	if(sc.using_parallel) out << "#include <functional>" << endl;
 	if(!opt.bare_metal) {
 		out << "#include <deque>" << endl;
