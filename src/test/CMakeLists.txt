@@ -32,7 +32,7 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
                  EXCLUDE_FROM_ALL)
 
 set( CMAKE_INCLUDE_CURRENT_DIR ON )
-set( CMAKE_CXX_STANDARD 11 ) 
+set( CMAKE_CXX_STANDARD 17 )
 
 
 ############################################
