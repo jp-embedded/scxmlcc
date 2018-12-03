@@ -30,9 +30,18 @@ class cpp_output {
 	const scxml_parser &sc;
 	const options &opt;
 	std::string tab;
+	const std::string any_ns; // namespace for any in generated code
+	const std::string optional_ns;
 
 	public:
-	cpp_output(std::ostream &ofs, const scxml_parser &sc, const options &op) : out(ofs), sc(sc), opt(op), tab("\t") {};
+	cpp_output(std::ostream &ofs, const scxml_parser &sc, const options &op)
+	: out(ofs)
+	, sc(sc)
+	, opt(op)
+	, tab("\t")
+	, any_ns(op.cpp14 ? "boost::" : "std::")
+	, optional_ns(any_ns)
+	{};
 
 	void gen();
 

@@ -29,6 +29,7 @@ struct options
 	bool bare_metal = false;
 	bool thread_safe = false;
 	bool string_events = false;
+	bool cpp14 = false;
 	std::string ns = "";
 };
 
