@@ -67,8 +67,8 @@ scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/stringevents.scxml gen_src )
 add_executable( test_scxml
     ${gen_src}
     test.cpp
-    test_t.cpp
     )
+#    test_t.cpp currently disabled because dies not work with scxmlcc_generator
 
 target_link_libraries(test_scxml 
 	gtest_main
