@@ -1362,9 +1362,9 @@ void cpp_output::gen()
 	if(opt.thread_safe) {
 		out << "#include <condition_variable>" << endl;
 		if(opt.cpp14) {
-			out << "#include <optional>\n";
-		} else {
 			out << "#include <boost/optional.hpp>\n";
+		} else {
+			out << "#include <optional>\n";
 		}
 	}
 	if(opt.string_events) {
