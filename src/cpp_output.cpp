@@ -444,11 +444,19 @@ void cpp_output::gen_model_base_data()
 
 	constructs.push_back(make_pair("user", "user"));
 
-	if(!opt.bare_metal)  {
+	if(!opt.bare_metal) {
 		out << tab << tab << "const std::string _sessionid;\n";
 		constructs.push_back(make_pair("_sessionid", "std::to_string(reinterpret_cast<long long unsigned int>(this))"));
 		out << tab << tab << "const std::string _name;\n";
 		constructs.push_back(make_pair("_name", "\"" + sc.sc().name + "\""));
+		if(opt.string_events) {
+			// _event
+			out << tab << tab << "struct EventStruct {\n";
+			out << tab << tab << tab << "std::string name;\n";
+			out << tab << tab << tab << any_ns << "any data;\n";
+			out << tab << tab << tab << "void clear () { name.clear(); data = " << any_ns << "any(); };\n";
+			out << tab << tab << "} _event;\n";
+		}
 	}
 	for (scxml_parser::data_list::const_iterator i_data = datamodel.begin(); i_data != datamodel.end(); ++i_data) {
 		string id = i_data->get()->id;
@@ -605,12 +613,12 @@ void cpp_output::gen_model_base()
 		out << tab << tab << tab << "lock.unlock();" << endl;
 		out << tab << tab << tab << "cv.notify_one();" << endl;
 		out << tab << tab << "}" << endl;
-		out << tab << tab << "std::optional<event> pop_event()" << endl;
+		out << tab << tab << optional_ns << "optional<event> pop_event()" << endl;
 		out << tab << tab << "{" << endl;
 		out << tab << tab << tab << "std::lock_guard<std::mutex> lock(queue_mutex);" << endl;
 		out << tab << tab << tab << "return pop_event_no_lock();" << endl;
 		out << tab << tab << "}" << endl;
-		out << tab << tab << "std::optional<event> wait_event()" << endl;
+		out << tab << tab << optional_ns << "optional<event> wait_event()" << endl;
 		out << tab << tab << "{" << endl;
 		out << tab << tab << tab << "std::unique_lock<std::mutex> lock(queue_mutex);" << endl;
 		out << tab << tab << tab << "cv.wait(lock, [this]{ return !event_queue.empty() || cancel_wait_; });" << endl;
@@ -625,7 +633,7 @@ void cpp_output::gen_model_base()
 		out << tab << tab << "bool is_canceled() const { return cancel_wait_; }" << endl;
 		out << tab << "private:" << endl;
 		out << tab << tab << "friend void " << classname() << "::dispatch(event);" << endl;
-		out << tab << tab << "std::optional<event> pop_event_no_lock()" << endl;
+		out << tab << tab << optional_ns << "optional<event> pop_event_no_lock()" << endl;
 		out << tab << tab << "{" << endl;
 		out << tab << tab << tab << "if (event_queue.empty()) return std::nullopt;" << endl;
 		out << tab << tab << tab << "event e = event_queue.front();" << endl;
@@ -966,11 +974,14 @@ void cpp_output::gen_sc()
 	out << tab << "}" << endl;
 	// dispatch by name
 	if(opt.string_events) {
-		out << tab << "public: void dispatch(const std::string& ev_name)" << endl;
+		out << tab << "public: void dispatch(const std::string& ev_name, " << any_ns << "any data = " << any_ns << "any())" << endl;
 		out << tab << "{" << endl;
 		if(opt.thread_safe) {
 			out << tab << tab << "event_map_mutex.lock();" << endl;
 		}
+		out << tab << tab << "model._event.name = ev_name;\n";
+		out << tab << tab << "model._event.data = data;\n";
+
 		out << tab << tab << "auto event_it = event_map.find(ev_name);" << endl;
 		out << tab << tab << "if(event_it != event_map.end()) {" << endl;
 		if(opt.thread_safe) {
@@ -1350,13 +1361,22 @@ void cpp_output::gen()
 	}
 	if(opt.thread_safe) {
 		out << "#include <condition_variable>" << endl;
-		out << "#include <optional>" << endl;
+		if(opt.cpp14) {
+			out << "#include <boost/optional.hpp>\n";
+		} else {
+			out << "#include <optional>\n";
+		}
 	}
 	if(opt.string_events) {
 		out << "#include <unordered_map>" << endl;
-    if(opt.thread_safe) {
-      out << "#include <mutex>" << endl;
-    }
+		if(opt.cpp14) {
+			out << "#include <boost/any.hpp>\n";
+		} else {
+			out << "#include <any>\n";
+		}
+		if(opt.thread_safe) {
+			out << "#include <mutex>" << endl;
+		}
 	}
 	if(sc.using_log || opt.debug) {
 		out << "#include <iostream>" << endl;

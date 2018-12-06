@@ -11,7 +11,7 @@ scxmlcc_generator( ${S}/microwave-01-cplusplus.scxml microwave_gen_src )
 scxmlcc_generator( ${S}/microwave-02-cplusplus.scxml microwave_gen_src )
 scxmlcc_generator( ${S}/vending_machine/vending_machine.scxml vending_gen_src )
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 17)
 
 add_executable( hello_world
     hello_world.cpp
