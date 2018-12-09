@@ -1126,7 +1126,8 @@ void cpp_output::gen_action_part_script(scxml_parser::action &a)
 	const string expr = a.attr["expr"];
 
 	//out << tab << tab << "// " << a.type << " expr=" << expr << endl;
-	out << tab << tab << expr << endl;
+	//out << tab << tab << expr << endl;
+	out << regex_replace(expr, regex("(^|\n)"), string("$1") + tab + tab) << endl;
 }
 
 void cpp_output::gen_action_part_raise(scxml_parser::action &a)
