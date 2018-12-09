@@ -1280,36 +1280,50 @@ void cpp_output::gen_actions()
 void cpp_output::trim()
 {
 	const scxml_parser::state_list &states = sc.sc().states;
+	map<string, string> changes;
 
 	// replace '-' with '_' in event names
-	// replace '-' with '_' in actions
 	// remove '.*' postfix in events
 	for (scxml_parser::state_list::const_iterator istate = states.begin(); istate != states.end(); ++istate) {
 		for (scxml_parser::transition_list::const_iterator itrans = istate->get()->transitions.begin(); itrans != istate->get()->transitions.end(); ++itrans) {
 			for (scxml_parser::slist::iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
+				string org = *ievent;
 				replace(ievent->begin(), ievent->end(), '-', '_');
 				if (ievent->size() >= 2 && string(ievent->rbegin(), ievent->rbegin() + 2) == "*.") ievent->erase(ievent->size()-2, 2);
+				if (org != *ievent) changes[org] = *ievent;
 			}
 
+		}
+	}
+
+	// replace above event changes in actions as well
+	for (scxml_parser::state_list::const_iterator istate = states.begin(); istate != states.end(); ++istate) {
+		for (scxml_parser::transition_list::const_iterator itrans = istate->get()->transitions.begin(); itrans != istate->get()->transitions.end(); ++itrans) {
 			// transition actions
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator iaction = itrans->get()->actions.begin(); iaction != itrans->get()->actions.end(); ++iaction) {
 				for (map<string, string>::iterator iattr = iaction->get()->attr.begin(); iattr != iaction->get()->attr.end(); ++iattr) {
-					replace(iattr->second.begin(), iattr->second.end(), '-', '_');
+					for (map<string, string>::iterator ichanges = changes.begin(); ichanges != changes.end(); ++ichanges) {
+						iattr->second = regex_replace(iattr->second, regex(ichanges->first), ichanges->second);
+					}
 				}
 			}
 		}
 
 		// entry actions
 		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = istate->get()->entry_actions.begin(); ai != istate->get()->entry_actions.end(); ++ai) {
-			for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
-				replace(attri->second.begin(), attri->second.end(), '-', '_');
+			for (map<string, string>::iterator iattr = ai->get()->attr.begin(); iattr != ai->get()->attr.end(); ++iattr) {
+				for (map<string, string>::iterator ichanges = changes.begin(); ichanges != changes.end(); ++ichanges) {
+					iattr->second = regex_replace(iattr->second, regex(ichanges->first), ichanges->second);
+				}
 			}
 		}
 
 		// exit actions
 		for (scxml_parser::plist<scxml_parser::action>::const_iterator ai = istate->get()->exit_actions.begin(); ai != istate->get()->exit_actions.end(); ++ai) {
-			for (map<string, string>::iterator attri = ai->get()->attr.begin(); attri != ai->get()->attr.end(); ++attri) {
-				replace(attri->second.begin(), attri->second.end(), '-', '_');
+			for (map<string, string>::iterator iattr = ai->get()->attr.begin(); iattr != ai->get()->attr.end(); ++iattr) {
+				for (map<string, string>::iterator ichanges = changes.begin(); ichanges != changes.end(); ++ichanges) {
+					iattr->second = regex_replace(iattr->second, regex(ichanges->first), ichanges->second);
+				}
 			}
 		}
 	}
