@@ -1127,7 +1127,7 @@ void cpp_output::gen_action_part_script(scxml_parser::action &a)
 
 	//out << tab << tab << "// " << a.type << " expr=" << expr << endl;
 	//out << tab << tab << expr << endl;
-	out << regex_replace(expr, regex("(^|[^\\\\]\\n)\\s*"), string("$1") + tab + tab) << endl;
+	out << regex_replace(expr, regex("(^|[^\\\\][\\r\\n])\\s*"), string("$1") + tab + tab) << endl;
 }
 
 void cpp_output::gen_action_part_raise(scxml_parser::action &a)
@@ -1283,14 +1283,14 @@ void cpp_output::trim()
 	const scxml_parser::state_list &states = sc.sc().states;
 	map<string, string> changes;
 
-	// replace '-' with '_' in event names
 	// remove '.*' postfix in events
+	// replace '-' with '_' in event names
 	for (scxml_parser::state_list::const_iterator istate = states.begin(); istate != states.end(); ++istate) {
 		for (scxml_parser::transition_list::const_iterator itrans = istate->get()->transitions.begin(); itrans != istate->get()->transitions.end(); ++itrans) {
 			for (scxml_parser::slist::iterator ievent = itrans->get()->event.begin(); ievent != itrans->get()->event.end(); ++ievent) {
+				if (ievent->size() >= 2 && string(ievent->rbegin(), ievent->rbegin() + 2) == "*.") ievent->erase(ievent->size()-2, 2);
 				string org = *ievent;
 				replace(ievent->begin(), ievent->end(), '-', '_');
-				if (ievent->size() >= 2 && string(ievent->rbegin(), ievent->rbegin() + 2) == "*.") ievent->erase(ievent->size()-2, 2);
 				if (org != *ievent) changes[org] = *ievent;
 			}
 
