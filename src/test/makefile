@@ -16,7 +16,7 @@
 #*************************************************************************
 
 CPPFLAGS := -Wall -Wpedantic -O2 -MD -MP
-CPPFLAGS += -std=c++17 -isystem gtest-1.7.0/include -pthread
+CPPFLAGS += -std=c++17 -isystem gtest-1.8.1/include -pthread
 
 test.objs := test.o
 test_t.objs := test_t.o

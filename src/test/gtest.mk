@@ -15,7 +15,7 @@
 #** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #*************************************************************************
 
-GTEST:=gtest-1.7.0
+GTEST:=gtest-1.8.1
 
 libgtest.a: gtest-all.o
 	ar -rv $@ $^
