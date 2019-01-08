@@ -1,0 +1,18 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+configuration:
+- Debug
+- Release
+before_build:
+- cmd: >-
+    appveyor DownloadFile http://download.microsoft.com/download/f/2/6/f263ac46-1fe9-4ae9-8fd3-21102100ebf5/msxsl.exe -FileName c:\windows\msxsl.exe -Timeout 600
+    appveyor DownloadFile https://sourceforge.net/projects/boost/files/boost/1.69.0/boost_1_69_0.7z/download -FileName boost.7z -Timeout 3000
+    7z x boost.7z -oc:\projects\scxmlcc\src
+    cd c:\projects\scxmlcc\src\boost_1_69_0
+    bootstrap
+    .\b2
+build:
+  project: c:\projects\scxmlcc\src\msvc2017\scxmlcc.sln
+  verbosity: minimal
+test_script:
+- cmd: c:\projects\scxmlcc\src\msvc2017\%CONFIGURATION%\test.exe
