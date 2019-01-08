@@ -3,8 +3,6 @@ image: Visual Studio 2017
 configuration:
 - Debug
 - Release
-init:
-- set PATH=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin;%PATH%
 before_build:
 - cmd: >-
     appveyor DownloadFile http://download.microsoft.com/download/f/2/6/f263ac46-1fe9-4ae9-8fd3-21102100ebf5/msxsl.exe -FileName c:\windows\msxsl.exe -Timeout 600
@@ -12,6 +10,8 @@ before_build:
     appveyor DownloadFile https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.7z -FileName boost.7z -Timeout 3000
 
     7z x boost.7z -oc:\projects\scxmlcc\src
+
+    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 
     cd c:\projects\scxmlcc\src\boost_1_69_0
 
