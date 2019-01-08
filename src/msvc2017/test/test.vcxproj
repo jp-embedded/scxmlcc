@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -13,19 +13,20 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8D5AB561-7C2D-430C-A5BD-6E156F005B86}</ProjectGuid>
     <RootNamespace>test</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
@@ -41,10 +42,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(OutDir)..\..\test\gtest-1.7.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(OutDir)..\..\test\gtest-1.8.1\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(OutDir)..\..\test\gtest-1.7.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(OutDir)..\..\test\gtest-1.8.1\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -52,10 +53,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OutDir)\..\..\test\gtest-1.7.0\msvc\gtest\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir)\..\..\test\gtest-1.8.1\msvc\2010\gtest\Win32-Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>gtestd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -67,12 +69,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(OutDir)\..\..\test\gtest-1.7.0\msvc\gtest\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir)\..\..\test\gtest-1.8.1\msvc\2010\gtest\Win32-Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>gtestd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -143,7 +146,7 @@ $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl/scxmlcc %(FullPath)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">msxsl/scxmlcc %(FullPath)</Message>
     </CustomBuild>
-     <CustomBuild Include="..\..\test\test364.txml">
+    <CustomBuild Include="..\..\test\test364.txml">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)cpp.xsl -o %(RelativeDir)%(Filename).scxml
 $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
@@ -195,7 +198,7 @@ $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl/scxmlcc %(FullPath)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">msxsl/scxmlcc %(FullPath)</Message>
     </CustomBuild>
-     <CustomBuild Include="..\..\test\test377.txml">
+    <CustomBuild Include="..\..\test\test377.txml">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)cpp.xsl -o %(RelativeDir)%(Filename).scxml
 $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
@@ -208,7 +211,7 @@ $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl/scxmlcc %(FullPath)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">msxsl/scxmlcc %(FullPath)</Message>
     </CustomBuild>
-     <CustomBuild Include="..\..\test\test378.txml">
+    <CustomBuild Include="..\..\test\test378.txml">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">msxsl %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)cpp.xsl -o %(RelativeDir)%(Filename).scxml
 $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
@@ -348,7 +351,7 @@ $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">scxmlcc %(FullPath)</Message>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
     </CustomBuild>
-     <CustomBuild Include="..\..\test\issue_88.scxml">
+    <CustomBuild Include="..\..\test\issue_88.scxml">
       <SubType>Designer</SubType>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)scxmlcc.exe %(RelativeDir)%(Filename)%(Extension)</Command>
@@ -372,7 +375,7 @@ $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">scxmlcc %(FullPath)</Message>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
     </CustomBuild>
-     <CustomBuild Include="..\..\test\stringevents.scxml">
+    <CustomBuild Include="..\..\test\stringevents.scxml">
       <SubType>Designer</SubType>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)scxmlcc.exe --stringevents %(RelativeDir)%(Filename)%(Extension)</Command>
@@ -384,7 +387,7 @@ $(OutDir)scxmlcc.exe %(RelativeDir)%(Filename).scxml</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">scxmlcc %(FullPath)</Message>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
     </CustomBuild>
-   </ItemGroup>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

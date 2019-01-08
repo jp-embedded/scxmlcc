@@ -86,5 +86,7 @@
     <CustomBuild Include="..\..\test\stringevents.scxml">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\test\test377.txml" />
+    <CustomBuild Include="..\..\test\test378.txml" />
   </ItemGroup>
 </Project>
