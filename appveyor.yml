@@ -12,7 +12,7 @@ build_script:
 
     7z x boost.7z -oc:\projects\scxmlcc\src
 
-    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
 
     cd c:\projects\scxmlcc\src\boost_1_69_0
 
