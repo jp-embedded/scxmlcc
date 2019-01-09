@@ -6,7 +6,7 @@ platform:
 configuration:
 - Debug
 - Release
-before_build:
+build_script:
 - cmd: >-
     appveyor DownloadFile http://download.microsoft.com/download/f/2/6/f263ac46-1fe9-4ae9-8fd3-21102100ebf5/msxsl.exe -FileName c:\windows\msxsl.exe -Timeout 600
 
@@ -20,10 +20,9 @@ before_build:
 
     bootstrap
 
-    .\b2
+    .\b2 -j 2
 
-build:
-  project: c:\projects\scxmlcc\src\msvc2017\scxmlcc.sln
-  verbosity: minimal
+    MSBuild.exe "c:\projects\scxmlcc\src\msvc2017\scxmlcc.sln" /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
 test_script:
 - cmd: c:\projects\scxmlcc\src\msvc2017\%CONFIGURATION%\test.exe
