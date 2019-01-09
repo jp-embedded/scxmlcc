@@ -20,7 +20,7 @@ build_script:
 
     .\b2 -j 2
 
-    MSBuild.exe "c:\projects\scxmlcc\src\msvc2017\scxmlcc.sln" /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+    MSBuild.exe "c:\projects\scxmlcc\src\msvc2017\scxmlcc.sln" /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Win32"
 
 test_script:
 - cmd: c:\projects\scxmlcc\src\msvc2017\%CONFIGURATION%\test.exe
