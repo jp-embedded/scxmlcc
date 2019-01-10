@@ -27,8 +27,9 @@ You need to download and compile the boost library. If you already have boost in
 
 Download [boost_1_69_0](https://dl.bintray.com/boostorg/release/1.69.0/source/) and put it under `scxmlcc/src/boost_1_69_0` (after you have obtained scxmlcc, see below). You can use another version, use another path or use an existing boost installation. But then you must update the boost include and linker path in the scxml project properties in the visual studio solution, under `Configuration Properties > C/C++ > General > Additional Include Directories` and `Configuration Properties > Linker > Additional Library Directories`.
 
-To build the boost library open a cmd prompt at the directory where boost was unzipped. Then execute the folowing two commands:
+To build the boost library open a cmd prompt at the directory where boost was unzipped. Then execute the folowing commands (for Visual Studio 2017):
 ```
+"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
 bootstrap
 .\b2
 ```
@@ -71,7 +72,7 @@ make test
 ```
 
 ### On Windows
-The solution file `scxmlcc\src\vc2013\vc2013.sln` contain projects to build the scxml compiler and examples. This is for visual studio 2013.
+The solution file `scxmlcc\src\msvc2017\scxmlcc.sln` contain projects to build the scxml compiler and examples. This is for visual studio 2017.
 
 ## The Examples
 This sections describes the examples which can be found at src/examples.
