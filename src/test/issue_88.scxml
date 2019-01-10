@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early">
+    <state id="State_1">
+        <onentry>
+		<script>auto str = new std::string(&quot;He\
+llo&quot;);
+str-&gt;append(&quot; world&quot;);
+			std::cout &lt;&lt; *str &lt;&lt; '\n';
+delete str;</script>
+        </onentry>
+    </state>
+    <script>#include &lt;iostream&gt;</script>
+</scxml>
+

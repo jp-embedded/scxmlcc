@@ -1,0 +1,26 @@
+version: 1.0.{build}
+image: 
+- Visual Studio 2017
+configuration:
+- Debug
+- Release
+build_script:
+- cmd: >-
+    appveyor DownloadFile http://download.microsoft.com/download/f/2/6/f263ac46-1fe9-4ae9-8fd3-21102100ebf5/msxsl.exe -FileName c:\windows\msxsl.exe -Timeout 600
+
+    appveyor DownloadFile https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.7z -FileName boost.7z -Timeout 3000
+
+    7z x boost.7z -oc:\projects\scxmlcc\src
+
+    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+
+    cd c:\projects\scxmlcc\src\boost_1_69_0
+
+    bootstrap
+
+    .\b2 -j 2
+
+    MSBuild.exe "c:\projects\scxmlcc\src\msvc2017\scxmlcc.sln" /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Win32"
+
+test_script:
+- cmd: c:\projects\scxmlcc\src\msvc2017\%CONFIGURATION%\test.exe

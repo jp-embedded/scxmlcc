@@ -20,6 +20,7 @@
 #include "lcca_parallel.h"
 #include "issue_69.h"
 #include "issue_72.h"
+#include "issue_88.h"
 #include "eventless.h"
 
 #ifndef _WIN32 // todo: this does not compile on current version of visual studio

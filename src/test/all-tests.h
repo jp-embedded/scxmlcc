@@ -381,6 +381,14 @@ TEST(issue_72, 0)
 	sc.init();
 }
 
+// This sc could not build because of a wrong generated script
+// Just test that this builds and can be instantiated.
+TEST(issue_88, 0)
+{
+	sc_issue_88 sc;
+	sc.init();
+}
+
 TEST(eventless, 0)
 {
 	sc_eventless sc;
