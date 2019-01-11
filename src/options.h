@@ -25,7 +25,7 @@ struct options
 	boost::filesystem::path input;
 	boost::filesystem::path output;
 	std::string ignore_unknown;
-	bool debug = false;
+	std::string debug;
 	bool bare_metal = false;
 	bool thread_safe = false;
 	bool string_events = false;
