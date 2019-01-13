@@ -377,5 +377,31 @@ todo
 ## Including scxmlcc in your makefile
 todo
 
+## Debugging
+scxmlcc has two options for debugging state machines. One for human readable log output and one for visual debugging with the [scxmlgui](https://github.com/fmorbini/scxmlgui/) tool
+
+### Log output
+When scxmlcc is invoked with the `--debug clog` option, the generated state machine will output to std::clog information about transitions taken and entered/exited states.
+
+For example, if the examples/hello_wold.scxml is compiled with this option, it will generate the folowing log:
+```
+sc_hello_world: transition [initial] sc_hello_world::scxml -> sc_hello_world::state_hello
+sc_hello_world: enter sc_hello_world::state_hello
+sc_hello_world: transition [unconditional] sc_hello_world::state_hello -> sc_hello_world::state_world
+sc_hello_world: exit sc_hello_world::state_hello
+sc_hello_world: enter sc_hello_world::state_world
+```
+
+### Visual debugging with scxmlgui
+scxmlcc can provide information to [scxmlgui](https://github.com/fmorbini/scxmlgui/) so this tool can visualise the active states and transitions taken. This is enabled with the `--debug scxmlgui` option.
+
+From the scxmlgui tool, open the state machine you want to debug. you can enable the 'SCXML execution listener' from the Tools menu. Then you can connect your state machine to scxmlgui with a command like this (for linux)
+```
+./my_machine 2> >(nc localhost 1234)
+```
+Where `my_machine` is your state machine and `1234` is the tcp port to use. This port must match the port chosen in scxmlgui. This command redirects stderr to the tcp port where scxmlgui listens.
+
+
+
 ## Performance
 todo
