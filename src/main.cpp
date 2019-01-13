@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
 		("help,h",				"This help message")
 		("input,i",	value<string>(),	"Input file.")
 		("output,o",	value<string>(),	"Output file.")
-		("debug,d",				"Enable debug output")
-		("ignore-unknown,u",	value<string>(),	"ignore unknown xml elements matching regex")
+		("debug,d",	value<string>(),	"Enable debug output (to clog or scxmlgui)")
+		("ignore-unknown,u",	value<string>(),"ignore unknown xml elements matching regex")
 		("baremetal,b",				"Generate code for bare metal C++")
 		("threadsafe,t",			"Generate threadsafe code for event_queue")
 		("stringevents,s",			"Enable triggering events by name")
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 	if(vm.count("input")) opt.input = vm["input"].as<string>();
 	if(vm.count("output")) opt.output = vm["output"].as<string>();
 	if(vm.count("ignore-unknown")) opt.ignore_unknown = vm["ignore-unknown"].as<string>();
-	if(vm.count("debug")) opt.debug = true;
+	if(vm.count("debug")) opt.debug = vm["debug"].as<string>();
 	if(vm.count("baremetal")) opt.bare_metal = true;
 	if(vm.count("threadsafe")) opt.thread_safe = true;
 	if(vm.count("stringevents")) opt.string_events = true;
@@ -121,6 +121,14 @@ int main(int argc, char *argv[])
 		cout << "Usage: " << argv[0] << " [options] [input]" << endl;
 		cout << desc << endl;
 		return 0;
+	}
+
+	if (!opt.debug.empty()) {
+		if ( (opt.debug != "clog")
+		&&   (opt.debug != "scxmlgui") ) {
+			cout << "Error: Unknown debug output specified." << endl;
+			return -1;
+		}
 	}
 
 	try {
