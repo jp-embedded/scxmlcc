@@ -134,9 +134,9 @@ int main(int argc, char *argv[])
 	try {
 		scxmlcc(opt);
 	}
-	catch (...) {
-		cerr << "Unandled error!" << endl;
+	catch (const std::exception& exc) {
+		cerr << "Unhandled exception: " << exc.what() << '\n';
 		return 1;
-	}
+  }
 	return 0;
 }
