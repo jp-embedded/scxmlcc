@@ -62,6 +62,7 @@ scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/lcca_parallel.scxml gen_src )
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_69.scxml gen_src )
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_72.scxml gen_src )
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_88.scxml gen_src )
+scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_94.scxml gen_src )
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/eventless.scxml gen_src )
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/stringevents.scxml gen_src )
 
