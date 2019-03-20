@@ -389,6 +389,16 @@ TEST(issue_88, 0)
 	sc.init();
 }
 
+// issue: state_P1S1 is exited when initial transitions is taken.
+TEST(issue_94, 0)
+{
+	sc_issue_94 sc;
+	sc.init();
+	EXPECT_TRUE(sc.model.In<sc_issue_94::state_P1S1>());
+	EXPECT_TRUE(sc.model.In<sc_issue_94::state_P1P1S1>());
+	EXPECT_TRUE(sc.model.In<sc_issue_94::state_P1P1S2>());
+}
+
 TEST(eventless, 0)
 {
 	sc_eventless sc;
@@ -404,7 +414,6 @@ TEST(eventless, 0)
 	EXPECT_TRUE(sc.model.In<sc_eventless::state_State_3>());
 }
 
-#ifndef _WIN32 // todo: this does not compile on current version of visual studio
 TEST(stringevents, 0)
 {
 	sc_stringevents sc;
@@ -418,6 +427,5 @@ TEST(stringevents, 0)
 	sc.dispatch("ev2.1");
 	EXPECT_TRUE(sc.model.In<sc_stringevents::state_State_3>());
 }
-#endif
 
 #endif
