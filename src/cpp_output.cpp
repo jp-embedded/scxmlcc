@@ -86,13 +86,13 @@ void cpp_output::gen_transition_base()
 
 	// since internal use S instead S::parent_t, use composite instead S, so enter is not forced on parallel states in this case
 
-	out << tab << tab << "void state_enter(D* d, data_model &m, id<internal>, S*) { d->template enter<composite<S, typename S::parent_t> >(m); }" << endl;
-	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<typename S::parent_t>(m); }" << endl;
-	out << tab << tab << "void state_exit(S*, data_model &, id<internal>, S*) {}" << endl;
-	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<typename D::parent_t>(m); }" << endl;
+	out << tab << tab << "void state_enter(D* d, data_model &m, id<internal>, S*) { d->template enter<composite<S, typename S::parent_t> >(m); } // internal transition, where dst is descendant of src" << endl;
+	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<typename S::parent_t>(m); } // external transition, or dst is not descendant of src" << endl;
+	out << tab << tab << "void state_exit(S*, data_model &, id<internal>, S*) {} // internal transition, where dst is descendant of src" << endl;
+	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<typename D::parent_t>(m); } // external transition, or dst is not descendant of src" << endl;
 	if (sc.using_parallel) {
-		out << tab << tab << "void state_exit_parallel(S*, D*, " << classname() << " &, id<internal>, S*) {}" << endl;
-		out << tab << tab << "void state_exit_parallel(S* s, D *d, " << classname() << " &sc, ...) { s->exit_parallel(sc, s, d); }" << endl;
+		out << tab << tab << "void state_exit_parallel(S*, D*, " << classname() << " &, id<internal>, S*) {} // internal transition, where dst is descendant of src" << endl;
+		out << tab << tab << "void state_exit_parallel(S* s, D *d, " << classname() << " &sc, ...) { s->exit_parallel(sc, s, d); } // external transition, or dst is not descendant of src" << endl;
 	}
 	
 	out << tab << tab << "public:" << endl;
