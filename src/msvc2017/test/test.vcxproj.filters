@@ -18,6 +18,9 @@
     <ClCompile Include="..\..\test\test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\test\test_t.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\test\test144.txml">
@@ -80,6 +83,9 @@
     <CustomBuild Include="..\..\test\issue_88.scxml">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\test\issue_94.scxml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="..\..\test\eventless.scxml">
       <Filter>Source Files</Filter>
     </CustomBuild>
@@ -88,5 +94,10 @@
     </CustomBuild>
     <CustomBuild Include="..\..\test\test377.txml" />
     <CustomBuild Include="..\..\test\test378.txml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\test\all-tests.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" initial="P1">
+    <parallel id="P1">
+        <state id="P1S1">
+        </state>
+        <parallel id="P1P1">
+            <state id="P1P1S1">
+            </state>
+            <state id="P1P1S2">
+            </state>
+        </parallel>
+    </parallel>
+</scxml>
+

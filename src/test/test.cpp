@@ -21,11 +21,9 @@
 #include "issue_69.h"
 #include "issue_72.h"
 #include "issue_88.h"
+#include "issue_94.h"
 #include "eventless.h"
-
-#ifndef _WIN32 // todo: this does not compile on current version of visual studio
 #include "stringevents.h"
-#endif
 
 #include <gtest/gtest.h>
 #include <thread>
