@@ -283,12 +283,17 @@ boost::shared_ptr<scxml_parser::action> scxml_parser::parse_raise(const ptree &p
 	boost::shared_ptr<action> ac = boost::make_shared<action>();
 	try {
 		const ptree &xmlattr = pt.get_child("<xmlattr>");
-
 		const string event = xmlattr.get<string>("event");
 
 		ac->type = "raise";
 		ac->attr["event"] = event;
+	}
+	catch (ptree_error &e) {
+		cerr << "error: '<raise>' must contain an 'event' attribute." << endl;
+		exit(1);
+	}
 
+	try {
 		for (ptree::const_iterator it = pt.begin(); it != pt.end(); ++it) {
 			if (it->first == "<xmlcomment>") ; // ignore comments
 			else if (it->first == "<xmlattr>") ; // ignore, parsed above
