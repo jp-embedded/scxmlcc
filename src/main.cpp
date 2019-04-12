@@ -17,11 +17,14 @@
 
 #include "scxml_parser.h"
 #include "cpp_output.h"
+#include "dot_output.h"
 #include "options.h"
 #include "version.h"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+
 #include <algorithm>
 #include <cctype>
 #include <iostream>
@@ -45,7 +48,13 @@ void scxmlcc(const options &opt)
 	scxml_parser sc(sc_name.c_str(), opt.ignore_unknown, pt);
 	ofstream ofs(opt.output.string().c_str());
 	cpp_output out(ofs, sc, opt);
-	out.gen();
+    out.gen();
+    if(!opt.dotFile.empty())
+    {
+        ofstream dotFile(opt.dotFile.string().c_str());
+        dot_output dot(dotFile, sc, opt);
+        dot.gen();
+    }
 }
 
 int main(int argc, char *argv[])
@@ -56,7 +65,8 @@ int main(int argc, char *argv[])
 		("help,h",				"This help message")
 		("input,i",	value<string>(),	"Input file.")
 		("output,o",	value<string>(),	"Output file.")
-		("debug,d",	value<string>(),	"Enable debug output (to clog or scxmlgui)")
+        ("dot,D", value<string>(), "Generate Graphviz Dot file")
+        ("debug,d",	value<string>(),	"Enable debug output (to clog or scxmlgui)")
 		("ignore-unknown,u",	value<string>(),"ignore unknown xml elements matching regex")
 		("baremetal,b",				"Generate code for bare metal C++")
 		("threadsafe,t",			"Generate threadsafe code for event_queue")
@@ -81,6 +91,7 @@ int main(int argc, char *argv[])
 
 	if(vm.count("input")) opt.input = vm["input"].as<string>();
 	if(vm.count("output")) opt.output = vm["output"].as<string>();
+    if(vm.count("dot")) opt.dotFile = vm["dot"].as<string>();
 	if(vm.count("ignore-unknown")) opt.ignore_unknown = vm["ignore-unknown"].as<string>();
 	if(vm.count("debug")) opt.debug = vm["debug"].as<string>();
 	if(vm.count("baremetal")) opt.bare_metal = true;
