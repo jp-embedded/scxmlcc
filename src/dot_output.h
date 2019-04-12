@@ -16,6 +16,11 @@ public:
     {}
 
     void gen();
+protected:
+    void gen_states();
+    void gen_state(const scxml_parser::state& state);
+    void gen_transition(const scxml_parser::state& state, const scxml_parser::transition &transition);
+    void gen_actions(const scxml_parser::plist<scxml_parser::action>& actions);
 private:
     std::ostream &out;
     const scxml_parser &sc;
