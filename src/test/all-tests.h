@@ -399,6 +399,18 @@ TEST(issue_94, 0)
 	EXPECT_TRUE(sc.model.In<sc_issue_94::state_P1P1S2>());
 }
 
+// issue: wrong transition taken
+TEST(issue_97, 0)
+{
+	sc_issue_97 sc;
+	sc.init();
+	EXPECT_TRUE(sc.model.In<sc_issue_97::state_P1S1S1>());
+	EXPECT_TRUE(sc.model.In<sc_issue_97::state_P1S2S1>());
+	sc.dispatch(&sc_issue_97::state::event_ev1);
+	EXPECT_TRUE(sc.model.In<sc_issue_97::state_P1S1S2>());
+	EXPECT_TRUE(sc.model.In<sc_issue_97::state_P1S2S1>());
+}
+
 TEST(eventless, 0)
 {
 	sc_eventless sc;

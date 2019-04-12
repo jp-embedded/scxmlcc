@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0">
+    <parallel id="P1">
+        <state id="P1S1">
+            <state id="P1S1S1">
+                <transition type="external" event="ev1" target="P1S1S2"/>
+            </state>
+            <state id="P1S1S2">
+            </state>
+        </state>
+        <state id="P1S2">
+            <state id="P1S2S1">
+            </state>
+        </state>
+        <transition type="external" event="ev1" target="Final_1"/>
+    </parallel>
+    <final id="Final_1">
+    </final>
+</scxml>
+
