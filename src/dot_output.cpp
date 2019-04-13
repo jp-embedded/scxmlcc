@@ -84,7 +84,12 @@ void dot_output::gen_state_with_children(const scxml_parser::state &state, std::
         << "style=\"rounded\";\n"
         << "label=<\n"
         << "<table border='0' cellborder='0' style='rounded'>\n"
-        << "\t<tr><td colspan='3'><b>" << state.id << "</b></td></tr>\n";
+        << "\t<tr><td colspan='3'>";
+    if(state.type)
+    {
+        os << "<i>" << state.type << "</i>";
+    }
+    os << "<b>" << state.id << "</b></td></tr>\n";
 
     gen_actions("entry", state.entry_actions, os);
     gen_actions("exit", state.exit_actions, os);
@@ -98,13 +103,18 @@ void dot_output::gen_state_with_children(const scxml_parser::state &state, std::
         gen_state(getState(stateName), subOss);
         os << subOss.str();
     }
-    // create initial state of the children and connect it
-    if(! state.initial.target.empty())
+
+    // for some reason parallel states have an initial state, don't add it for them
+    if(! state.type || *state.type != "parallel")
     {
-        scxml_parser::state startState;
-        startState.id = std::string("_start") + std::to_string(clusterNumber);
-        os << "_start" << clusterNumber << "[label=\"\",shape=\"circle\",style=filled,fixedsize=\"true\",fillcolor=\"black\",width=\"0.2\"]\n";
-        gen_transition(startState, state.initial, os);
+        // create initial state of the children and connect it
+        if(! state.initial.target.empty())
+        {
+            scxml_parser::state startState;
+            startState.id = std::string("_start") + std::to_string(clusterNumber);
+            os << "_start" << clusterNumber << "[label=\"\",shape=\"circle\",style=filled,fixedsize=\"true\",fillcolor=\"black\",width=\"0.2\"]\n";
+            gen_transition(startState, state.initial, os);
+        }
     }
 
 
@@ -187,7 +197,7 @@ void dot_output::gen_transition(const scxml_parser::state& sourceState,
             << "\t\t\t\t<tr><td colspan='2'>" << events;
         if(transition.condition)
         {
-          os << " ["<< transition.condition << "]";
+          os << " ["<< htmlEscape(*transition.condition) << "]";
         }
         os << "</td></tr>\n";
 
@@ -226,6 +236,10 @@ void dot_output::gen_actions(const std::string& actionLabel,
         firstActionAttr = false;
 
         // type = script,...
+        // first = expr, ...
+        // second = content
+
+        // TODO: More than one <td>/td> possible, this does not fit to the colspan stuff if more than one.
         for(auto& actionPair : action->attr)
         {
             os << "<td><i>" << action->type << ":" << actionPair.first << "</i></td>"
@@ -325,12 +339,13 @@ std::string dot_output::htmlEscape(const std::string& data)
     {
         switch(data[pos])
         {
-            case '&':  ret.append("&amp;");       break;
-            case '\"': ret.append("&quot;");      break;
-            case '\'': ret.append("&apos;");      break;
-            case '<':  ret.append("&lt;");        break;
-            case '>':  ret.append("&gt;");        break;
-            case '\n': ret.append("<br/>");       break;
+            case '&':  ret.append("&amp;");   break;
+            case '\"': ret.append("&quot;");  break;
+            case '\'': ret.append("&apos;");  break;
+            case '<':  ret.append("&lt;");    break;
+            case '>':  ret.append("&gt;");    break;
+            case '\n': ret.append("<br/>");   break;
+        case ' ':  ret.append("&nbsp;");      break;
             default:   ret.append(&data[pos], 1); break;
         }
     }
