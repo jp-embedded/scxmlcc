@@ -31,12 +31,17 @@ std::clog << __func__ << "()called.\n";
     for(const auto& state : states)
     {
         gen_state(*state, out);
+    }
 
+    // transitions must be created after all states are in our "created" list.
+    for(const auto& state : states)
+    {
         for(const auto& transition : state->transitions)
         {
             gen_transition(*state, *transition, out);
         }
     }
+
 }
 
 void dot_output::gen_state(const scxml_parser::state &state, std::ostream& os)
@@ -148,7 +153,7 @@ std::clog << __func__ << "()called.\n";
     addState(state.id);
 }
 
-void dot_output::gen_transition(const scxml_parser::state& state,
+void dot_output::gen_transition(const scxml_parser::state& sourceState,
                                 const scxml_parser::transition& transition,
                                 std::ostream& os)
 {
@@ -156,7 +161,7 @@ std::clog << __func__ << "()called.\n";
     scxml_parser::slist targets = transition.target;
     if(targets.empty())
     {
-        targets.push_back(state.id);
+        targets.push_back(sourceState.id);
     }
     for(const auto& target : targets)
     {
@@ -169,7 +174,23 @@ std::clog << __func__ << "()called.\n";
         {
             events.pop_back();
         }
-        os << "\t\t" << state.id << "->" << target << "[";
+
+
+        const scxml_parser::state& targetState = getState(target);
+        const scxml_parser::state& targetLeaf = getFirstLeafState(targetState);
+        const scxml_parser::state& sourceLeaf = getFirstLeafState(sourceState);
+
+        os << sourceLeaf.id << "->" << targetLeaf.id << '[';
+        // draw arrow connections to the first child because arrow to cluster is not possible
+        if(sourceState.id != sourceLeaf.id)
+        {
+            os << "ltail=cluster" << getStateClusterNumber(sourceState.id) << ',';
+        }
+        if(targetState.id != targetLeaf.id)
+        {
+          os << "lhead=cluster" << getStateClusterNumber(targetState.id) << ',';
+        }
+
         if(transition.type && *transition.type == "internal")
         {
             out << "style=\"dashed\",";
@@ -231,7 +252,7 @@ bool dot_output::addState(const std::string& stateName, int clusterNumber)
     addedStateNames[stateName] = clusterNumber;
 }
 
-int dot_output::getSateClusterNumber(const std::string& stateName) const
+int dot_output::getStateClusterNumber(const std::string& stateName) const
 {
     if(! stateAdded(stateName))
     {
@@ -281,4 +302,23 @@ const scxml_parser::state& dot_output::getState(const std::string &stateName)
         }
     }
     throw std::out_of_range(std::string("State name not found: ") + stateName);
+}
+
+const scxml_parser::state &dot_output::getFirstLeafState(const scxml_parser::state &state)
+{
+    //Find the first state which is child of the given state
+    for(const auto& currStatePtr : sc.sc().states)
+    {
+        if(currStatePtr->parent)
+        {
+            if(currStatePtr->parent->id == state.id)
+            {
+                // found, try again with the found one
+                return getFirstLeafState(*currStatePtr);
+            }
+        }
+    }
+
+    // if we are here, we have a leaf node
+    return state;
 }
