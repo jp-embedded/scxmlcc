@@ -95,38 +95,44 @@ void dot_output::gen_state(const scxml_parser::state &state)
 
 void dot_output::gen_transition(const scxml_parser::state& state, const scxml_parser::transition& transition)
 {
-    if(transition.target.empty())
+    scxml_parser::slist targets = transition.target;
+    if(targets.empty())
     {
-        out << "\t\t" << state.id << "->" << state.id << '\n';
-    }else
+        targets.push_back(state.id);
+    }
+    for(const auto& target : targets)
     {
-        for(const auto& target : transition.target)
+        std::string events;
+        for(const auto& event : transition.event)
         {
-            std::string events;
-            for(const auto& event : transition.event)
-            {
-                events += event + ",";
-            }
-            if(!events.empty())
-            {
-                events.pop_back();
-            }
-            out << "\t\t" << state.id << "->" << target << "[label=<\n"
-                << "\t\t\t<table border='0'>\n"
-                << "\t\t\t\t<tr><td colspan='2'>" << events;
-            if(transition.condition)
-            {
-              out << " ["<< transition.condition << "]";
-            }
-            out << "</td></tr>\n";
-            if(!transition.actions.empty())
-            {
-                gen_actions(transition.actions);
-            }
-
-            out << "\t\t\t</table>"
-                << "\t>];\n";
+            events += event + ",";
         }
+        if(!events.empty())
+        {
+            events.pop_back();
+        }
+        out << "\t\t" << state.id << "->" << target << "[";
+        if(transition.type && *transition.type == "internal")
+        {
+            out << "style=\"dashed\",";
+        }
+
+        out << "label=<\n"
+            << "\t\t\t<table border='0'>\n"
+            << "\t\t\t\t<tr><td colspan='2'>" << events;
+        if(transition.condition)
+        {
+          out << " ["<< transition.condition << "]";
+        }
+        out << "</td></tr>\n";
+        if(!transition.actions.empty())
+        {
+            gen_actions(transition.actions);
+        }
+
+        out << "\t\t\t</table>\n"
+            << "\t\t\n";
+        out << "\t>];\n";
     }
 }
 
