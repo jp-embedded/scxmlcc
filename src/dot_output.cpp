@@ -86,19 +86,8 @@ void dot_output::gen_state_with_children(const scxml_parser::state &state, std::
         << "<table border='0' cellborder='0' style='rounded'>\n"
         << "\t<tr><td colspan='3'><b>" << state.id << "</b></td></tr>\n";
 
-    if(! state.entry_actions.empty())
-    {
-        os << "<tr><td rowspan='" << state.entry_actions.size() << "'>entry:</td>";
-        gen_actions(state.entry_actions, os);
-        os << "</tr>\n";
-    }
-
-    if(! state.exit_actions.empty())
-    {
-        os << "<tr><td rowspan='" << state.exit_actions.size() << "'>exit:</td>";
-        gen_actions(state.exit_actions, os);
-        os << "</tr>\n";
-    }
+    gen_actions("entry", state.entry_actions, os);
+    gen_actions("exit", state.exit_actions, os);
 
     os << "</table>\n"
        << ">;\n";
@@ -130,19 +119,9 @@ void dot_output::gen_state_simple(const scxml_parser::state &state, std::ostream
         << "\t\t\t<table border='0' cellborder='0' style='rounded'>\n"
         << "\t\t\t\t<tr><td colspan='3'><b>" << state.id << "</b></td></tr>\n";
 
-    if(! state.entry_actions.empty())
-    {
-        os << "<tr><td rowspan='" << state.entry_actions.size() << "'>entry:</td>";
-        gen_actions(state.entry_actions, os);
-        os << "</tr>\n";
-    }
+    gen_actions("entry", state.entry_actions, os);
+    gen_actions("exit", state.exit_actions, os);
 
-    if(! state.exit_actions.empty())
-    {
-        os << "<tr><td rowspan='" << state.exit_actions.size() << "'>exit:</td>";
-        gen_actions(state.exit_actions, os);
-        os << "</tr>\n";
-    }
     os << "\t\t\t</table>\n"
         << "\t\t>]\n";
     addState(state.id);
@@ -211,12 +190,8 @@ void dot_output::gen_transition(const scxml_parser::state& sourceState,
           os << " ["<< transition.condition << "]";
         }
         os << "</td></tr>\n";
-        if(! transition.actions.empty())
-        {
-            os << "<tr><td rowspan='" << transition.actions.size() << "'>onTransition:</td>";
-            gen_actions(transition.actions, os);
-            os << "</tr>\n";
-        }
+
+        gen_actions("onTrans", transition.actions, os);
 
         os << "\t\t\t</table>\n"
             << "\t\t\n";
@@ -224,9 +199,23 @@ void dot_output::gen_transition(const scxml_parser::state& sourceState,
     }
 }
 
-void dot_output::gen_actions(const scxml_parser::plist<scxml_parser::action>& actions,
+void dot_output::gen_actions(const std::string& actionLabel,
+                             const scxml_parser::plist<scxml_parser::action>& actions,
                              std::ostream& os)
 {
+
+    if(actions.empty())
+    {
+        return;
+    }
+    // count number of needed rows
+    int lineCount = 0;
+    for(auto& action : actions)
+    {
+        lineCount += action->attr.size();
+    }
+    os << "<tr><td rowspan='" << lineCount << "'>" << actionLabel << "</td>";
+
     bool firstActionAttr = true;
     for(auto& action : actions)
     {
@@ -237,14 +226,14 @@ void dot_output::gen_actions(const scxml_parser::plist<scxml_parser::action>& ac
         firstActionAttr = false;
 
         // type = script,...
-        os << "<td>" << action->type << ": </td>"
-            << "<td>";
         for(auto& actionPair : action->attr)
         {
-            os << "TODO";
+            os << "<td><i>" << action->type << ":" << actionPair.first << "</i></td>"
+               << "<td border=\"1\">" << htmlEscape(actionPair.second) << "</td>\n";
+            // htmlEscape
         }
-        os << "</td>";
     }
+    os << "</tr>";
 }
 
 bool dot_output::stateAdded(const std::string& stateName) const
@@ -326,4 +315,24 @@ const scxml_parser::state &dot_output::getFirstLeafState(const scxml_parser::sta
 
     // if we are here, we have a leaf node
     return state;
+}
+
+std::string dot_output::htmlEscape(const std::string& data)
+{
+    std::string ret;
+    ret.reserve(data.size());
+    for(size_t pos = 0; pos != data.size(); ++pos)
+    {
+        switch(data[pos])
+        {
+            case '&':  ret.append("&amp;");       break;
+            case '\"': ret.append("&quot;");      break;
+            case '\'': ret.append("&apos;");      break;
+            case '<':  ret.append("&lt;");        break;
+            case '>':  ret.append("&gt;");        break;
+            case '\n': ret.append("<br/>");       break;
+            default:   ret.append(&data[pos], 1); break;
+        }
+    }
+    return ret;
 }

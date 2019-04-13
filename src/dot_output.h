@@ -24,7 +24,7 @@ protected:
     void gen_state_simple(const scxml_parser::state& state, std::ostream &os);
     void gen_state_final(const scxml_parser::state& state, std::ostream &os);
     void gen_transition(const scxml_parser::state& sourceState, const scxml_parser::transition &transition, std::ostream &os);
-    void gen_actions(const scxml_parser::plist<scxml_parser::action>& actions, std::ostream &os);
+    void gen_actions(const std::string &actionLabel, const scxml_parser::plist<scxml_parser::action>& actions, std::ostream &os);
 
 
     bool stateAdded(const std::string &stateName) const;
@@ -40,6 +40,8 @@ protected:
      */
     const scxml_parser::state& getState(const std::string& stateName);
     const scxml_parser::state& getFirstLeafState(const scxml_parser::state& state);
+
+    static std::string htmlEscape(const std::string &data);
 
 private:
     std::ostream &out;
