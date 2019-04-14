@@ -48,9 +48,38 @@ private:
     const scxml_parser &sc;
     const options &opt;
 
-
     std::map<std::string, int> addedStateNames; // state name, cluster nr (0 = none)
     int currentClusterNumber;
+
+    class Indent
+    {
+    public:
+        Indent(int level = 0): numIndents(level){}
+        friend std::ostream& operator<< (std::ostream& stream, const Indent& indent) {
+            for(int i = 0; i < indent.numIndents; i++)
+            {
+                stream << '\t';
+            }
+            return stream;
+        }
+        // pre-inclrement
+        Indent& operator++()
+        {
+            numIndents++;
+            return *this;
+        }
+        Indent& operator--()
+        {
+            numIndents--;
+            if(numIndents < 0)
+            {
+                numIndents = 0;
+            }
+            return *this;
+        }
+    private:
+        int numIndents;
+    } indent;
 
 };
 
