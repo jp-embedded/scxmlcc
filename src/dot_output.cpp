@@ -186,7 +186,6 @@ void dot_output::gen_transition(const scxml_parser::state& sourceState,
         const scxml_parser::state& sourceLeaf = getFirstLeafState(sourceState);
 
         os << indent << sourceLeaf.id << "->" << targetLeaf.id;
-        ++indent;
 
         if((sourceState.id != sourceLeaf.id)
                 || (targetState.id != targetLeaf.id)
@@ -230,7 +229,7 @@ void dot_output::gen_transition(const scxml_parser::state& sourceState,
             }
             os << --indent << "]";
         } // transition needs label
-        os << --indent << "\n";
+        os << indent << "\n";
     }
 }
 
