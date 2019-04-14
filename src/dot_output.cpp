@@ -21,6 +21,9 @@ void dot_output::gen()
         << "\tcompound=true;\n"
         << "\tsize=\"8,5;\"\n";
 
+    // TODO: Add a node containing the scxml content (instead of label)
+    // including start actions, datamodel,...
+
     gen_states();
 
     out << "}\n";
@@ -199,20 +202,24 @@ void dot_output::gen_transition(const scxml_parser::state& sourceState,
             out << "style=\"dashed\",";
         }
 
-        os << "label=<\n"
-            << "\t\t\t<table border='0'>\n"
-            << "\t\t\t\t<tr><td colspan='2'>" << events;
-        if(transition.condition)
+        if(transition.condition || !events.empty())
         {
-          os << " ["<< htmlEscape(*transition.condition) << "]";
+            os << "label=<\n"
+                << "\t\t\t<table border='0'>\n"
+                << "\t\t\t\t<tr><td colspan='2'>" << events;
+            if(transition.condition)
+            {
+              os << " ["<< htmlEscape(*transition.condition) << "]";
+            }
+            os << "</td></tr>\n";
+
+            gen_actions("onTrans", transition.actions, os);
+
+            os << "\t\t\t</table>\n"
+                << "\t\t\n";
+            os << "\t>";
         }
-        os << "</td></tr>\n";
-
-        gen_actions("onTrans", transition.actions, os);
-
-        os << "\t\t\t</table>\n"
-            << "\t\t\n";
-        os << "\t>];\n";
+        os << "];\n";
     }
 }
 
