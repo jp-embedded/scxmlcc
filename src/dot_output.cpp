@@ -185,40 +185,52 @@ void dot_output::gen_transition(const scxml_parser::state& sourceState,
         const scxml_parser::state& targetLeaf = getFirstLeafState(targetState);
         const scxml_parser::state& sourceLeaf = getFirstLeafState(sourceState);
 
-        os << indent << sourceLeaf.id << "->" << targetLeaf.id << "[\n";
+        os << indent << sourceLeaf.id << "->" << targetLeaf.id;
         ++indent;
-        // draw arrow connections to the first child because arrow to cluster is not possible
-        if(sourceState.id != sourceLeaf.id)
-        {
-            os << indent << "ltail=cluster" << getStateClusterNumber(sourceState.id) << ",\n";
-        }
-        if(targetState.id != targetLeaf.id)
-        {
-          os << indent << "lhead=cluster" << getStateClusterNumber(targetState.id) << ",\n";
-        }
 
-        if(transition.type && *transition.type == "internal")
+        if((sourceState.id != sourceLeaf.id)
+                || (targetState.id != targetLeaf.id)
+                || transition.condition
+                || !events.empty())
         {
-            os << indent << "style=\"dashed\",\n";
-        }
+            os << "[\n";
+            ++indent;
+            // transition needs label
 
-        if(transition.condition || !events.empty())
-        {
-            os << indent << "label=<\n"
-               << ++indent << "<table border='0'>\n"
-               << ++indent << "<tr><td colspan='2'>" << events;
-            if(transition.condition)
+            // draw arrow connections to the first child because arrow to cluster is not possible
+            if(sourceState.id != sourceLeaf.id)
             {
-              os << " ["<< htmlEscape(*transition.condition) << "]";
+                os << indent << "ltail=cluster" << getStateClusterNumber(sourceState.id) << ",\n";
             }
-            os << "</td></tr>\n";
+            if(targetState.id != targetLeaf.id)
+            {
+              os << indent << "lhead=cluster" << getStateClusterNumber(targetState.id) << ",\n";
+            }
 
-            gen_actions("onTrans", transition.actions, os);
+            if(transition.type && *transition.type == "internal")
+            {
+                os << indent << "style=\"dashed\",\n";
+            }
 
-            os << --indent << "</table>\n";
-            os << --indent << ">\n";
-        }
-        os << --indent << "]\n";
+            if(transition.condition || !events.empty())
+            {
+                os << indent << "label=<\n"
+                   << ++indent << "<table border='0'>\n"
+                   << ++indent << "<tr><td colspan='2'>" << events;
+                if(transition.condition)
+                {
+                  os << " ["<< htmlEscape(*transition.condition) << "]";
+                }
+                os << "</td></tr>\n";
+
+                gen_actions("onTrans", transition.actions, os);
+
+                os << --indent << "</table>\n";
+                os << --indent << ">\n";
+            }
+            os << --indent << "]";
+        } // transition needs label
+        os << --indent << "\n";
     }
 }
 
@@ -359,7 +371,7 @@ std::string dot_output::htmlEscape(const std::string& data)
             case '<':  ret.append("&lt;");    break;
             case '>':  ret.append("&gt;");    break;
             case '\n': ret.append("<br/>");   break;
-        case ' ':  ret.append("&nbsp;");      break;
+            case ' ':  ret.append("&nbsp;");  break;
             default:   ret.append(&data[pos], 1); break;
         }
     }
