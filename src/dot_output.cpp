@@ -374,7 +374,10 @@ std::string dot_output::htmlEscape(const std::string& data)
             case '<':  ret.append("&lt;");    break;
             case '>':  ret.append("&gt;");    break;
             case '\n': ret.append("<br/>");   break;
-            case ' ':  ret.append("&nbsp;");  break;
+//            case ' ':  ret.append("&nbsp;");  break;
+            case '|':  ret.append("\\|");     break;
+            case '{':  ret.append("\\{");     break;
+            case '}':  ret.append("\\}");     break;
             default:   ret.append(&data[pos], 1); break;
         }
     }
