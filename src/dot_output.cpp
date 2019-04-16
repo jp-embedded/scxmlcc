@@ -272,8 +272,7 @@ void dot_output::gen_actions(const std::string& actionLabel,
         for(auto& actionPair : action->attr)
         {
             os << "<td><i>" << action->type << ":" << actionPair.first << "</i></td>"
-               << "<td border=\"1\">" << htmlEscape(actionPair.second) << "</td>";
-            // htmlEscape
+               << "<td border=\"1\">" << htmlEscape(actionPair.second + '\n') << "</td>"; // add a newline fixes alignment of last line in htmlEscape
         }
     }
     os << indent << "</tr>\n";
