@@ -143,8 +143,6 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << tab << tab << tab << "}" << endl;
 		out << tab << tab << tab << tab << tab << "if (!t1_preemted) eval.filtered.push_back(t1);" << endl;
 
-		out << tab << tab << tab << tab << tab << "state::state_list r;" << endl;
-		out << tab << tab << tab << tab << tab << "r.push_back(t1.s); // return 'true'" << endl;
 		out << tab << tab << tab << tab << "}" << endl;
 		out << tab << tab << tab << tab << "return state::state_list();" << endl;
 		out << tab << tab << tab << "}" << endl;
@@ -192,13 +190,28 @@ void cpp_output::gen_transition_base()
 		else out << ")" << endl;
 		out << tab << tab << "{" << endl;
 		if (sc.using_parallel) {
-			/* todo rework as internal/external transition. Needed for transitions without target?
-			out << tab << tab << tab << "for (state::eval_list::const_iterator i = eval.begin(); i != eval.end(); ++i) {" << endl;
-			out << tab << tab << tab << "	if (i->get() == typeid(S)) return state::state_list();" << endl;
+			out << tab << tab << tab << "if (eval.filtering) {" << endl;
+			out << tab << tab << tab << tab << "bool enabled = transition_actions<E, S, no_state>::condition(sc.model);" << endl;
+			out << tab << tab << tab << tab << "if (enabled) {" << endl;
+			out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
+
+			out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
+			out << tab << tab << tab << tab << tab << "t1.s = sc.get_state<S>();" << endl;
+
+			// Transitions without target don't conflict
+			out << tab << tab << tab << tab << tab << "eval.filtered.push_back(t1);" << endl;
+
+			out << tab << tab << tab << tab << "}" << endl;
+			out << tab << tab << tab << tab << "return state::state_list();" << endl;
 			out << tab << tab << tab << "}" << endl;
-			*/
+			out << endl;
+			out << tab << tab << tab << "bool enabled = false;" << endl;
+			out << tab << tab << tab << "for (state::eval_data::enabled_list::const_iterator i = eval.enabled.begin(); i != eval.enabled.end() && !enabled; ++i) enabled = (i->get() == typeid(*this));" << endl; 
+			out << tab << tab << tab << "if (!enabled) return " << empty << ';' << endl;
 		}
-		out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return " << empty << ";" << endl;
+		else {
+			out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return " << empty << ";" << endl;
+		}
 		if(opt.debug == "clog") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << std::endl;" << endl;
 		else if(opt.debug == "scxmlgui") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"3 \" << S::debug_name() << \" -> \" << S::debug_name() << std::endl;" << endl;
 		out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
@@ -244,15 +257,32 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << '{' << endl;
 
 		if (sc.using_parallel) {
-			/* todo rework as internal/external transition
-			out << tab << tab << tab << "for (state::eval_list::const_iterator i = eval.begin(); i != eval.end(); ++i) {" << endl;
-			out << tab << tab << tab << "	if (i->get() == typeid(S)) return state::state_list();" << endl;
+			out << tab << tab << tab << "if (eval.filtering) {" << endl;
+			out << tab << tab << tab << tab << "bool enabled = transition_actions<E, S";
+			for (int i = 0; i < sz; ++i) out << ", D" << i;
+			out << ">::condition(sc.model);" << endl;
+			out << tab << tab << tab << tab << "if (enabled) {" << endl;
+			out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
+
+			out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
+			out << tab << tab << tab << tab << tab << "t1.s = sc.get_state<S>();" << endl;
+
+			// Internal transitions don't conflict
+			out << tab << tab << tab << tab << tab << "eval.filtered.push_back(t1);" << endl;
+
+			out << tab << tab << tab << tab << "}" << endl;
+			out << tab << tab << tab << tab << "return state::state_list();" << endl;
 			out << tab << tab << tab << "}" << endl;
-			*/
+			out << endl;
+			out << tab << tab << tab << "bool enabled = false;" << endl;
+			out << tab << tab << tab << "for (state::eval_data::enabled_list::const_iterator i = eval.enabled.begin(); i != eval.enabled.end() && !enabled; ++i) enabled = (i->get() == typeid(*this));" << endl; 
+			out << tab << tab << tab << "if (!enabled) return " << empty << ';' << endl;
 		}
-		out << tab << tab << tab << "if(!transition_actions<E, S";
-		for (int i = 0; i < sz; ++i) out << ", D" << i;
-		out << ">::condition(sc.model)) return " << empty << ";" << endl;
+		else {
+			out << tab << tab << tab << "if(!transition_actions<E, S";
+			for (int i = 0; i < sz; ++i) out << ", D" << i;
+			out << ">::condition(sc.model)) return " << empty << ";" << endl;
+		}
 		
 		if (opt.debug == "clog") {
 			out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \"";
