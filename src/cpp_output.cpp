@@ -124,15 +124,16 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << tab << tab << state_t() << "::state_list r;" << endl;
 		out << tab << tab << tab << tab << "if(transition_actions<E, S, D>::condition(sc.model)) {" << endl;
 		out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
+		out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
 
 		out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
 		out << tab << tab << tab << tab << tab << "t1.s = sc.get_state<S>();" << endl;
 		out << tab << tab << tab << tab << tab << "t1.cur = s;" << endl;
+
 		out << tab << tab << tab << tab << tab << "size_t i_mask = 0;" << endl;
 		out << tab << tab << tab << tab << tab << "for(state::state_list::iterator i_cur = sc.model.cur_state.begin(); i_cur != sc.model.cur_state.end(); ++i_cur) if (*i_cur) {" << endl;
 		out << tab << tab << tab << tab << tab << tab << "t1.exit_mask[i_mask++] = would_exit(*i_cur, id<T>(), (typename D::parent_t*)0);" << endl;
 		out << tab << tab << tab << tab << tab << "}" << endl;
-
 		out << tab << tab << tab << tab << tab << "bool t1_preemted = false;" << endl;
 		out << tab << tab << tab << tab << tab << "for (state::eval_data::eval_list::iterator i_t2 = eval.filtered.begin(); i_t2 != eval.filtered.end();) {" << endl;
 		out << tab << tab << tab << tab << tab << tab << "bool erased = false;" << endl;
@@ -143,7 +144,6 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << tab << tab << tab << tab << "if (!erased) ++i_t2;" << endl;
 		out << tab << tab << tab << tab << tab << "}" << endl;
 		out << tab << tab << tab << tab << tab << "if (!t1_preemted) eval.filtered.push_back(t1);" << endl;
-		out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
 
 		out << tab << tab << tab << tab << "}" << endl;
 		out << tab << tab << tab << tab << "return r;" << endl;
@@ -185,6 +185,9 @@ void cpp_output::gen_transition_base()
 		out << tab << "// transition with no target" << endl;
 		out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
 		out << tab << "{" << endl;
+		if (sc.using_parallel) {
+			out << tab << tab << "bool would_exit(state* n) { return !!dynamic_cast<S*>(n) && typeid(S) != typeid(*n); }" << endl;
+		}
 		out << tab << tab << "public:" << endl;
 		if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, state::eval_data &eval";
 		else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc";
@@ -196,14 +199,26 @@ void cpp_output::gen_transition_base()
 			out << tab << tab << tab << tab << state_t() << "::state_list r;" << endl;
 			out << tab << tab << tab << tab << "if (transition_actions<E, S, no_state>::condition(sc.model)) {" << endl;
 			out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
+			out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
 
 			out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
 			out << tab << tab << tab << tab << tab << "t1.s = sc.get_state<S>();" << endl;
 			out << tab << tab << tab << tab << tab << "t1.cur = s;" << endl;
 
-			// Transitions without target don't conflict
-			out << tab << tab << tab << tab << tab << "eval.filtered.push_back(t1);" << endl;
-			out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
+			out << tab << tab << tab << tab << tab << "size_t i_mask = 0;" << endl;
+			out << tab << tab << tab << tab << tab << "for(state::state_list::iterator i_cur = sc.model.cur_state.begin(); i_cur != sc.model.cur_state.end(); ++i_cur) if (*i_cur) {" << endl;
+			out << tab << tab << tab << tab << tab << tab << "t1.exit_mask[i_mask++] = would_exit(*i_cur);" << endl;
+			out << tab << tab << tab << tab << tab << "}" << endl;
+			out << tab << tab << tab << tab << tab << "bool t1_preemted = false;" << endl;
+			out << tab << tab << tab << tab << tab << "for (state::eval_data::eval_list::iterator i_t2 = eval.filtered.begin(); i_t2 != eval.filtered.end();) {" << endl;
+			out << tab << tab << tab << tab << tab << tab << "bool erased = false;" << endl;
+			out << tab << tab << tab << tab << tab << tab << "if ((t1.exit_mask & i_t2->exit_mask).any()) {" << endl;
+			out << tab << tab << tab << tab << tab << tab << tab << "if (i_t2->s->is_descendant(t1.s)) i_t2 = eval.filtered.erase(i_t2), erased = true;" << endl;
+			out << tab << tab << tab << tab << tab << tab << tab << "else t1_preemted = true;" << endl;
+			out << tab << tab << tab << tab << tab << tab << "}" << endl;
+			out << tab << tab << tab << tab << tab << tab << "if (!erased) ++i_t2;" << endl;
+			out << tab << tab << tab << tab << tab << "}" << endl;
+			out << tab << tab << tab << tab << tab << "if (!t1_preemted) eval.filtered.push_back(t1);" << endl;
 
 			out << tab << tab << tab << tab << "}" << endl;
 			out << tab << tab << tab << tab << "return r;" << endl;
@@ -250,6 +265,9 @@ void cpp_output::gen_transition_base()
 		out << ", internal> : public transition_actions<E, S, D0, D1>" << endl;
 
 		out << tab << '{' << endl;
+		if (sc.using_parallel) {
+			out << tab << tab << "bool would_exit(state* n) { return !!dynamic_cast<S*>(n) && typeid(S) != typeid(*n); }" << endl;
+		}
 		out << tab << tab << "public:" << endl;
 
 		//todo: for now, all targets must have same parallel parent
@@ -267,14 +285,29 @@ void cpp_output::gen_transition_base()
 			for (int i = 0; i < sz; ++i) out << ", D" << i;
 			out << ">::condition(sc.model)) {" << endl;
 			out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
+			out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
 
 			out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
 			out << tab << tab << tab << tab << tab << "t1.s = sc.get_state<S>();" << endl;
 			out << tab << tab << tab << tab << tab << "t1.cur = s;" << endl;
 
-			// Internal transitions don't conflict
-			out << tab << tab << tab << tab << tab << "eval.filtered.push_back(t1);" << endl;
-			out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
+			out << tab << tab << tab << tab << tab << "size_t i_mask = 0;" << endl;
+			out << tab << tab << tab << tab << tab << "for(state::state_list::iterator i_cur = sc.model.cur_state.begin(); i_cur != sc.model.cur_state.end(); ++i_cur) if (*i_cur) {" << endl;
+			
+			//todo: for now, all targets must have same parallel parent
+			out << tab << tab << tab << tab << tab << tab << "t1.exit_mask[i_mask++] = would_exit(*i_cur);" << endl;
+
+			out << tab << tab << tab << tab << tab << "}" << endl;
+			out << tab << tab << tab << tab << tab << "bool t1_preemted = false;" << endl;
+			out << tab << tab << tab << tab << tab << "for (state::eval_data::eval_list::iterator i_t2 = eval.filtered.begin(); i_t2 != eval.filtered.end();) {" << endl;
+			out << tab << tab << tab << tab << tab << tab << "bool erased = false;" << endl;
+			out << tab << tab << tab << tab << tab << tab << "if ((t1.exit_mask & i_t2->exit_mask).any()) {" << endl;
+			out << tab << tab << tab << tab << tab << tab << tab << "if (i_t2->s->is_descendant(t1.s)) i_t2 = eval.filtered.erase(i_t2), erased = true;" << endl;
+			out << tab << tab << tab << tab << tab << tab << tab << "else t1_preemted = true;" << endl;
+			out << tab << tab << tab << tab << tab << tab << "}" << endl;
+			out << tab << tab << tab << tab << tab << tab << "if (!erased) ++i_t2;" << endl;
+			out << tab << tab << tab << tab << tab << "}" << endl;
+			out << tab << tab << tab << tab << tab << "if (!t1_preemted) eval.filtered.push_back(t1);" << endl;
 
 			out << tab << tab << tab << tab << "}" << endl;
 			out << tab << tab << tab << tab << "return r;" << endl;
@@ -435,7 +468,6 @@ void cpp_output::gen_state_parallel_base()
 		exit(1);
 	}
 
-	//todo combine with no_class
 	if(min_c < max_c) out << tab << "class no_class {};" << endl;
 
 	for (set<int>::reverse_iterator i = parallel_sizes.rbegin(); i != parallel_sizes.rend(); ++i) {
