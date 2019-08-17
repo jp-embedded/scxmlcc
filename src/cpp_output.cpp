@@ -1551,6 +1551,7 @@ void cpp_output::gen()
 	if(sc.using_parallel) {
 		out << "#include <functional>" << endl;
 		out << "#include <bitset>" << endl;
+		out << "#include <algorithm>" << endl;
 	}
 	if(!opt.bare_metal) {
 		out << "#include <deque>" << endl;
