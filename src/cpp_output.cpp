@@ -1082,8 +1082,8 @@ void cpp_output::gen_sc()
 		out << tab << tab << tab << tab << "}" << endl;
 		out << tab << tab << tab << tab << "++i_cur;" << endl;
 		out << tab << tab << tab << "}" << endl;
-		out << tab << tab << tab << "else i_cur = model.cur_state.erase(i_cur);" << endl;
 		out << tab << tab << "}" << endl;
+		out << tab << tab << "model.cur_state.erase(std::remove(model.cur_state.begin(), model.cur_state.end(), nullptr), model.cur_state.end());" << endl;
 		out << tab << tab << "return cont;" << endl;
 
 		out << tab << '}' << endl;
