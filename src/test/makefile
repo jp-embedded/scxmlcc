@@ -15,7 +15,7 @@
 #** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #*************************************************************************
 
-CPPFLAGS := -Wall -Wpedantic -O2 -MD -MP
+CPPFLAGS := -Wall -Wpedantic -Wold-style-cast -Wshadow -O2 -MD -MP
 CPPFLAGS += -std=c++17 -isystem gtest-1.8.1/include -pthread
 
 test.objs := test.o

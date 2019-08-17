@@ -1,25 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" binding="early" name="stringevents" qt:editorversion="4.5.2" xmlns:qt="http://www.qt.io/2015/02/scxml-ext">
     <state id="State_1">
-        <qt:editorinfo scenegeometry="136.57;86.63;76.57;36.63;120;100" geometry="136.57;86.63;-60;-50;120;100"/>
         <transition type="external" event="ev1" target="State_2"/>
     </state>
     <state id="State_2">
-        <qt:editorinfo scenegeometry="136.57;306.77;76.57;256.77;120;100" geometry="136.57;306.77;-60;-50;120;100"/>
         <transition type="external" event="ev2.1" target="State_3"/>
         <transition type="external" event="ev2" target="ErrorState"/>
     </state>
     <state id="ErrorState">
-        <qt:editorinfo scenegeometry="434.17;306.77;374.17;256.77;120;100" geometry="434.17;306.77;-60;-50;120;100"/>
         <transition type="external" target="Final_3"/>
         <onentry>
             <log expr="Error state entered"/>
         </onentry>
     </state>
     <state id="State_3">
-        <qt:editorinfo scenegeometry="136.57;537.11;76.57;487.11;120;100" geometry="136.57;537.11;-60;-50;120;100"/>
     </state>
     <final id="Final_3">
-        <qt:editorinfo scenegeometry="434.17;537.11;414.17;517.11;40;40" geometry="434.17;537.11;-20;-20;40;40"/>
     </final>
 </scxml>
