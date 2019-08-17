@@ -23,8 +23,8 @@ TEST(w3c, 355)
 // If we get to s01111 we succeed, if any other state, failure.
 TEST(w3c, 364)
 {
-    sc_test364 sc;
-    sc.init();
+	sc_test364 sc;
+	sc.init();
 	EXPECT_EQ(1, sc.model.cur_state.size());
 	EXPECT_TRUE(sc.model.In<sc_test364::state_pass>());
 }
