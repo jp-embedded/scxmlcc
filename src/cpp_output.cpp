@@ -121,12 +121,13 @@ void cpp_output::gen_transition_base()
 	out << tab << tab << "{" << endl;
 	if (sc.using_parallel) {
 		out << tab << tab << tab << "if (eval.filtering) {" << endl;
-		out << tab << tab << tab << tab << "bool enabled = transition_actions<E, S, D>::condition(sc.model);" << endl;
-		out << tab << tab << tab << tab << "if (enabled) {" << endl;
+		out << tab << tab << tab << tab << state_t() << "::state_list r;" << endl;
+		out << tab << tab << tab << tab << "if(transition_actions<E, S, D>::condition(sc.model)) {" << endl;
 		out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
 
 		out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
 		out << tab << tab << tab << tab << tab << "t1.s = sc.get_state<S>();" << endl;
+		out << tab << tab << tab << tab << tab << "t1.cur = s;" << endl;
 		out << tab << tab << tab << tab << tab << "size_t i_mask = 0;" << endl;
 		out << tab << tab << tab << tab << tab << "for(state::state_list::iterator i_cur = sc.model.cur_state.begin(); i_cur != sc.model.cur_state.end(); ++i_cur) if (*i_cur) {" << endl;
 		out << tab << tab << tab << tab << tab << tab << "t1.exit_mask[i_mask++] = would_exit(*i_cur, id<T>(), (typename D::parent_t*)0);" << endl;
@@ -142,9 +143,10 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << tab << tab << tab << tab << "if (!erased) ++i_t2;" << endl;
 		out << tab << tab << tab << tab << tab << "}" << endl;
 		out << tab << tab << tab << tab << tab << "if (!t1_preemted) eval.filtered.push_back(t1);" << endl;
+		out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
 
 		out << tab << tab << tab << tab << "}" << endl;
-		out << tab << tab << tab << tab << "return state::state_list();" << endl;
+		out << tab << tab << tab << tab << "return r;" << endl;
 		out << tab << tab << tab << "}" << endl;
 		out << endl;
 		out << tab << tab << tab << "bool enabled = false;" << endl;
@@ -191,18 +193,20 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << "{" << endl;
 		if (sc.using_parallel) {
 			out << tab << tab << tab << "if (eval.filtering) {" << endl;
-			out << tab << tab << tab << tab << "bool enabled = transition_actions<E, S, no_state>::condition(sc.model);" << endl;
-			out << tab << tab << tab << tab << "if (enabled) {" << endl;
+			out << tab << tab << tab << tab << state_t() << "::state_list r;" << endl;
+			out << tab << tab << tab << tab << "if (transition_actions<E, S, no_state>::condition(sc.model)) {" << endl;
 			out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
 
 			out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
 			out << tab << tab << tab << tab << tab << "t1.s = sc.get_state<S>();" << endl;
+			out << tab << tab << tab << tab << tab << "t1.cur = s;" << endl;
 
 			// Transitions without target don't conflict
 			out << tab << tab << tab << tab << tab << "eval.filtered.push_back(t1);" << endl;
+			out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
 
 			out << tab << tab << tab << tab << "}" << endl;
-			out << tab << tab << tab << tab << "return state::state_list();" << endl;
+			out << tab << tab << tab << tab << "return r;" << endl;
 			out << tab << tab << tab << "}" << endl;
 			out << endl;
 			out << tab << tab << tab << "bool enabled = false;" << endl;
@@ -258,20 +262,22 @@ void cpp_output::gen_transition_base()
 
 		if (sc.using_parallel) {
 			out << tab << tab << tab << "if (eval.filtering) {" << endl;
-			out << tab << tab << tab << tab << "bool enabled = transition_actions<E, S";
+			out << tab << tab << tab << tab << state_t() << "::state_list r;" << endl;
+			out << tab << tab << tab << tab << "if (transition_actions<E, S";
 			for (int i = 0; i < sz; ++i) out << ", D" << i;
-			out << ">::condition(sc.model);" << endl;
-			out << tab << tab << tab << tab << "if (enabled) {" << endl;
+			out << ">::condition(sc.model)) {" << endl;
 			out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
 
 			out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
 			out << tab << tab << tab << tab << tab << "t1.s = sc.get_state<S>();" << endl;
+			out << tab << tab << tab << tab << tab << "t1.cur = s;" << endl;
 
 			// Internal transitions don't conflict
 			out << tab << tab << tab << tab << tab << "eval.filtered.push_back(t1);" << endl;
+			out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
 
 			out << tab << tab << tab << tab << "}" << endl;
-			out << tab << tab << tab << tab << "return state::state_list();" << endl;
+			out << tab << tab << tab << tab << "return r;" << endl;
 			out << tab << tab << tab << "}" << endl;
 			out << endl;
 			out << tab << tab << tab << "bool enabled = false;" << endl;
@@ -770,7 +776,7 @@ void cpp_output::gen_state_base()
  		out << tab << tab << "{" << std::endl;
 		out << tab << tab << tab << "struct eval_item" << std::endl;
 		out << tab << tab << tab << "{" << std::endl;
- 		out << tab << tab << tab << tab << "state *s;" << std::endl;
+ 		out << tab << tab << tab << tab << "state *s, *cur;" << std::endl;
 		// todo: figure out bitset size
  		out << tab << tab << tab << tab << "std::bitset<32> exit_mask;" << std::endl;
 		out << tab << tab << tab << "};" << std::endl;
@@ -1071,7 +1077,7 @@ void cpp_output::gen_sc()
 		out << tab << tab << "state::state_list::iterator i_cur = model.cur_state.begin();" << endl;
 		out << tab << tab << "for (state::eval_data::eval_list::iterator i_filtered = eval.filtered.begin(); i_filtered != eval.filtered.end(); ++i_filtered) {" << endl;
 		out << tab << tab << tab << "while(i_cur != model.cur_state.end()) if(*i_cur) {" << endl;
-		out << tab << tab << tab << tab << "if(*i_cur == i_filtered->s) {" << endl;
+		out << tab << tab << tab << tab << "if(*i_cur == i_filtered->cur) {" << endl;
 		out << tab << tab << tab << tab << tab << "state::state_list r = ((*i_cur)->*e)(*this, eval);" << endl;
 		out << tab << tab << tab << tab << tab << "cont = true;" << endl;
 		out << tab << tab << tab << tab << tab << "std::vector<state*>::const_iterator i_new = r.begin();" << endl;
