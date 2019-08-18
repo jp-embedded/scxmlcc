@@ -22,6 +22,7 @@
 #include "issue_72.h"
 #include "issue_88.h"
 #include "issue_94.h"
+#include "issue_97.h"
 #include "eventless.h"
 #include "stringevents.h"
 

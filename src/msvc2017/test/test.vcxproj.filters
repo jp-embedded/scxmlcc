@@ -86,6 +86,9 @@
     <CustomBuild Include="..\..\test\issue_94.scxml">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\test\issue_97.scxml">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="..\..\test\eventless.scxml">
       <Filter>Source Files</Filter>
     </CustomBuild>
