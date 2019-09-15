@@ -156,11 +156,11 @@ void cpp_output::gen_transition_base()
 	else {
 		out << tab << tab << tab << "if(!transition_actions<E, S, D>::condition(sc.model)) return " << empty << ';' << endl;
 	}
-	if(opt.debug == "clog") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \" << scxmlcc::demangle(typeid(D).name()) << std::endl;" << endl;
+	if(opt.debug == "clog") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << S::debug_name() << \" -> \" << D::debug_name() << std::endl;" << endl;
 	else if(opt.debug == "scxmlgui") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"3 \" << S::debug_name() << \" -> \" << D::debug_name() << std::endl;" << endl;
 	out << tab << tab << tab << "D *d = sc.get_state<D>();" << endl;
 	if (sc.using_parallel) out << tab << tab << tab << "state_exit_parallel(s, d, sc, id<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
-	if (sc.using_compound) out << tab << tab << tab << "s->exit_to_src(sc.model, typeid(S));" << endl;
+	if (sc.using_compound) out << tab << tab << tab << "s->exit_to_src(sc.model, S::id());" << endl;
 	out << tab << tab << tab << "state_exit(s, sc.model, id<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
 	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
 	out << tab << tab << tab << "state_enter(d, sc.model, id<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
@@ -231,7 +231,7 @@ void cpp_output::gen_transition_base()
 		else {
 			out << tab << tab << tab << "if(!transition_actions<E, S, no_state>::condition(sc.model)) return " << empty << ";" << endl;
 		}
-		if(opt.debug == "clog") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << std::endl;" << endl;
+		if(opt.debug == "clog") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << S::debug_name() << std::endl;" << endl;
 		else if(opt.debug == "scxmlgui") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"3 \" << S::debug_name() << \" -> \" << S::debug_name() << std::endl;" << endl;
 		out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
 		if (sc.using_parallel) {
@@ -324,10 +324,10 @@ void cpp_output::gen_transition_base()
 		}
 		
 		if (opt.debug == "clog") {
-			out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << scxmlcc::demangle(typeid(S).name()) << \" -> \"";
+			out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << S::debug_name() << \" -> \"";
 			for(int i = 0; i < sz; ++i) {
 				if(i) out << " << \", \"";
-				out << " << scxmlcc::demangle(typeid(D" << i << ").name())";
+				out << " << D" << i << "::debug_name()";
 			}
 			out << " << std::endl;" << endl;
 		}
@@ -337,7 +337,7 @@ void cpp_output::gen_transition_base()
 			out << tab << tab << tab << 'D' << i << "*d" << i << " = sc.get_state<D" << i << ">();" << endl;
 		}
 		out << tab << tab << tab << "s->exit_parallel(sc, s, d0);" << endl;
-		if(sc.using_compound) out << tab << tab << tab << "s->exit_to_src(sc.model, typeid(S));" << endl;
+		if(sc.using_compound) out << tab << tab << tab << "s->exit_to_src(sc.model, S::id());" << endl;
 		out << tab << tab << tab << "s->template exit<D0>(sc.model, static_cast<D0*>(nullptr));" << endl;
 
 		out << tab << tab << tab << "transition_actions<E, S";
@@ -393,26 +393,28 @@ void cpp_output::gen_state_composite_base()
 	out << tab << tab << "template<class T> void enter(data_model&, " << state_composite_t() << "*) {}" << endl;
 
 	out << tab << tab << "template<class T> void enter(data_model &m, ...) { P::template enter<T>(m, static_cast<T*>(nullptr));";
-	if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": enter \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+	if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": enter \" << C::debug_name() << std::endl;";
 	else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"1 \" << C::debug_name() << std::endl;";
 	out << " state_actions<C>::enter(m); }" << endl;
 
 	out << tab << tab << "template<class T> void exit(data_model&, " << state_composite_t() << "*) {}" << endl;
 
 	out << tab << tab << "template<class T> void exit(data_model &m, ...) {";
-	if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+	if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << C::debug_name() << std::endl;";
 	else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"0 \" << C::debug_name() << std::endl;";
 	out << " state_actions<C>::exit(m); P::template exit<T>(m, static_cast<T*>(nullptr)); }" << endl;
 
 	if(sc.using_compound) {
-		out << tab << tab << "virtual void exit_to_src(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
-		if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+		out << tab << tab << "virtual void exit_to_src(data_model &m, const void *sti) { if (C::id() == sti) return;";
+		if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << C::debug_name() << std::endl;";
 		else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"0 \" << C::debug_name() << std::endl;";
 		out << " state_actions<C>::exit(m); P::exit_to_src(m, sti); }" << endl;
 	}
 	if(sc.using_parallel) {
 		out << tab << tab << "virtual bool is_descendant(state *s) { return !!dynamic_cast<C*>(s) && (typeid(*s) != typeid(C)); }" << std::endl;
 	}
+        out << tab << tab << "static const void* id() { static const struct{} _id; return &_id; }" << endl;
+	out << tab << tab << "bool in(const void *si) { return (si == id() || P::in(si)); }" << endl;
 
 	out << tab << "};" << endl;
 	out << endl;
@@ -426,8 +428,8 @@ void cpp_output::gen_state_final_base()
 	out << tab << '{' << endl;
 
 	if (sc.using_parallel) {
-		out << tab << tab << "virtual void exit_to_src(data_model &m, const std::type_info &sti) { if(typeid(C) == sti) return;";
-		if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << scxmlcc::demangle(typeid(C).name()) << std::endl;";
+		out << tab << tab << "virtual void exit_to_src(data_model &m, const void *sti) { if (C::id() == sti) return;";
+		if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << C::debug_name() << std::endl;";
 		else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"0 \" << C::debug_name() << std::endl;";
 		out << " P::parallel_exit_final(m); state_actions<C>::exit(m); P::exit_to_src(m, sti); }" << endl;
 	}
@@ -559,7 +561,7 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << tab << tab << "for(" << classname() << "::" << state_t() << "::" << ret << "::iterator i = sc.model.cur_state.begin(); (i != sc.model.cur_state.end()) && *i; ++i) {" << endl;
 		out << tab << tab << tab << tab << "if(typeid(*this) == typeid(**i)) continue;" << endl;
 		out << tab << tab << tab << tab << "if(!(*i)->parallel_parent(typeid(C))) continue;" << endl;
-		out << tab << tab << tab << tab << "(*i)->exit_to_src(sc.model, typeid(C));" << endl;
+		out << tab << tab << tab << tab << "(*i)->exit_to_src(sc.model, C::id());" << endl;
 		out << tab << tab << tab << tab << "*i = 0;" << endl;
 		out << tab << tab << tab << '}' << endl;
 		out << tab << tab << tab << "P::exit_parallel(sc, s, d);" << endl;
@@ -728,13 +730,13 @@ void cpp_output::gen_model_base()
 		out << tab << tab << state_t() << "::state_list cur_state;" << endl;
 		out << tab << tab << "template <class S> bool In()" << endl;
 		out << tab << tab << "{" << endl;
-		out << tab << tab << tab << "for (state::state_list::const_iterator i = cur_state.begin(); i != cur_state.end(); ++i) if (typeid(**i) == typeid(S)) return true;" << endl;
+		out << tab << tab << tab << "for (state::state_list::const_iterator i = cur_state.begin(); i != cur_state.end(); ++i) if ((*i)->in(S::id())) return true;" << endl;
 		out << tab << tab << tab << "return false;" << endl;
 		out << tab << tab << "}" << endl;
 	}
 	else {
 		out << tab << tab << state_t() << " *cur_state;" << endl;
-		out << tab << tab << "template <class S> bool In() { return typeid(*cur_state) == typeid(S); }" << endl;
+		out << tab << tab << "template <class S> bool In() { return cur_state->in(S::id()); }" << endl;
 	}
 	out << tab << tab << "user_model *user;" << endl;
 	if (opt.debug == "clog" || opt.debug == "scxmlgui") out << tab << tab << "bool debug = true;" << endl;
@@ -882,7 +884,7 @@ void cpp_output::gen_state_base()
 
 	out << tab << tab << "template<class T> void enter(data_model&, ...) {}" << endl;
 	out << tab << tab << "template<class T> void exit(data_model&, ...) {}" << endl;
-	if(sc.using_compound) out << tab << tab << "virtual void exit_to_src(data_model&, const std::type_info&) {}" << endl;
+	if(sc.using_compound) out << tab << tab << "virtual void exit_to_src(data_model&, const void*) {}" << endl;
 	if(sc.using_parallel) {
 		out << tab << tab << "template<class S> " << retp << " enter_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) { return state_list(); }" << endl;
 		out << tab << tab << "virtual void exit_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) {}" << endl;
@@ -893,6 +895,7 @@ void cpp_output::gen_state_base()
 		}
 		out << tab << tab << "virtual bool is_descendant(state*) = 0;" << endl;
 	}
+	out << tab << tab << "virtual bool in(const void*) { return false; }" << endl;
 
 	// removed - this may require delete() wihich is'nt available in some embedded setups
 	//out << tab << tab << "virtual ~" << state_t() << "() {}" << endl;
@@ -959,7 +962,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	out << tab << "{" << endl;
 
-	if (opt.debug == "scxmlgui") {
+	if ((opt.debug == "scxmlgui") || opt.debug == "clog") {
 		// todo: use non-trimmed version of state.id
 		out << tab << tab << "static std::string debug_name() { return \"" << state.id << "\"; }" << endl;
 	}
@@ -1247,7 +1250,8 @@ void cpp_output::gen_sc()
 	out << tab << "struct scxml : public composite<scxml, state>" << endl;
 	out << tab << "{" << endl;
 
-	if (opt.debug == "scxmlgui") {
+	if ((opt.debug == "scxmlgui") || opt.debug == "clog") {
+		// todo: use non-trimmed version of state.id
 		out << tab << tab << "static std::string debug_name() { return \"scxml\"; }" << endl;
 	}
 
@@ -1547,8 +1551,8 @@ void cpp_output::gen()
 	out << "#define __SC_" << boost::to_upper_copy(sc.sc().name) << endl;
 	out << endl;
 
-	out << "#include <typeinfo>" << endl;
 	if(sc.using_parallel) {
+                out << "#include <typeinfo>" << endl;
 		out << "#include <functional>" << endl;
 		out << "#include <bitset>" << endl;
 		out << "#include <algorithm>" << endl;
@@ -1579,22 +1583,6 @@ void cpp_output::gen()
 	}
 	if(sc.using_log || opt.debug == "clog" || opt.debug == "scxmlgui") {
 		out << "#include <iostream>" << endl;
-	}
-	if(opt.debug == "clog") {
-		out << "#include <memory>" << endl;
-		out << "#include <cxxabi.h>" << endl;
-		out << endl;
-
-		out << "#ifndef __SCXMLCC" << endl;
-		out << "#define __SCXMLCC" << endl;
-		out << "namespace scxmlcc {" << endl;
-		out << tab << "inline std::string demangle(const char* name) {" << endl;
-		out << tab << tab << "int s = 0;" << endl;
-		out << tab << tab << "std::unique_ptr<char, void(*)(void*)> res { abi::__cxa_demangle(name, nullptr, nullptr, &s), std::free };" << endl;
-		out << tab << tab << "return s ? name : res.get();" << endl;
-		out << tab << "}" << endl;
-		out << "}" << endl;
-		out << "#endif" << endl;
 	}
 	out << endl;
 
