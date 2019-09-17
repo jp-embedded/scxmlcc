@@ -25,6 +25,12 @@ microwave-01.objs := microwave-01.o
 microwave-02.objs := microwave-02.o
 vending_machine/vending_machine.objs := $(patsubst %.cpp,%.o,$(wildcard vending_machine/*.cpp))
 
+# These should compile without RTTI
+$(timer_switch.objs) : CPPFLAGS += -fno-rtti
+$(hello_world.objs) : CPPFLAGS += -fno-rtti
+$(microwave-01.objs) : CPPFLAGS += -fno-rtti
+$(vending_machine/vending_machine.objs) : CPPFLAGS += -fno-rtti
+
 all: $(APPS)
 clean: $(APPS:=.clean)
 	rm -f $(patsubst %.scxml,%.h,$(wildcard *.scxml))
