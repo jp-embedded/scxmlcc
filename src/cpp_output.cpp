@@ -86,7 +86,7 @@ void cpp_output::gen_transition_base()
 	out << tab << "// external/internal transition" << endl;
 	out << tab << "template<event E, class S, class D = no_state, transition_type T = external> class transition : public transition_actions<E, S, D>" << endl;
 	out << tab << "{" << endl;
-	out << tab << tab << "template<transition_type I> struct id { };" << endl;
+	out << tab << tab << "template<transition_type I> struct type { };" << endl;
 	// when exit/enter is called here without parameter, it forces the action to always exit/enter at least current state
 	// for internal transitions, D must be child of S, otherwise, handle as external transition
 	// S is the source state of the transition, not current state
@@ -102,14 +102,15 @@ void cpp_output::gen_transition_base()
 
 	// since internal use S instead S::parent_t, use composite instead S, so enter is not forced on parallel states in this case
 
-	out << tab << tab << "void state_enter(D* d, data_model &m, id<internal>, S*) { d->template enter<composite<S, typename S::parent_t> >(m); } // internal transition, where dst is descendant of src" << endl;
+	out << tab << tab << "void state_enter(D* d, data_model &m, type<internal>, S*) { d->template enter<composite<S, typename S::parent_t> >(m); } // internal transition, where dst is descendant of src" << endl;
 	out << tab << tab << "void state_enter(D* d, data_model &m, ...) { d->template enter<typename S::parent_t>(m); } // external transition, or dst is not descendant of src" << endl;
-	out << tab << tab << "void state_exit(S*, data_model &, id<internal>, S*) {} // internal transition, where dst is descendant of src" << endl;
+	out << tab << tab << "void state_exit(S*, data_model &, type<internal>, S*) {} // internal transition, where dst is descendant of src" << endl;
 	out << tab << tab << "void state_exit(S* s, data_model &m, ...) { s->template exit<typename D::parent_t>(m); } // external transition, or dst is not descendant of src" << endl;
 	if (sc.using_parallel) {
-		out << tab << tab << "void state_exit_parallel(S*, D*, " << classname() << " &, id<internal>, S*) {} // internal transition, where dst is descendant of src" << endl;
+		out << tab << tab << "static const void* id() { static const struct{} _id; return &_id; }" << endl;
+		out << tab << tab << "void state_exit_parallel(S*, D*, " << classname() << " &, type<internal>, S*) {} // internal transition, where dst is descendant of src" << endl;
 		out << tab << tab << "void state_exit_parallel(S* s, D *d, " << classname() << " &sc, ...) { s->exit_parallel(sc, s, d); } // external transition, or dst is not descendant of src" << endl;
-		out << tab << tab << "bool would_exit(state* n, id<internal>, S*) { return n->in(S::id()) && !n->is(S::id()); }" << endl;
+		out << tab << tab << "bool would_exit(state* n, type<internal>, S*) { return n->in(S::id()) && !n->is(S::id()); }" << endl;
 		out << tab << tab << "bool would_exit(state* n, ...) { return n->in(lcca<S, D>::type::id()) && !n->is(lcca<S, D>::type::id()); }" << endl;
 	}
 	
@@ -123,7 +124,7 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << tab << "if (eval.filtering) {" << endl;
 		out << tab << tab << tab << tab << state_t() << "::state_list r;" << endl;
 		out << tab << tab << tab << tab << "if(transition_actions<E, S, D>::condition(sc.model)) {" << endl;
-		out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
+		out << tab << tab << tab << tab << tab << "eval.enabled.push_back(id());" << endl;
 		out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
 
 		out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
@@ -132,7 +133,7 @@ void cpp_output::gen_transition_base()
 
 		out << tab << tab << tab << tab << tab << "size_t i_mask = 0;" << endl;
 		out << tab << tab << tab << tab << tab << "for(state::state_list::iterator i_cur = sc.model.cur_state.begin(); i_cur != sc.model.cur_state.end(); ++i_cur) if (*i_cur) {" << endl;
-		out << tab << tab << tab << tab << tab << tab << "t1.exit_mask[i_mask++] = would_exit(*i_cur, id<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
+		out << tab << tab << tab << tab << tab << tab << "t1.exit_mask[i_mask++] = would_exit(*i_cur, type<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
 		out << tab << tab << tab << tab << tab << "}" << endl;
 		out << tab << tab << tab << tab << tab << "bool t1_preemted = false;" << endl;
 		out << tab << tab << tab << tab << tab << "for (state::eval_data::eval_list::iterator i_t2 = eval.filtered.begin(); i_t2 != eval.filtered.end();) {" << endl;
@@ -150,7 +151,7 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << tab << "}" << endl;
 		out << endl;
 		out << tab << tab << tab << "bool enabled = false;" << endl;
-		out << tab << tab << tab << "for (state::eval_data::enabled_list::const_iterator i = eval.enabled.begin(); i != eval.enabled.end() && !enabled; ++i) enabled = (i->get() == typeid(*this));" << endl; 
+		out << tab << tab << tab << "for (state::eval_data::enabled_list::const_iterator i = eval.enabled.begin(); i != eval.enabled.end() && !enabled; ++i) enabled = (*i == id());" << endl; 
 		out << tab << tab << tab << "if (!enabled) return " << empty << ';' << endl;
 	}
 	else {
@@ -159,11 +160,11 @@ void cpp_output::gen_transition_base()
 	if(opt.debug == "clog") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << S::debug_name() << \" -> \" << D::debug_name() << std::endl;" << endl;
 	else if(opt.debug == "scxmlgui") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"3 \" << S::debug_name() << \" -> \" << D::debug_name() << std::endl;" << endl;
 	out << tab << tab << tab << "D *d = sc.get_state<D>();" << endl;
-	if (sc.using_parallel) out << tab << tab << tab << "state_exit_parallel(s, d, sc, id<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
+	if (sc.using_parallel) out << tab << tab << tab << "state_exit_parallel(s, d, sc, type<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
 	if (sc.using_compound) out << tab << tab << tab << "s->exit_to_src(sc.model, S::id());" << endl;
-	out << tab << tab << tab << "state_exit(s, sc.model, id<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
+	out << tab << tab << tab << "state_exit(s, sc.model, type<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
 	out << tab << tab << tab << "transition_actions<E, S, D>::enter(sc.model);" << endl;
-	out << tab << tab << tab << "state_enter(d, sc.model, id<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
+	out << tab << tab << tab << "state_enter(d, sc.model, type<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
 	if (sc.using_parallel) {
 		out << tab << tab << tab << state_t() << "::state_list r = d->template enter_parallel<S>(sc, d, s);" << endl;
 		out << tab << tab << tab << "r.push_back(d);" << endl;
@@ -186,6 +187,7 @@ void cpp_output::gen_transition_base()
 		out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
 		out << tab << "{" << endl;
 		if (sc.using_parallel) {
+			out << tab << tab << "static const void* id() { static const struct{} _id; return &_id; }" << endl;
 			out << tab << tab << "bool would_exit(state* n) { return n->in(S::id()) && !n->is(S::id()); }" << endl;
 		}
 		out << tab << tab << "public:" << endl;
@@ -198,7 +200,7 @@ void cpp_output::gen_transition_base()
 			out << tab << tab << tab << "if (eval.filtering) {" << endl;
 			out << tab << tab << tab << tab << state_t() << "::state_list r;" << endl;
 			out << tab << tab << tab << tab << "if (transition_actions<E, S, no_state>::condition(sc.model)) {" << endl;
-			out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
+			out << tab << tab << tab << tab << tab << "eval.enabled.push_back(id());" << endl;
 			out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
 
 			out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
@@ -225,7 +227,7 @@ void cpp_output::gen_transition_base()
 			out << tab << tab << tab << "}" << endl;
 			out << endl;
 			out << tab << tab << tab << "bool enabled = false;" << endl;
-			out << tab << tab << tab << "for (state::eval_data::enabled_list::const_iterator i = eval.enabled.begin(); i != eval.enabled.end() && !enabled; ++i) enabled = (i->get() == typeid(*this));" << endl; 
+			out << tab << tab << tab << "for (state::eval_data::enabled_list::const_iterator i = eval.enabled.begin(); i != eval.enabled.end() && !enabled; ++i) enabled = (*i == id());" << endl; 
 			out << tab << tab << tab << "if (!enabled) return " << empty << ';' << endl;
 		}
 		else {
@@ -266,6 +268,7 @@ void cpp_output::gen_transition_base()
 
 		out << tab << '{' << endl;
 		if (sc.using_parallel) {
+			out << tab << tab << "static const void* id() { static const struct{} _id; return &_id; }" << endl;
 			out << tab << tab << "bool would_exit(state* n) { return n->in(S::id()) && !n->is(S::id()); }" << endl;
 		}
 		out << tab << tab << "public:" << endl;
@@ -284,7 +287,7 @@ void cpp_output::gen_transition_base()
 			out << tab << tab << tab << tab << "if (transition_actions<E, S";
 			for (int i = 0; i < sz; ++i) out << ", D" << i;
 			out << ">::condition(sc.model)) {" << endl;
-			out << tab << tab << tab << tab << tab << "eval.enabled.push_back(typeid(*this));" << endl;
+			out << tab << tab << tab << tab << tab << "eval.enabled.push_back(id());" << endl;
 			out << tab << tab << tab << tab << tab << "r.push_back(s);" << endl;
 
 			out << tab << tab << tab << tab << tab << "state::eval_data::eval_item t1;" << endl;
@@ -314,7 +317,7 @@ void cpp_output::gen_transition_base()
 			out << tab << tab << tab << "}" << endl;
 			out << endl;
 			out << tab << tab << tab << "bool enabled = false;" << endl;
-			out << tab << tab << tab << "for (state::eval_data::enabled_list::const_iterator i = eval.enabled.begin(); i != eval.enabled.end() && !enabled; ++i) enabled = (i->get() == typeid(*this));" << endl; 
+			out << tab << tab << tab << "for (state::eval_data::enabled_list::const_iterator i = eval.enabled.begin(); i != eval.enabled.end() && !enabled; ++i) enabled = (*i == id());" << endl; 
 			out << tab << tab << tab << "if (!enabled) return " << empty << ';' << endl;
 		}
 		else {
@@ -411,9 +414,10 @@ void cpp_output::gen_state_composite_base()
 		out << " state_actions<C>::exit(m); P::exit_to_src(m, sti); }" << endl;
 	}
 	if(sc.using_parallel) {
-		out << tab << tab << "virtual bool is_descendant(state *s) { return !!dynamic_cast<C*>(s) && (typeid(*s) != typeid(C)); }" << std::endl;
+		out << tab << tab << "virtual bool is_descendant(state *s) { return !!dynamic_cast<C*>(s) && !s->is(C::id()); }" << std::endl;
 	}
         out << tab << tab << "static const void* id() { static const struct{} _id; return &_id; }" << endl;
+	out << tab << tab << "const void* vid() { return id(); }" << endl;
 	out << tab << tab << "bool is(const void *si) { return (si == id()); }" << endl;
 	out << tab << tab << "bool in(const void *si) { return (si == id() || P::in(si)); }" << endl;
 
@@ -552,7 +556,7 @@ void cpp_output::gen_state_parallel_base()
 		out << endl;
 
 		// parallel exit
-		out << tab << tab << "bool parallel_parent(const std::type_info& pti) { return typeid(C) == pti; }" << endl;
+		out << tab << tab << "bool parallel_parent(const void* pti) { return C::id() == pti; }" << endl;
 		for (int n = 0; n < children; ++n) {
 			out << tab << tab << "void exit_parallel(" << classname() << " &sc, C" << n << "*, C" << n << "*) {}" << endl;
 		}
@@ -560,8 +564,12 @@ void cpp_output::gen_state_parallel_base()
 		out << tab << tab << '{' << endl;
 		out << tab << tab << tab << "// parallel state exited from C or child" << endl;
 		out << tab << tab << tab << "for(" << classname() << "::" << state_t() << "::" << ret << "::iterator i = sc.model.cur_state.begin(); (i != sc.model.cur_state.end()) && *i; ++i) {" << endl;
-		out << tab << tab << tab << tab << "if(typeid(*this) == typeid(**i)) continue;" << endl;
-		out << tab << tab << tab << tab << "if(!(*i)->parallel_parent(typeid(C))) continue;" << endl;
+
+		// todo:
+		out << tab << tab << tab << tab << "if((*i)->is(this->vid())) continue;" << endl;
+		//out << tab << tab << tab << tab << "if(typeid(*this) == typeid(**i)) continue;" << endl;
+
+		out << tab << tab << tab << tab << "if(!(*i)->parallel_parent(C::id())) continue;" << endl;
 		out << tab << tab << tab << tab << "(*i)->exit_to_src(sc.model, C::id());" << endl;
 		out << tab << tab << tab << tab << "*i = 0;" << endl;
 		out << tab << tab << tab << '}' << endl;
@@ -817,7 +825,7 @@ void cpp_output::gen_state_base()
 		out << tab << tab << tab << "};" << std::endl;
  		out << tab << tab << tab << "typedef std::vector<eval_item> eval_list;" << std::endl;
  		out << tab << tab << tab << "eval_list filtered;" << std::endl;
- 		out << tab << tab << tab << "typedef std::vector<std::reference_wrapper<const std::type_info> > enabled_list;" << std::endl;
+ 		out << tab << tab << tab << "typedef std::vector<const void*> enabled_list;" << std::endl;
  		out << tab << tab << tab << "enabled_list enabled;" << std::endl;
  		out << tab << tab << tab << "bool filtering;" << std::endl;
  		out << tab << tab << "};" << std::endl;
@@ -889,7 +897,7 @@ void cpp_output::gen_state_base()
 	if(sc.using_parallel) {
 		out << tab << tab << "template<class S> " << retp << " enter_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) { return state_list(); }" << endl;
 		out << tab << tab << "virtual void exit_parallel(" << classname() << "&, " << state_t() << "*, " << state_t() << "*) {}" << endl;
-		out << tab << tab << "virtual bool parallel_parent(const std::type_info&) { return false; }" << endl;
+		out << tab << tab << "virtual bool parallel_parent(const void*) { return false; }" << endl;
 		if (sc.using_final) {
 			out << tab << tab << "void parallel_enter_final(data_model &m) {}" << endl;
 			out << tab << tab << "void parallel_exit_final(data_model &m) {}" << endl;
@@ -898,6 +906,7 @@ void cpp_output::gen_state_base()
 	}
 	out << tab << tab << "virtual bool is(const void*) { return false; }" << endl;
 	out << tab << tab << "virtual bool in(const void*) { return false; }" << endl;
+	out << tab << tab << "virtual const void* vid() = 0;" << endl;
 
 	// removed - this may require delete() wihich is'nt available in some embedded setups
 	//out << tab << tab << "virtual ~" << state_t() << "() {}" << endl;
@@ -1554,7 +1563,6 @@ void cpp_output::gen()
 	out << endl;
 
 	if(sc.using_parallel) {
-                out << "#include <typeinfo>" << endl;
 		out << "#include <functional>" << endl;
 		out << "#include <bitset>" << endl;
 		out << "#include <algorithm>" << endl;
