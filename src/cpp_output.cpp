@@ -109,8 +109,8 @@ void cpp_output::gen_transition_base()
 	if (sc.using_parallel) {
 		out << tab << tab << "void state_exit_parallel(S*, D*, " << classname() << " &, id<internal>, S*) {} // internal transition, where dst is descendant of src" << endl;
 		out << tab << tab << "void state_exit_parallel(S* s, D *d, " << classname() << " &sc, ...) { s->exit_parallel(sc, s, d); } // external transition, or dst is not descendant of src" << endl;
-		out << tab << tab << "bool would_exit(state* n, id<internal>, S*) { return !!dynamic_cast<S*>(n) && typeid(S) != typeid(*n); }" << endl;
-		out << tab << tab << "bool would_exit(state* n, ...) { return !!dynamic_cast<typename lcca<S, D>::type*>(n) && typeid(typename lcca<S, D>::type) != typeid(*n); }" << endl;
+		out << tab << tab << "bool would_exit(state* n, id<internal>, S*) { return n->in(S::id()) && !n->is(S::id()); }" << endl;
+		out << tab << tab << "bool would_exit(state* n, ...) { return n->in(lcca<S, D>::type::id()) && !n->is(lcca<S, D>::type::id()); }" << endl;
 	}
 	
 	out << tab << tab << "public:" << endl;
@@ -186,7 +186,7 @@ void cpp_output::gen_transition_base()
 		out << tab << "template<event E, class S> class transition<E, S, no_state> : public transition_actions<E, S, no_state>" << endl;
 		out << tab << "{" << endl;
 		if (sc.using_parallel) {
-			out << tab << tab << "bool would_exit(state* n) { return !!dynamic_cast<S*>(n) && typeid(S) != typeid(*n); }" << endl;
+			out << tab << tab << "bool would_exit(state* n) { return n->in(S::id()) && !n->is(S::id()); }" << endl;
 		}
 		out << tab << tab << "public:" << endl;
 		if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, state::eval_data &eval";
@@ -266,7 +266,7 @@ void cpp_output::gen_transition_base()
 
 		out << tab << '{' << endl;
 		if (sc.using_parallel) {
-			out << tab << tab << "bool would_exit(state* n) { return !!dynamic_cast<S*>(n) && typeid(S) != typeid(*n); }" << endl;
+			out << tab << tab << "bool would_exit(state* n) { return n->in(S::id()) && !n->is(S::id()); }" << endl;
 		}
 		out << tab << tab << "public:" << endl;
 
@@ -414,6 +414,7 @@ void cpp_output::gen_state_composite_base()
 		out << tab << tab << "virtual bool is_descendant(state *s) { return !!dynamic_cast<C*>(s) && (typeid(*s) != typeid(C)); }" << std::endl;
 	}
         out << tab << tab << "static const void* id() { static const struct{} _id; return &_id; }" << endl;
+	out << tab << tab << "bool is(const void *si) { return (si == id()); }" << endl;
 	out << tab << tab << "bool in(const void *si) { return (si == id() || P::in(si)); }" << endl;
 
 	out << tab << "};" << endl;
@@ -895,6 +896,7 @@ void cpp_output::gen_state_base()
 		}
 		out << tab << tab << "virtual bool is_descendant(state*) = 0;" << endl;
 	}
+	out << tab << tab << "virtual bool is(const void*) { return false; }" << endl;
 	out << tab << tab << "virtual bool in(const void*) { return false; }" << endl;
 
 	// removed - this may require delete() wihich is'nt available in some embedded setups
