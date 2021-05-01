@@ -66,6 +66,7 @@ scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_94.scxml gen_src )
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_97.scxml gen_src )
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/eventless.scxml gen_src )
 scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/stringevents.scxml gen_src )
+scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/parallel_exit.scxml gen_src )
 
 add_executable( test_scxml
     ${gen_src}
