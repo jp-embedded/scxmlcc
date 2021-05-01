@@ -1,18 +1,6 @@
+os: linux
+dist: xenial
 language: cpp
-
-sudo: required
-
-matrix:
-  include:
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-7
-      env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
@@ -27,10 +15,10 @@ compiler:
   - gcc
 
 jobs:
-   include:
-      - name: make
-        script: make -C src && make -C src/examples && make -C src/test && ./src/test/test
-      - name: cmake
-        script: mkdir build && cd build && cmake .. && make -j4
-      - name: cmake_dev
-        script: mkdir build-dev && cd build-dev && cmake -DDEVELOPER=1 .. && make -j4 && ctest -V 
+  - name: make
+    script: make -C src && make -C src/examples && make -C src/test && ./src/test/test
+  - name: cmake
+    script: mkdir build && cd build && cmake .. && make -j4
+  - name: cmake_dev
+    script: mkdir build-dev && cd build-dev && cmake -DDEVELOPER=1 .. && make -j4 && ctest -V 
+
