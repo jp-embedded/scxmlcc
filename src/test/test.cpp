@@ -25,6 +25,7 @@
 #include "issue_97.h"
 #include "eventless.h"
 #include "stringevents.h"
+#include "parallel_exit.h"
 
 #include <gtest/gtest.h>
 #include <thread>

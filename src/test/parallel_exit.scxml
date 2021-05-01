@@ -1,0 +1,32 @@
+<scxml name="parallel_exit" version="0.9" xmlns="http://www.w3.org/2005/07/scxml">
+	<state id="global" initial="stateA">
+		<state id="stateA">
+			<transition event="event1" target="stateB"/>
+		</state>
+		<state id="stateB" initial="stateB1">
+			<transition event="event6" target="stateA"/>
+			<state id="stateB1">
+				<transition event="event2" target="stateB2"/>
+			</state>
+			<state id="stateB2">
+				<transition event="event3" target="stateP"/>
+			</state>
+			<parallel id="stateP">
+				<state id="stateP1" initial="stateP11">
+					<state id="stateP11">
+						<transition event="event4" target="stateP12"/>
+					</state>
+					<state id="stateP12">
+					</state>
+				</state>
+				<state id="stateP2" initial="stateP21">
+					<state id="stateP21">
+						<transition event="event5" target="stateP22"/>
+					</state>
+					<state id="stateP22">
+					</state>
+				</state>
+			</parallel>
+		</state>
+	</state>
+</scxml>
