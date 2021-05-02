@@ -555,7 +555,7 @@ void cpp_output::gen_state_parallel_base()
 		for (int n = 0; n < children; ++n) {
 			out << tab << tab << "void exit_parallel(" << classname() << " &sc, C" << n << "*, C" << n << "*) {}" << endl;
 		}
-		out << tab << tab << "void exit_parallel(" << classname() << " &sc, C *s, state *d)" << endl;
+		out << tab << tab << "void exit_parallel(" << classname() << " &sc, state *s, state *d)" << endl;
 		out << tab << tab << '{' << endl;
 		out << tab << tab << tab << "// parallel state exited from C or child" << endl;
 		out << tab << tab << tab << "for(" << classname() << "::" << state_t() << "::" << ret << "::iterator i = sc.model.cur_state.begin(); (i != sc.model.cur_state.end()) && *i; ++i) {" << endl;

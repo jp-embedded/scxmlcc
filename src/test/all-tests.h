@@ -440,4 +440,34 @@ TEST(stringevents, 0)
 	EXPECT_TRUE(sc.model.In<sc_stringevents::state_State_3>());
 }
 
+// Exit parallel state with transition which source is parent of that parallel state
+TEST(parallel_exit, 0)
+{
+	sc_parallel_exit sc;
+	sc.init();
+	EXPECT_EQ(1, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_parallel_exit::state_stateA>());
+	sc.dispatch(&sc_parallel_exit::state::event_event1);
+	EXPECT_EQ(1, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_parallel_exit::state_stateB1>());
+	sc.dispatch(&sc_parallel_exit::state::event_event2);
+	EXPECT_EQ(1, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_parallel_exit::state_stateB2>());
+	sc.dispatch(&sc_parallel_exit::state::event_event3);
+	EXPECT_EQ(2, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_parallel_exit::state_stateP11>());
+	EXPECT_TRUE(sc.model.In<sc_parallel_exit::state_stateP21>());
+	sc.dispatch(&sc_parallel_exit::state::event_event4);
+	EXPECT_EQ(2, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_parallel_exit::state_stateP12>());
+	EXPECT_TRUE(sc.model.In<sc_parallel_exit::state_stateP21>());
+	sc.dispatch(&sc_parallel_exit::state::event_event5);
+	EXPECT_EQ(2, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_parallel_exit::state_stateP12>());
+	EXPECT_TRUE(sc.model.In<sc_parallel_exit::state_stateP22>());
+	sc.dispatch(&sc_parallel_exit::state::event_event6);
+	EXPECT_EQ(1, sc.model.cur_state.size());
+	EXPECT_TRUE(sc.model.In<sc_parallel_exit::state_stateA>());
+}
+
 #endif
