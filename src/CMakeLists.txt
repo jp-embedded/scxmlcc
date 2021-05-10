@@ -5,6 +5,7 @@ find_package (Boost REQUIRED COMPONENTS filesystem system program_options )
 
 add_executable( ${PROJECT_NAME}
    cpp_output.cpp
+   dot_output.cpp
    main.cpp
    scxml_parser.cpp
    version.cpp
