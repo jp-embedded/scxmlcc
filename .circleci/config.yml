@@ -9,7 +9,7 @@ jobs:
       - run:
           command: 
             sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
-            make -C src && make -C src/examples && make -C src/test && ./src/test/test
+            && make -C src && make -C src/examples && make -C src/test && ./src/test/test
 
   cmake:
     docker:
@@ -19,7 +19,7 @@ jobs:
       - run:
           command:
             sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
-            mkdir build && cd build && cmake .. && make -j4
+            && mkdir build && cd build && cmake .. && make -j4
  
   cmake-dev:
     docker:
@@ -29,7 +29,7 @@ jobs:
       - run:
           command:
             sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
-            mkdir build-dev && cd build-dev && cmake -DDEVELOPER=1 .. && make -j4 && ctest -V
+            && mkdir build-dev && cd build-dev && cmake -DDEVELOPER=1 .. && make -j4 && ctest -V
 
 workflows:
   build:
