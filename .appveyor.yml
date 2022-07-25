@@ -8,7 +8,7 @@ install:
 - cmd: choco install xsltproc
 build_script:
 - cmd: >-
-    appveyor DownloadFile https://dl.bintray.com/boostorg/release/1.79.0/source/boost_1_79_0.7z -FileName boost.7z -Timeout 3000
+    appveyor DownloadFile https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.7z -FileName boost.7z -Timeout 3000
 
     7z x boost.7z -oc:\projects\scxmlcc\src
 
