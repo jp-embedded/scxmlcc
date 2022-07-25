@@ -605,13 +605,14 @@ void cpp_output::gen_model_base_data()
 	for (scxml_parser::data_list::const_iterator i_data = datamodel.begin(); i_data != datamodel.end(); ++i_data) {
 		string id = i_data->get()->id;
 		const boost::optional<string> expr_opt = i_data->get()->expr;
-		vector<string> id_tokens;
-		split(id_tokens, id, is_any_of(" "), token_compress_on);
+
 		string type = "int"; // default type
-		if (id_tokens.size() == 2) {
-			type = id_tokens[0];
-			id = id_tokens[1];
-		}
+                const auto sep = id.find_first_of(" ");
+                if (sep != string::npos) {
+                   // use first item as type
+                   type = id.substr(0, sep);
+                   id = id.substr(sep + 1);
+                }
 		out << tab << tab << type << ' ' << id << ';' << endl;
 		if (expr_opt) {
 			constructs.push_back(make_pair(id, *expr_opt));
