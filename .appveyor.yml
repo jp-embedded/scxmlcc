@@ -5,7 +5,7 @@ configuration:
 - Debug
 - Release
 install:
-  - choco install xsltproc
+- cmd: choco install xsltproc
 build_script:
 - cmd: >-
     appveyor DownloadFile https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.7z -FileName boost.7z -Timeout 3000
