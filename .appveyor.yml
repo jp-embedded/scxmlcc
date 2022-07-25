@@ -8,13 +8,13 @@ install:
 - cmd: choco install xsltproc
 build_script:
 - cmd: >-
-    appveyor DownloadFile https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.7z -FileName boost.7z -Timeout 3000
+    appveyor DownloadFile https://dl.bintray.com/boostorg/release/1.79.0/source/boost_1_79_0.7z -FileName boost.7z -Timeout 3000
 
     7z x boost.7z -oc:\projects\scxmlcc\src
 
     call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
 
-    cd c:\projects\scxmlcc\src\boost_1_69_0
+    cd c:\projects\scxmlcc\src\boost_1_79_0
 
     bootstrap
 
