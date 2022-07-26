@@ -39,7 +39,7 @@ jobs:
     steps:
       - checkout
       - run: dir
-      - run: msbuild.exe C:\Users\circleci\project\src\msvc2017\scxmlcc.sln /verbosity:minimal p:Platform="Win32"
+      - run: msbuild.exe C:\Users\circleci\project\src\msvc2017\scxmlcc.sln /verbosity:minimal /p:Platform="Win32"
           
 
 workflows:
