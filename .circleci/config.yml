@@ -39,16 +39,23 @@ jobs:
     steps:
       - checkout
       - run:
-          name: boost 
+          name: Deps 
           command: |
+            choco install xsltproc
             curl https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.7z -O boost.7z
             7z x boost.7z -oc:\Users\circleci\project\src
             cd c:\Users\circleci\project\src\boost_1_79_0
             .\bootstrap
             .\b2 -j 2
-      - run: msbuild.exe C:\Users\circleci\project\src\msvc2017\scxmlcc.sln /verbosity:minimal /p:Platform="Win32"
-          
-
+      - run: 
+          name: Build
+          command: msbuild.exe C:\Users\circleci\project\src\msvc2017\scxmlcc.sln /verbosity:minimal /p:Platform="Win32"
+      - run:
+          name: Test
+          command: |
+            C:\Users\circleci\project\src\msvc2017\Debug\test.exe
+            C:\Users\circleci\project\src\msvc2017\Release\test.exe
+       
 workflows:
   build:
     jobs:
