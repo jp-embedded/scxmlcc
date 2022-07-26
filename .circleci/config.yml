@@ -38,10 +38,8 @@ jobs:
     executor: win/default
     steps:
       - checkout
-      - run:
-          command:
-            dir
-            msbuild.exe -help
+      - run: dir
+      - run: msbuild.exe -help
           
 
 workflows:
