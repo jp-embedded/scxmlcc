@@ -37,7 +37,7 @@ jobs:
           command: mkdir build-dev && cd build-dev && cmake -DDEVELOPER=1 .. && make -j2
       - run:
           name: Test
-          command: ctest -V
+          command: cd build-dev && ctest -V
 
   vstudio:
     executor: win/default
