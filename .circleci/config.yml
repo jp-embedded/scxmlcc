@@ -40,7 +40,8 @@ jobs:
       - checkout
       - run:
           command:
-            msbuild.exe -v
+            dir
+            msbuild.exe -help
           
 
 workflows:
