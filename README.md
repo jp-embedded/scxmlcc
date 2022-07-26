@@ -8,9 +8,10 @@
 # Welcome to scxmlcc.
 The scxml state machine to c++ compiler.
 
-[![](doc/ubuntu_logo.png)](https://travis-ci.org/jp-embedded/scxmlcc)[![](https://travis-ci.org/jp-embedded/scxmlcc.svg?branch=master)](https://travis-ci.org/jp-embedded/scxmlcc)
+| Target | Build Status |
+| --- | --- |
+| ![](doc/ubuntu_logo.png)![](doc/windows_logo.png) | [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jp-embedded/scxmlcc/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/jp-embedded/scxmlcc/tree/master) |
 
-[![](doc/windows_logo.png)](https://ci.appveyor.com/project/jp-embedded/scxmlcc)[![](https://ci.appveyor.com/api/projects/status/github//jp-embedded/scxmlcc?branch=master&svg=true)](https://ci.appveyor.com/project/jp-embedded/scxmlcc)
 
 ## What?
 ![](doc/header.png)
