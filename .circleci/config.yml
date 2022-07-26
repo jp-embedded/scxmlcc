@@ -30,9 +30,14 @@ jobs:
     steps:
       - checkout
       - run:
-          command:
-            sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
-            && mkdir build-dev && cd build-dev && cmake -DDEVELOPER=1 .. && make -j4 && ctest -V
+          name: Deps
+          command: sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
+      - run:
+          name: Build
+          command: mkdir build-dev && cd build-dev && cmake -DDEVELOPER=1 .. && make -j2
+      - run:
+          name: Test
+          command: ctest -V
 
   vstudio:
     executor: win/default
