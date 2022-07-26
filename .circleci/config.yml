@@ -1,0 +1,98 @@
+version: 2.1
+
+orbs:
+  win: circleci/windows@4.1.1
+
+jobs:
+  make:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Deps
+          command: sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
+      - run:
+          name: Build
+          command: make -C src && make -C src/examples && make -C src/test
+      - run:
+          name: Test
+          command: ./src/test/test
+
+  cmake:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Deps
+          command: sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
+      - run:
+          name: Build
+          command: mkdir build && cd build && cmake .. && make -j2
+      
+  cmake-dev:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Deps
+          command: sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
+      - run:
+          name: Build
+          command: mkdir build-dev && cd build-dev && cmake -DDEVELOPER=1 .. && make -j2
+      - run:
+          name: Test
+          command: cd build-dev && ctest -V
+
+  vstudio-debug:
+    executor: win/default
+    steps:
+      - checkout
+      - run:
+          name: Deps 
+          command: |
+            choco install xsltproc
+            curl https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.7z -O boost.7z
+            7z x boost.7z -oc:\Users\circleci\project\src
+            cd c:\Users\circleci\project\src\boost_1_79_0
+            .\bootstrap
+            .\b2 -j 2
+      - run: 
+          name: Build
+          command: msbuild.exe C:\Users\circleci\project\src\msvc2017\scxmlcc.sln /verbosity:minimal /p:Platform="Win32" /p:Configuration=Debug
+      - run:
+          name: Test
+          command: |
+            C:\Users\circleci\project\src\msvc2017\Debug\test.exe
+
+  vstudio:
+    executor: win/default
+    steps:
+      - checkout
+      - run:
+          name: Deps 
+          command: |
+            choco install xsltproc
+            curl https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.7z -O boost.7z
+            7z x boost.7z -oc:\Users\circleci\project\src
+            cd c:\Users\circleci\project\src\boost_1_79_0
+            .\bootstrap
+            .\b2 -j 2
+      - run: 
+          name: Build
+          command: msbuild.exe C:\Users\circleci\project\src\msvc2017\scxmlcc.sln /verbosity:minimal /p:Platform="Win32" /p:Configuration=Release
+      - run:
+          name: Test
+          command: |
+            C:\Users\circleci\project\src\msvc2017\Release\test.exe       
+
+workflows:
+  validate:
+    jobs:
+      - make
+      - cmake
+      - cmake-dev
+      - vstudio
+      - vstudio-debug
