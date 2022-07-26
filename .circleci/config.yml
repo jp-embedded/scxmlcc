@@ -40,7 +40,7 @@ jobs:
       - checkout
       - run:
           command:
-            echo "hello vs"
+            msbuild.exe -v
           
 
 workflows:
