@@ -25,7 +25,7 @@ So if you plan to just use scxmlcc as is for building your state machines, you c
 
 You need to download and compile the boost library. If you already have boost installed, you can also use this.
 
-Download [boost_1_69_0](https://dl.bintray.com/boostorg/release/1.69.0/source/) and put it under `scxmlcc/src/boost_1_69_0` (after you have obtained scxmlcc, see below). You can use another version, use another path or use an existing boost installation. But then you must update the boost include and linker path in the scxml project properties in the visual studio solution, under `Configuration Properties > C/C++ > General > Additional Include Directories` and `Configuration Properties > Linker > Additional Library Directories`.
+Download [boost_1_79_0](https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.7z) and put it under `scxmlcc/src/boost_1_79_0` (after you have obtained scxmlcc, see below). You can use another version, use another path or use an existing boost installation. But then you must update the boost include and linker path in the scxml project properties in the visual studio solution, under `Configuration Properties > C/C++ > General > Additional Include Directories` and `Configuration Properties > Linker > Additional Library Directories`.
 
 To build the boost library open a cmd prompt at the directory where boost was unzipped. Then execute the folowing commands (for Visual Studio 2017):
 ```
