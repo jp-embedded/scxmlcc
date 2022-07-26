@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  win: circleci/windows@4.1.1
+
 jobs:
   make:
     docker:
@@ -31,9 +34,19 @@ jobs:
             sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
             && mkdir build-dev && cd build-dev && cmake -DDEVELOPER=1 .. && make -j4 && ctest -V
 
+  vstudio:
+    executor: win/default
+    steps:
+      - checkout
+      - run:
+          command:
+            echo "hello vs"
+          
+
 workflows:
   build:
     jobs:
+      - vstudio
       - make
       - cmake
       - cmake-dev
