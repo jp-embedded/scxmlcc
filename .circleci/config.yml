@@ -42,7 +42,7 @@ jobs:
           name: boost 
           command: |
             curl https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.7z -O boost.7z
-            7z boost.7z -o c:\Users\circleci\project\src
+            7z x boost.7z -oc:\Users\circleci\project\src
             cd c:\Users\circleci\project\src\boost_1_79_0
             bootstrap
             .\b2 -j 2
