@@ -10,9 +10,14 @@ jobs:
     steps:
       - checkout
       - run:
-          command: 
-            sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
-            && make -C src && make -C src/examples && make -C src/test && ./src/test/test
+          name: Deps
+          command: sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
+      - run:
+          name: Build
+          command: make -C src && make -C src/examples && make -C src/test
+      - run:
+          name: Test
+          command: ./src/test/test
 
   cmake:
     docker:
@@ -20,10 +25,12 @@ jobs:
     steps:
       - checkout
       - run:
-          command:
-            sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
-            && mkdir build && cd build && cmake .. && make -j4
- 
+          name: Deps
+          command: sudo apt-get install build-essential libboost-all-dev xsltproc autorevision
+      - run:
+          name: Build
+          command: mkdir build && cd build && cmake .. && make -j2
+      
   cmake-dev:
     docker:
       - image: cimg/base:stable
