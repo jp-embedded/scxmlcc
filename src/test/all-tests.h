@@ -426,20 +426,6 @@ TEST(eventless, 0)
 	EXPECT_TRUE(sc.model.In<sc_eventless::state_State_3>());
 }
 
-TEST(stringevents, 0)
-{
-	sc_stringevents sc;
-	sc.init();
-
-	// must trigger event "ev1"
-	sc.dispatch("ev1.foo");
-	EXPECT_TRUE(sc.model.In<sc_stringevents::state_State_2>());
-
-	// must trigger event "ev2.1", not "ev2"
-	sc.dispatch("ev2.1");
-	EXPECT_TRUE(sc.model.In<sc_stringevents::state_State_3>());
-}
-
 // Exit parallel state with transition which source is parent of that parallel state
 TEST(parallel_exit, 0)
 {

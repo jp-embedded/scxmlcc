@@ -35,7 +35,7 @@
 
 using namespace std::chrono_literals;
 
-namespace threadsafe {
+namespace t {
 
 #include "all-tests.h"
 
@@ -69,8 +69,7 @@ TEST(timer_switch, 1)
 	sc.model.push_event(&sc_timer_switch::state::event_timer);
 	sc.model.push_event(&sc_timer_switch::state::event_timer);
 
-	auto e = sc.model.pop_event();
-	if (e) sc.dispatch(*e);
+        sc.dispatch_ext();
 
 	EXPECT_TRUE(sc.model.In<sc_timer_switch::state_off>());
 }

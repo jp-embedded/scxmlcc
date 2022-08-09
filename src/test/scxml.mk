@@ -21,4 +21,10 @@ SCXMLCC:=../scxmlcc
 	$(SCXMLCC) --stringevents -o $@ $<
 
 %_t.h: %.scxml
-	$(SCXMLCC) --stringevents -t -n threadsafe -o $@ $<
+	$(SCXMLCC) --threadsafe   -n t -o $@ $<
+
+%_s.h: %.scxml
+	$(SCXMLCC) --stringevents -n s -o $@ $<
+
+%_ts.h: %.scxml
+	$(SCXMLCC) --threadsafe --stringevents -n ts -o $@ $<

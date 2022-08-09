@@ -18,8 +18,7 @@
 CPPFLAGS := -Wall -Wpedantic -Wold-style-cast -Wshadow -O2 -MD -MP
 CPPFLAGS += -std=c++17 -isystem gtest-1.8.1/include -pthread
 
-test.objs := test.o
-test_t.objs := test_t.o
+test.objs := test.o test_t.o test_s.o test_ts.o
 
 all: test
 
@@ -31,15 +30,13 @@ clean: gtest.clean
 	rm -f $(patsubst %.scxml,%_t.h,$(wildcard *.scxml))
 	rm -f $(patsubst %.txml,%.scxml,$(wildcard *.txml))
 	rm -f $(test.objs) $(test.objs:.o=.d)
-	rm -f $(test_t.objs) $(test_t.objs:.o=.d)
 
-$(test.objs) $(test_t.objs): libgtest.a
+$(test.objs): libgtest.a
 
-test: $(test.objs) $(test_t.objs)
+test: $(test.objs)
 	$(CXX) -o $@ $^ libgtest.a -lpthread
 
 -include $(test.objs:.o=.d)
--include $(test_t.objs:.o=.d)
 
 include scxml.mk
 include gtest.mk
