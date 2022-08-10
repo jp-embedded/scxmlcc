@@ -16,7 +16,7 @@
 #*************************************************************************
 
 CPPFLAGS := -Wall -Wpedantic -O2 -MD -MP
-CXXFLAGS := -std=c++11
+CXXFLAGS := -std=c++17
 APPS := timer_switch hello_world microwave-01 microwave-02 vending_machine/vending_machine
 
 timer_switch.objs := timer_switch.o
