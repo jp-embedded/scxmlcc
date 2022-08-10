@@ -8,7 +8,7 @@
 # Welcome to scxmlcc.
 The scxml state machine to c++ compiler.
 
-| Target | Build & Test Status |
+| Target | Build & Test |
 | --- | --- |
 | ![](doc/ubuntu_logo.png)![](doc/windows_logo.png) | [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jp-embedded/scxmlcc/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/jp-embedded/scxmlcc/tree/master) |
 
