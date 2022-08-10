@@ -587,19 +587,23 @@ void cpp_output::gen_model_base_data()
 	const scxml_parser::data_list &datamodel = sc.sc().datamodel;
 
 	constructs.push_back(make_pair("user", "um"));
+        if(!opt.cpp14) {
+           constructs.push_back(make_pair("event_queue_int", "allocator"));
+           constructs.push_back(make_pair("event_queue_ext", "allocator"));
+        }
 
 	if(!opt.bare_metal) {
-		out << tab << tab << "const std::string _sessionid;\n";
+		out << tab << tab << "const std::string _sessionid;" << endl;
 		constructs.push_back(make_pair("_sessionid", "std::to_string(reinterpret_cast<long long unsigned int>(this))"));
-		out << tab << tab << "const std::string _name;\n";
+		out << tab << tab << "const std::string _name;" << endl;
 		constructs.push_back(make_pair("_name", "\"" + sc.sc().name + "\""));
 		if(opt.string_events) {
 			// _event
-			out << tab << tab << "struct EventStruct {\n";
-			out << tab << tab << tab << "std::string name;\n";
-			out << tab << tab << tab << any_ns << "any data;\n";
-			out << tab << tab << tab << "void clear () { name.clear(); data = " << any_ns << "any(); };\n";
-			out << tab << tab << "} _event;\n";
+			out << tab << tab << "struct EventStruct {" << endl;
+			out << tab << tab << tab << "std::string name;" << endl;
+			out << tab << tab << tab << any_ns << "any data;" << endl;
+			out << tab << tab << tab << "void clear () { name.clear(); data = " << any_ns << "any(); };" << endl;
+			out << tab << tab << "} _event;" << endl;
 		}
 	}
 	for (scxml_parser::data_list::const_iterator i_data = datamodel.begin(); i_data != datamodel.end(); ++i_data) {
@@ -618,14 +622,15 @@ void cpp_output::gen_model_base_data()
 			constructs.push_back(make_pair(id, *expr_opt));
 		}
 	}
-	out << tab << tab << "data_model(user_model* um)\n";
+        if(opt.cpp14) out << tab << tab << "data_model(user_model* um)" << endl;
+        else out << tab << tab << "data_model(user_model* um, std::pmr::memory_resource* allocator)" << endl;
 	char delim(':');
 
 	for (pair_vect::const_iterator i_construct = constructs.begin(); i_construct != constructs.end(); ++i_construct) {
-		out << tab << tab << delim << ' ' << i_construct->first << '(' << i_construct->second << ")\n";
+		out << tab << tab << delim << ' ' << i_construct->first << '(' << i_construct->second << ")" << endl;
 		delim = ',';
 	}	
-	out << tab << tab << "{}\n";
+	out << tab << tab << "{}" << endl;
 }
 
 scxml_parser::state_list cpp_output::states(const std::string &type)
@@ -726,9 +731,16 @@ void cpp_output::gen_model_base()
 {
 	out << tab << "struct data_model" << endl;
 	out << tab << "{" << endl;
-	if (!opt.bare_metal && !opt.thread_safe) {
-                out << tab << tab << "std::deque<event> event_queue_int;" << endl;
-                out << tab << tab << "std::deque<event> event_queue_ext;" << endl;
+	out << tab << tab << "user_model *user;" << endl;
+	if (!opt.bare_metal) {
+                if (opt.cpp14) {
+                      out << tab << tab << "std::deque<event> event_queue_int;" << endl;
+                      out << tab << tab << "std::deque<event> event_queue_ext;" << endl;
+                }
+                else {
+                      out << tab << tab << "std::pmr::deque<event> event_queue_int;" << endl;
+                      out << tab << tab << "std::pmr::deque<event> event_queue_ext;" << endl;
+                }
         }
 	if(sc.using_parallel) {
 		out << tab << tab << state_t() << "::state_list cur_state;" << endl;
@@ -742,7 +754,6 @@ void cpp_output::gen_model_base()
 		out << tab << tab << state_t() << " *cur_state;" << endl;
 		out << tab << tab << "template <class S> bool In() { return cur_state->in(S::id()); }" << endl;
 	}
-	out << tab << tab << "user_model *user;" << endl;
 	if (opt.debug == "clog" || opt.debug == "scxmlgui") out << tab << tab << "bool debug = true;" << endl;
 	gen_model_base_data();
 	gen_model_base_finals();
@@ -787,8 +798,6 @@ void cpp_output::gen_model_base()
 		out << tab << tab << "bool is_canceled() const { return cancel_wait_; }" << endl;
 		out << tab << tab << "std::condition_variable cv;" << endl;
 		out << tab << tab << "std::mutex queue_mutex;" << endl;
-		out << tab << tab << "std::deque<event> event_queue_int;" << endl;
-		out << tab << tab << "std::deque<event> event_queue_ext;" << endl;
 		out << tab << tab << "bool cancel_wait_ = false;" << endl;
 	}
 	out << tab << "} model;" << endl;
@@ -1177,8 +1186,8 @@ void cpp_output::gen_sc()
 		if(opt.thread_safe) {
 			out << tab << tab << "event_map_mutex.lock();" << endl;
 		}
-		out << tab << tab << "model._event.name = ev_name;\n";
-		out << tab << tab << "model._event.data = data;\n";
+		out << tab << tab << "model._event.name = ev_name;" << endl;
+		out << tab << tab << "model._event.data = data;" << endl;
 
 		out << tab << tab << "auto event_it = event_map.find(ev_name);" << endl;
 		out << tab << tab << "if(event_it != event_map.end()) {" << endl;
@@ -1241,7 +1250,8 @@ void cpp_output::gen_sc()
 	// constructor
 	auto event_names = get_event_names();
 
-	out << tab << classname() << "(user_model *user = nullptr)\n";
+	if (opt.cpp14) out << tab << classname() << "(user_model *user = nullptr)" << endl;
+	else out << tab << classname() << "(user_model *user = nullptr, std::pmr::memory_resource* allocator = std::pmr::get_default_resource())" << endl;
 	out << tab << ": ";
 	if(opt.string_events && ! event_names.empty()) {
 		out << "event_map{";
@@ -1250,10 +1260,11 @@ void cpp_output::gen_sc()
 			out << delim << "{\"" << ev_name << "\", &" << classname() << "::state::" << event_name(ev_name) << "}";
 			delim = ", ";
 		}
-		out << "}\n"; 
+		out << "}" << endl;
 		out << tab << ", ";
 	}
-	out << "model(user)\n";
+	if (opt.cpp14) out << "model(user)" << endl;
+	else out << "model(user, allocator)" << endl;
 
 	out << tab << "{" << endl;
 	if(sc.using_parallel) out << tab << tab << "model.cur_state.push_back(get_state<scxml>());" << endl;
@@ -1346,7 +1357,7 @@ void cpp_output::gen_action_part_raise(scxml_parser::action &a)
 void cpp_output::gen_action_part(scxml_parser::action &a)
 {
 	if(a.type == "raise") {
-		if(opt.bare_metal) cerr << "warning: raise ignored for bare-metal\n";
+		if(opt.bare_metal) cerr << "warning: raise ignored for bare-metal" << endl;
 		else gen_action_part_raise(a);
 	}
 	else if(a.type == "log") gen_action_part_log(a);
@@ -1585,17 +1596,17 @@ void cpp_output::gen()
 	if(opt.thread_safe) {
 		out << "#include <condition_variable>" << endl;
 		if(opt.cpp14) {
-			out << "#include <boost/optional.hpp>\n";
+			out << "#include <boost/optional.hpp>" << endl;
 		} else {
-			out << "#include <optional>\n";
+			out << "#include <optional>" << endl;
 		}
 	}
 	if(opt.string_events) {
 		out << "#include <unordered_map>" << endl;
 		if(opt.cpp14) {
-			out << "#include <boost/any.hpp>\n";
+			out << "#include <boost/any.hpp>" << endl;
 		} else {
-			out << "#include <any>\n";
+			out << "#include <any>" << endl;
 		}
 		if(opt.thread_safe) {
 			out << "#include <mutex>" << endl;
@@ -1604,6 +1615,9 @@ void cpp_output::gen()
 	if(sc.using_log || opt.debug == "clog" || opt.debug == "scxmlgui") {
 		out << "#include <iostream>" << endl;
 	}
+        if(!opt.cpp14) {
+		out << "#include <memory_resource>" << endl;
+        }
 	out << endl;
 
 	if(! sc.sc().scripts.empty()) {
