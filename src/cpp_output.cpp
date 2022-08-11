@@ -116,7 +116,7 @@ void cpp_output::gen_transition_base()
 	out << tab << tab << "public:" << endl;
 	if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, state::eval_data &eval";
 	else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc";
-	if (opt.debug == "clog") out << ", const char* ename)" << endl;
+	if (opt.debug == "clog" || opt.debug == "scxmleditor") out << ", const char* ename)" << endl;
 	else out << ")" << endl;
 	out << tab << tab << "{" << endl;
 	if (sc.using_parallel) {
@@ -158,6 +158,7 @@ void cpp_output::gen_transition_base()
 	}
 	if(opt.debug == "clog") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << S::debug_name() << \" -> \" << D::debug_name() << std::endl;" << endl;
 	else if(opt.debug == "scxmlgui") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"3 \" << S::debug_name() << \" -> \" << D::debug_name() << std::endl;" << endl;
+	else if(opt.debug == "scxmleditor") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"12@\" << sc.model._name << \'@\' << ename << \'@\' << std::endl;" << endl;
 	out << tab << tab << tab << "D *d = sc.get_state<D>();" << endl;
 	if (sc.using_parallel) out << tab << tab << tab << "state_exit_parallel(s, d, sc, id<T>(), static_cast<typename D::parent_t*>(nullptr));" << endl;
 	if (sc.using_compound) out << tab << tab << tab << "s->exit_to_src(sc.model, S::id());" << endl;
@@ -170,6 +171,7 @@ void cpp_output::gen_transition_base()
 	}
 
 	if(opt.debug == "scxmlgui") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"2 \" << S::debug_name() << \" -> \" << D::debug_name() << std::endl;" << endl;
+	else if(opt.debug == "scxmleditor") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"13@\" << sc.model._name << \'@\' << ename << \'@\' << std::endl;" << endl;
 
 	if (sc.using_parallel) {
 		out << tab << tab << tab << "return r;" << endl;
@@ -191,7 +193,7 @@ void cpp_output::gen_transition_base()
 		out << tab << tab << "public:" << endl;
 		if (sc.using_parallel) out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc, state::eval_data &eval";
 		else out << tab << tab << ret << " operator ()(S *s, " << classname() << " &sc";
-		if (opt.debug == "clog") out << ", const char* ename)" << endl;
+		if (opt.debug == "clog" || opt.debug == "scxmleditor") out << ", const char* ename)" << endl;
 		else out << ")" << endl;
 		out << tab << tab << "{" << endl;
 		if (sc.using_parallel) {
@@ -233,6 +235,7 @@ void cpp_output::gen_transition_base()
 		}
 		if(opt.debug == "clog") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"" << classname() << ": transition [\" << ename << \"] \" << S::debug_name() << std::endl;" << endl;
 		else if(opt.debug == "scxmlgui") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"3 \" << S::debug_name() << \" -> \" << S::debug_name() << std::endl;" << endl;
+                else if(opt.debug == "scxmleditor") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"12@\" << sc.model._name << \'@\' << ename << \'@\' << std::endl;" << endl;
 		out << tab << tab << tab << "transition_actions<E, S, no_state>::enter(sc.model);" << endl;
 		if (sc.using_parallel) {
 			out << tab << tab << tab << state_t() << "::state_list r;" << endl;
@@ -240,6 +243,7 @@ void cpp_output::gen_transition_base()
 		}
 
 		if(opt.debug == "scxmlgui") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"2 \" << S::debug_name() << \" -> \" << S::debug_name() << std::endl;" << endl;
+                else if(opt.debug == "scxmleditor") out << tab << tab << tab << "if (sc.model.debug) std::clog << \"13@\" << sc.model._name << \'@\' << ename << \'@\' << std::endl;" << endl;
 
 		if (sc.using_parallel) {
 			out << tab << tab << tab << "return r;" << endl;
@@ -273,7 +277,7 @@ void cpp_output::gen_transition_base()
 		//todo: for now, all targets must have same parallel parent
 		if (sc.using_parallel) out << tab << tab << state_t() << "::state_list operator ()(S *s, " << classname() << "&sc, state::eval_data &eval";
 		else out << tab << tab << state_t() << "::state_list operator ()(S *s, " << classname() << "&sc";
-		if (opt.debug == "clog") out << ", const char* ename)" << endl;
+		if (opt.debug == "clog" || opt.debug == "scxmleditor") out << ", const char* ename)" << endl;
 		else out << ")" << endl;
 
 		out << tab << tab << '{' << endl;
@@ -395,20 +399,28 @@ void cpp_output::gen_state_composite_base()
 	out << tab << tab << "template<class T> void enter(data_model &m, ...) { P::template enter<T>(m, static_cast<T*>(nullptr));";
 	if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": enter \" << C::debug_name() << std::endl;";
 	else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"1 \" << C::debug_name() << std::endl;";
-	out << " state_actions<C>::enter(m); }" << endl;
-
+	else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@2\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+	out << " state_actions<C>::enter(m);";
+	if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@1\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+        out << " }" << endl;
 	out << tab << tab << "template<class T> void exit(data_model&, " << state_composite_t() << "*) {}" << endl;
 
 	out << tab << tab << "template<class T> void exit(data_model &m, ...) {";
 	if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << C::debug_name() << std::endl;";
 	else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"0 \" << C::debug_name() << std::endl;";
-	out << " state_actions<C>::exit(m); P::template exit<T>(m, static_cast<T*>(nullptr)); }" << endl;
+	else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@4\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+	out << " state_actions<C>::exit(m); P::template exit<T>(m, static_cast<T*>(nullptr));";
+	if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@3\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+        out << " }" << endl;
 
 	if(sc.using_compound) {
 		out << tab << tab << "virtual void exit_to_src(data_model &m, const void *sti) { if (C::id() == sti) return;";
 		if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << C::debug_name() << std::endl;";
 		else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"0 \" << C::debug_name() << std::endl;";
-		out << " state_actions<C>::exit(m); P::exit_to_src(m, sti); }" << endl;
+                else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@4\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+		out << " state_actions<C>::exit(m); P::exit_to_src(m, sti);";
+                if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@3\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+                out << " }" << endl;
 	}
 	if(sc.using_parallel) {
 		out << tab << tab << "virtual bool is_descendant(state *s) { return !!dynamic_cast<C*>(s) && (typeid(*s) != typeid(C)); }" << std::endl;
@@ -431,7 +443,10 @@ void cpp_output::gen_state_final_base()
 		out << tab << tab << "virtual void exit_to_src(data_model &m, const void *sti) { if (C::id() == sti) return;";
 		if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << C::debug_name() << std::endl;";
 		else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"0 \" << C::debug_name() << std::endl;";
-		out << " P::parallel_exit_final(m); state_actions<C>::exit(m); P::exit_to_src(m, sti); }" << endl;
+                else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@4\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+		out << " P::parallel_exit_final(m); state_actions<C>::exit(m); P::exit_to_src(m, sti);";
+                if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@3\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+                out << " }" << endl;
 	}
 
 	out << tab << "};" << endl << endl;
@@ -754,7 +769,7 @@ void cpp_output::gen_model_base()
 		out << tab << tab << state_t() << " *cur_state;" << endl;
 		out << tab << tab << "template <class S> bool In() { return cur_state->in(S::id()); }" << endl;
 	}
-	if (opt.debug == "clog" || opt.debug == "scxmlgui") out << tab << tab << "bool debug = true;" << endl;
+	if (opt.debug == "clog" || opt.debug == "scxmlgui" || opt.debug == "scxmleditor") out << tab << tab << "bool debug = true;" << endl;
 	gen_model_base_data();
 	gen_model_base_finals();
 	if (opt.thread_safe) {
@@ -973,7 +988,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 
 	out << tab << "{" << endl;
 
-	if ((opt.debug == "scxmlgui") || opt.debug == "clog") {
+	if (opt.debug == "scxmlgui" || opt.debug == "clog" || opt.debug == "scxmleditor") {
 		// todo: use non-trimmed version of state.id
 		out << tab << tab << "static std::string debug_name() { return \"" << state.id << "\"; }" << endl;
 	}
@@ -987,7 +1002,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 		for (int i = 0; i < sz; ++i) out << ", state_" << state.initial.target[i];
 		string tparams = "(this, sc";
 		if (sc.using_parallel) tparams = "(this, sc, eval";
-		if (opt.debug == "clog") tparams += ", __func__";
+		if (opt.debug == "clog" || opt.debug == "scxmleditor") tparams += ", __func__";
 		tparams += ")";
 		out << ", internal>()" << tparams << "; }" << endl;
 	}
@@ -1048,7 +1063,7 @@ void cpp_output::gen_state(const scxml_parser::state &state)
 			if (multiple) out << "(s = ";
 			string tparams = "(this, sc";
 			if (sc.using_parallel) tparams = "(this, sc, eval";
-			if (opt.debug == "clog") tparams += ", __func__";
+			if (opt.debug == "clog" || opt.debug == "scxmleditor") tparams += ", __func__";
 			tparams += ")";
 			if (has_target) {
 				// normal transition
@@ -1281,7 +1296,7 @@ void cpp_output::gen_sc()
 	out << tab << "struct scxml : public composite<scxml, state>" << endl;
 	out << tab << "{" << endl;
 
-	if ((opt.debug == "scxmlgui") || opt.debug == "clog") {
+	if (opt.debug == "scxmlgui" || opt.debug == "clog" || opt.debug == "scxmleditor") {
 		// todo: use non-trimmed version of state.id
 		out << tab << tab << "static std::string debug_name() { return \"scxml\"; }" << endl;
 	}
@@ -1294,7 +1309,7 @@ void cpp_output::gen_sc()
 	for(int i = 0; i < sz; ++i) out << ", state_" << sc.sc().initial.target[i];
 	string tparams = "(this, sc";
 	if (sc.using_parallel) tparams = "(this, sc, eval";
-	if (opt.debug == "clog") tparams += ", __func__";
+	if (opt.debug == "clog" || opt.debug == "scxmleditor") tparams += ", __func__";
 	tparams += ")";
 	out << ", internal>()" << tparams << "; }" << endl;
 	out << tab << "};" << endl;
@@ -1561,7 +1576,7 @@ void cpp_output::gen()
 		cerr << "error: Hierarchical states is not currenty supported with bare metal C++" << endl;
 		exit(1);
 	}
-	if (opt.bare_metal && opt.debug == "clog") {
+	if (opt.bare_metal && (opt.debug == "clog" || opt.debug == "scxmlgui" || opt.debug == "scxmleditor")) {
 		cerr << "error: The debug option is not currenty supported with bare metal C++" << endl;
 		exit(1);
 	}
@@ -1612,7 +1627,7 @@ void cpp_output::gen()
 			out << "#include <mutex>" << endl;
 		}
 	}
-	if(sc.using_log || opt.debug == "clog" || opt.debug == "scxmlgui") {
+	if(sc.using_log || opt.debug == "clog" || opt.debug == "scxmlgui" || opt.debug == "scxmleditor") {
 		out << "#include <iostream>" << endl;
 	}
         if(!opt.cpp14) {

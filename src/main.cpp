@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 		("help,h",				"This help message")
 		("input,i",	value<string>(),	"Input file.")
 		("output,o",	value<string>(),	"Output file.")
-		("debug,d",	value<string>(),	"Enable debug output (to clog or scxmlgui)")
+		("debug,d",	value<string>(),	"Enable debug output (to clog, scxmlgui or scxmleditor)")
 		("ignore-unknown,u",	value<string>(),"ignore unknown xml elements matching regex")
 		("baremetal,b",				"Generate code for bare metal C++")
 		("threadsafe,t",			"Generate threadsafe code for event_queue")
@@ -125,7 +125,8 @@ int main(int argc, char *argv[])
 
 	if (!opt.debug.empty()) {
 		if ( (opt.debug != "clog")
-		&&   (opt.debug != "scxmlgui") ) {
+		&&   (opt.debug != "scxmlgui") 
+		&&   (opt.debug != "scxmleditor") ) {
 			cout << "Error: Unknown debug output specified." << endl;
 			return -1;
 		}
