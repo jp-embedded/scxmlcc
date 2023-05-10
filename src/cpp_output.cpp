@@ -1425,7 +1425,7 @@ void cpp_output::gen_actions()
 
 		// entry actions
 		if(s->get()->entry_actions.size()) {
-			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::enter(" << classname() << "::data_model &m)" << endl;
+			out << "template<> inline void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::enter(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
 			gen_with_begin(false);
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->entry_actions.begin(); i != s->get()->entry_actions.end(); ++i) {
@@ -1438,7 +1438,7 @@ void cpp_output::gen_actions()
 
 		// exit actions
 		if(s->get()->exit_actions.size()) {
-			out << "template<> void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::exit(" << classname() << "::data_model &m)" << endl;
+			out << "template<> inline void " << classname() << "::state_actions<" << classname() << "::state_" << s->get()->id << ">::exit(" << classname() << "::data_model &m)" << endl;
 			out << '{' << endl;
 			gen_with_begin(false);
 			for (scxml_parser::plist<scxml_parser::action>::const_iterator i = s->get()->exit_actions.begin(); i != s->get()->exit_actions.end(); ++i) {
@@ -1451,7 +1451,7 @@ void cpp_output::gen_actions()
 
 		// initial actions
 		if(s->get()->initial.actions.size()) {
-			out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::initial, " << classname() << "::state_" << s->get()->id;
+			out << "template<> inline void " << classname() << "::transition_actions<&" << classname() << "::state::initial, " << classname() << "::state_" << s->get()->id;
 			for(scxml_parser::slist::const_iterator ai = s->get()->initial.target.begin(); ai != s->get()->initial.target.end(); ++ai) {
 				out << ", " << classname() << "::state_" << *ai;
 			}
@@ -1473,7 +1473,7 @@ void cpp_output::gen_actions()
 				string event = "unconditional";
 				if(itrans->get()->event.size()) event = event_name(itrans->get()->event.front());
 
-				out << "template<> void " << classname() << "::transition_actions<&" << classname() << "::state::" << event << ", " << classname() << "::state_" << s->get()->id;
+				out << "template<> inline void " << classname() << "::transition_actions<&" << classname() << "::state::" << event << ", " << classname() << "::state_" << s->get()->id;
 				for(scxml_parser::slist::const_iterator iaction = itrans->get()->target.begin(); iaction != itrans->get()->target.end(); ++iaction) {
 					out << ", " << classname() << "::state_" << *iaction;
 				}
@@ -1491,7 +1491,7 @@ void cpp_output::gen_actions()
 				string event = "unconditional";
 				if(itrans->get()->event.size()) event = event_name(itrans->get()->event.front());
 
-				out << "template<> bool " << classname() << "::transition_actions<&" << classname() << "::state::" << event << ", " << classname() << "::state_" << s->get()->id;
+				out << "template<> inline bool " << classname() << "::transition_actions<&" << classname() << "::state::" << event << ", " << classname() << "::state_" << s->get()->id;
 				for(scxml_parser::slist::const_iterator iaction = itrans->get()->target.begin(); iaction != itrans->get()->target.end(); ++iaction) {
 					out << ", " << classname() << "::state_" << *iaction;
 				}
