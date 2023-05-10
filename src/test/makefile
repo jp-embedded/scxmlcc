@@ -26,9 +26,7 @@ test.txml := $(wildcard *.txml)
 test.scxml := $(wildcard *.scxml) 
 
 # Using timer_switch from examples
-test.scxml += timer_switch.scxml
-timer_switch.scxml: ../examples/timer_switch.scxml
-	cp -f $^ $@
+test.scxml += ../examples/timer_switch.scxml
 
 test.gen := $(patsubst %.txml,%.h,$(test.txml))
 test.gen += $(patsubst %.scxml,%.h,$(test.scxml))
