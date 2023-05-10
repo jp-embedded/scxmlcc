@@ -15,23 +15,38 @@
 #** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #*************************************************************************
 
+all: test
+
 CPPFLAGS := -Wall -Wpedantic -Wold-style-cast -Wshadow -O2 -MD -MP
 CPPFLAGS += -std=c++17 -isystem gtest-1.8.1/include -pthread
 
 test.objs := test.o test_t.o test_s.o test_ts.o
 
-all: test
+test.txml := $(wildcard *.txml)
+test.scxml := $(wildcard *.scxml) 
+
+# Using timer_switch from examples
+test.scxml += timer_switch.scxml
+timer_switch.scxml: ../examples/timer_switch.scxml
+	cp -f $^ $@
+
+test.gen := $(patsubst %.txml,%.h,$(test.txml))
+test.gen += $(patsubst %.scxml,%.h,$(test.scxml))
+test.gen += $(patsubst %.txml,%_t.h,$(test.txml))
+test.gen += $(patsubst %.scxml,%_t.h,$(test.scxml))
+test.gen += $(patsubst %.txml,%_s.h,$(test.txml))
+test.gen += $(patsubst %.scxml,%_s.h,$(test.scxml))
+test.gen += $(patsubst %.txml,%_ts.h,$(test.txml))
+test.gen += $(patsubst %.scxml,%_ts.h,$(test.scxml))
 
 clean: gtest.clean
 	rm -f test
-	rm -f $(patsubst %.txml,%.h,$(wildcard *.txml))
-	rm -f $(patsubst %.scxml,%.h,$(wildcard *.scxml))
-	rm -f $(patsubst %.txml,%_t.h,$(wildcard *.txml))
-	rm -f $(patsubst %.scxml,%_t.h,$(wildcard *.scxml))
 	rm -f $(patsubst %.txml,%.scxml,$(wildcard *.txml))
+	rm -f $(test.gen)
 	rm -f $(test.objs) $(test.objs:.o=.d)
+	rm -f timer_switch.scxml
 
-$(test.objs): libgtest.a
+$(test.objs): libgtest.a | $(test.gen)
 
 test: $(test.objs)
 	$(CXX) -o $@ $^ libgtest.a -lpthread
@@ -43,8 +58,4 @@ include gtest.mk
 
 %.scxml: %.txml
 	xsltproc cpp.xsl $^ > $@
-
-# Initial depedency files must be generated to be able to auto generate .h from .scxml
-%.d: %.cpp
-	$(CXX) -std=c++17 -MM -MG $^ > $@
 

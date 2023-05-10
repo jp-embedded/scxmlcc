@@ -28,3 +28,4 @@ SCXMLCC:=../scxmlcc
 
 %_ts.h: %.scxml
 	$(SCXMLCC) --threadsafe --stringevents -n ts -o $@ $<
+

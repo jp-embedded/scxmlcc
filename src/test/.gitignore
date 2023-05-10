@@ -2,3 +2,4 @@
 gtest-*
 libgtest.a
 test
+timer_switch.scxml

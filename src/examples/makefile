@@ -20,10 +20,19 @@ CXXFLAGS := -std=c++17
 APPS := timer_switch hello_world microwave-01 microwave-02 vending_machine/vending_machine
 
 timer_switch.objs := timer_switch.o
+timer_switch.gen := timer_switch.h
+
 hello_world.objs := hello_world.o
+hello_world.gen := hello_world.h
+
 microwave-01.objs := microwave-01.o
+microwave-01.gen := microwave-01-cplusplus.h
+
 microwave-02.objs := microwave-02.o
+microwave-02.gen := microwave-02-cplusplus.h
+
 vending_machine/vending_machine.objs := $(patsubst %.cpp,%.o,$(wildcard vending_machine/*.cpp))
+vending_machine/vending_machine.gen := vending_machine/vending_machine.h
 
 # These should compile without RTTI
 $(timer_switch.objs) : CPPFLAGS += -fno-rtti
@@ -43,17 +52,11 @@ $1: $($1.objs)
 $1.clean:
 	rm -f $1 $($1.objs) $($1.objs:.o=.d)
 
+$($1.objs): | $($1.gen)
+
 -include $($1.objs:.o=.d)
 endef
 $(foreach app,$(APPS),$(eval $(call TARGET,$(app))))
 
 include scxml.mk
-
-#todo auto generate these
-vending_machine/main.cpp: vending_machine/vending_machine.h
-timer_switch.cpp: timer_switch.h
-hello_world.cpp: hello_world.h
-microwave-01.cpp: microwave-01-cplusplus.h
-microwave-02.cpp: microwave-02-cplusplus.h
-
 

@@ -16,7 +16,7 @@
 #include "event_list_s.h"
 #include "event_tokens_s.h"
 #include "conditional_s.h"
-#include "../examples/timer_switch_s.h"
+#include "timer_switch_s.h"
 #include "lcca_parallel_s.h"
 #include "issue_69_s.h"
 #include "issue_72_s.h"
