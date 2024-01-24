@@ -94,5 +94,5 @@ workflows:
       - make
       - cmake
       - cmake-dev
-      - vstudio
-      - vstudio-debug
+#      - vstudio
+#      - vstudio-debug
