@@ -57,22 +57,27 @@ foreach(file ${txmls})
        COMMAND ${XSLT} ${CMAKE_CURRENT_LIST_DIR}/cpp.xsl ${file} > ${output}
        DEPENDS ${file}
        )
-   scxmlcc_generator( ${output} test_scxml )
+     scxmlcc_generator(INPUTS ${output} TARGETS test_scxml)
 endforeach()
 
 #generate  scxml->headers
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/event_list.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/event_tokens.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/conditional.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/lcca_parallel.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_69.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_72.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_88.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_94.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/issue_97.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/eventless.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/stringevents.scxml test_scxml )
-scxmlcc_generator( ${CMAKE_CURRENT_SOURCE_DIR}/parallel_exit.scxml test_scxml )
+scxmlcc_generator(
+  INPUTS
+    ${CMAKE_CURRENT_SOURCE_DIR}/event_list.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/event_tokens.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/conditional.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/lcca_parallel.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/issue_69.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/issue_72.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/issue_88.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/issue_94.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/issue_97.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/eventless.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/stringevents.scxml
+    ${CMAKE_CURRENT_SOURCE_DIR}/parallel_exit.scxml
+  TARGETS
+    test_scxml
+  )
 
 
 target_link_libraries(test_scxml

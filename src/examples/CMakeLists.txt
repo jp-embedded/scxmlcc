@@ -9,16 +9,16 @@ set(S ${CMAKE_CURRENT_SOURCE_DIR} )
 set (CMAKE_CXX_STANDARD 17)
 
 add_executable( hello_world hello_world.cpp )
-scxmlcc_generator( ${S}/hello_world.scxml hello_world )
+scxmlcc_generator(INPUTS ${S}/hello_world.scxml CLIARGUMENTS --debug=clog --cpp14 TARGETS hello_world )
 
 add_executable( timer_switch timer_switch.cpp )
-scxmlcc_generator( ${S}/timer_switch.scxml timer_switch )
+scxmlcc_generator(INPUTS ${S}/timer_switch.scxml TARGETS timer_switch )
 
 add_executable( microwave-01 microwave-01.cpp )
-scxmlcc_generator( ${S}/microwave-01-cplusplus.scxml microwave-01 )
+scxmlcc_generator(INPUTS ${S}/microwave-01-cplusplus.scxml TARGETS microwave-01 )
 
 add_executable( microwave-02 microwave-02.cpp )
-scxmlcc_generator( ${S}/microwave-02-cplusplus.scxml microwave-02 )
+scxmlcc_generator(INPUTS ${S}/microwave-02-cplusplus.scxml TARGETS microwave-02 )
 
 add_executable( vending_machine
     vending_machine/coin_refund.cpp
@@ -37,4 +37,4 @@ add_executable( vending_machine
     vending_machine/main.cpp
     vending_machine/signal.h
     )
-scxmlcc_generator( ${S}/vending_machine/vending_machine.scxml vending_machine )
+scxmlcc_generator(INPUTS ${S}/vending_machine/vending_machine.scxml TARGETS vending_machine )
