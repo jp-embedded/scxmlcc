@@ -1,8 +1,19 @@
 # Generate statemachine from input file
 # Usage:
-#   filename: Name of input file
-#   target: Name of target, which depends on the statemachine
-function (scxmlcc_generator filename target )
+#   INPUTS: Input file(s)
+#   TARGETS: Name of target(s), which depends on the statemachine
+function (scxmlcc_generator )
+
+  set(options "")
+  set(oneValueArgs "")
+  set(multiValueArgs INPUTS TARGETS)
+
+  cmake_parse_arguments(PARSED_ARG
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+  )
 
    # if we didn't compile the scxmlcc, then go find it in the system
    if ( TARGET scxmlcc )
