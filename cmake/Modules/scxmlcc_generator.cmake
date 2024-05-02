@@ -7,6 +7,13 @@
 # The generated file(s) are placed within current build folder. Every input
 # file will produce an output file. The output name depends on the input name,
 # eg. microwave-01-cplusplus.xml --> microwave-01-cplusplus.h
+#
+# Be aware: You can't use the scxmlcc_generator command with the same INPUTS arguments twice, e.g.:
+# scxmlcc_generator(INPUT ${CMAKE_CURRENT_SOURCE_DIR}/microwave-02-cplusplus.scxml TARGETS testlib)
+# scxmlcc_generator(INPUT ${CMAKE_CURRENT_SOURCE_DIR}/microwave-02-cplusplus.scxml TARGETS testlib2)
+#
+# Instead use a single command and specify both targets:
+# scxmlcc_generator(INPUT ${CMAKE_CURRENT_SOURCE_DIR}/microwave-02-cplusplus.scxml TARGETS testlib testlib2)
 
 function (scxmlcc_generator )
 
