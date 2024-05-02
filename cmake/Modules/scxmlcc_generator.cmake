@@ -2,6 +2,7 @@
 # Usage:
 #   INPUTS: Input file(s)
 #   TARGETS: Name of target(s), which depends on the statemachine
+#   CLIARGUMENTS: Optional scxmlcc cli argument(s) (e.g. --debug=clog and/or --cpp14)
 #
 # The generated file(s) are placed within current build folder. Every input
 # file will produce an output file. The output name depends on the input name,
@@ -11,7 +12,7 @@ function (scxmlcc_generator )
 
   set(options "")
   set(oneValueArgs "")
-  set(multiValueArgs INPUTS TARGETS)
+  set(multiValueArgs INPUTS TARGETS CLIARGUMENTS)
 
   cmake_parse_arguments(PARSED_ARG
     "${options}"
@@ -39,7 +40,7 @@ function (scxmlcc_generator )
 
      add_custom_command(
           OUTPUT ${output}
-          COMMAND ${SCC} --stringevents -i ${input}  -o ${output}
+          COMMAND ${SCC} ${PARSED_ARG_CLIARGUMENTS} --stringevents -i ${input}  -o ${output}
           DEPENDS ${input}
      )
      list(APPEND outputs ${output})
