@@ -35,6 +35,10 @@ function (scxmlcc_generator )
       find_program( SCC scxmlcc )
    endif()
 
+   if(NOT PARSED_ARG_INPUTS)
+     message(FATAL_ERROR "Missing INPUTS parameter for scxmlcc_generator command")
+   endif()
+
    foreach(input ${PARSED_ARG_INPUTS})
      get_filename_component(ext ${input} EXT)
      if(NOT ext STREQUAL ".scxml")
