@@ -5,33 +5,20 @@ include( scxmlcc_generator )
 set( CMAKE_INCLUDE_CURRENT_DIR ON )
 
 set(S ${CMAKE_CURRENT_SOURCE_DIR} )
-scxmlcc_generator( ${S}/hello_world.scxml hello_gen_src )
-scxmlcc_generator( ${S}/timer_switch.scxml timer_gen_src )
-scxmlcc_generator( ${S}/microwave-01-cplusplus.scxml microwave_gen_src )
-scxmlcc_generator( ${S}/microwave-02-cplusplus.scxml microwave_gen_src )
-scxmlcc_generator( ${S}/vending_machine/vending_machine.scxml vending_gen_src )
 
 set (CMAKE_CXX_STANDARD 17)
 
-add_executable( hello_world
-    hello_world.cpp
-    ${hello_gen_src} 
-    )
+add_executable( hello_world hello_world.cpp )
+scxmlcc_generator( ${S}/hello_world.scxml hello_world )
 
-add_executable( timer_switch
-    timer_switch.cpp
-    ${timer_gen_src}
-    )
+add_executable( timer_switch timer_switch.cpp )
+scxmlcc_generator( ${S}/timer_switch.scxml timer_switch )
 
-add_executable( microwave-01
-    microwave-01.cpp
-    ${microwave_gen_src}
-    )
+add_executable( microwave-01 microwave-01.cpp )
+scxmlcc_generator( ${S}/microwave-01-cplusplus.scxml microwave-01 )
 
-add_executable( microwave-02
-    microwave-02.cpp
-    ${microwave_gen_src}
-    )
+add_executable( microwave-02 microwave-02.cpp )
+scxmlcc_generator( ${S}/microwave-02-cplusplus.scxml microwave-02 )
 
 add_executable( vending_machine
     vending_machine/coin_refund.cpp
@@ -49,5 +36,5 @@ add_executable( vending_machine
     vending_machine/machine.h
     vending_machine/main.cpp
     vending_machine/signal.h
-    ${vending_gen_src}
     )
+scxmlcc_generator( ${S}/vending_machine/vending_machine.scxml vending_machine )
