@@ -9,7 +9,7 @@ set(S ${CMAKE_CURRENT_SOURCE_DIR} )
 set (CMAKE_CXX_STANDARD 17)
 
 add_executable( hello_world hello_world.cpp )
-scxmlcc_generator(INPUTS ${S}/hello_world.scxml TARGETS hello_world )
+scxmlcc_generator(INPUTS ${S}/hello_world.scxml CLIARGUMENTS --debug=clog --cpp14 TARGETS hello_world )
 
 add_executable( timer_switch timer_switch.cpp )
 scxmlcc_generator(INPUTS ${S}/timer_switch.scxml TARGETS timer_switch )
