@@ -26,6 +26,9 @@ SCXMLCC:=../scxmlcc
 %_s.h: %.scxml
 	$(SCXMLCC) --stringevents -n s -o $@ $<
 
+%_b.h: %.scxml
+	$(SCXMLCC) --baremetal -n b -o $@ $<
+
 %_ts.h: %.scxml
 	$(SCXMLCC) --threadsafe --stringevents -n ts -o $@ $<
 

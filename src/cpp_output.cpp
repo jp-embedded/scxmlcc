@@ -602,12 +602,13 @@ void cpp_output::gen_model_base_data()
 	const scxml_parser::data_list &datamodel = sc.sc().datamodel;
 
 	constructs.push_back(make_pair("user", "um"));
+	if(!opt.bare_metal) {
+
         if(!opt.cpp14) {
            constructs.push_back(make_pair("event_queue_int", "allocator"));
            constructs.push_back(make_pair("event_queue_ext", "allocator"));
         }
 
-	if(!opt.bare_metal) {
 		out << tab << tab << "const std::string _sessionid;" << endl;
 		constructs.push_back(make_pair("_sessionid", "std::to_string(reinterpret_cast<long long unsigned int>(this))"));
 		out << tab << tab << "const std::string _name;" << endl;
@@ -637,7 +638,7 @@ void cpp_output::gen_model_base_data()
 			constructs.push_back(make_pair(id, *expr_opt));
 		}
 	}
-        if(opt.cpp14) out << tab << tab << "data_model(user_model* um)" << endl;
+        if(opt.cpp14 || opt.bare_metal) out << tab << tab << "data_model(user_model* um)" << endl;
         else out << tab << tab << "data_model(user_model* um, std::pmr::memory_resource* allocator)" << endl;
 	char delim(':');
 
@@ -1179,20 +1180,29 @@ void cpp_output::gen_sc()
 	out << tab << "}" << endl;
         out << endl;
 
-	out << tab << "void dispatch_ext()" << endl;
-        out << tab << "{" << endl;
-        out << tab << tab << "while (!model.event_queue_ext.empty()) {" << endl;
-        out << tab << tab << tab << "dispatch_int(model.event_queue_ext.front());" << endl;
-        out << tab << tab << tab << "model.event_queue_ext.pop_front();" << endl;
-        out << tab << tab << "}" << endl;
-        out << tab << "}" << endl;
-        out << endl;
-	out << tab << "void dispatch(event e = &state::unconditional)" << endl;
-        out << tab << "{" << endl;
-        out << tab << tab << "model.event_queue_ext.push_back(e);" << endl;
-        out << tab << tab << "if (model.event_queue_ext.size() == 1) do dispatch_ext(); while (!model.event_queue_ext.empty());" << endl;
-        out << tab << "}" << endl;
-        out << endl;
+   if(opt.bare_metal) {
+      out << tab << "void dispatch(event e = &state::unconditional)" << endl;
+      out << tab << "{" << endl;
+      out << tab << tab << "dispatch_int(e);" << endl;
+      out << tab << "}" << endl;
+      out << endl;
+   }
+   else {
+      out << tab << "void dispatch_ext()" << endl;
+      out << tab << "{" << endl;
+      out << tab << tab << "while (!model.event_queue_ext.empty()) {" << endl;
+      out << tab << tab << tab << "dispatch_int(model.event_queue_ext.front());" << endl;
+      out << tab << tab << tab << "model.event_queue_ext.pop_front();" << endl;
+      out << tab << tab << "}" << endl;
+      out << tab << "}" << endl;
+      out << endl;
+      out << tab << "void dispatch(event e = &state::unconditional)" << endl;
+      out << tab << "{" << endl;
+      out << tab << tab << "model.event_queue_ext.push_back(e);" << endl;
+      out << tab << tab << "if (model.event_queue_ext.size() == 1) do dispatch_ext(); while (!model.event_queue_ext.empty());" << endl;
+      out << tab << "}" << endl;
+      out << endl;
+   }
 
 	// dispatch by name
 	if(opt.string_events) {
@@ -1265,7 +1275,7 @@ void cpp_output::gen_sc()
 	// constructor
 	auto event_names = get_event_names();
 
-	if (opt.cpp14) out << tab << classname() << "(user_model *user = nullptr)" << endl;
+	if (opt.cpp14 || opt.bare_metal) out << tab << classname() << "(user_model *user = nullptr)" << endl;
 	else out << tab << classname() << "(user_model *user = nullptr, std::pmr::memory_resource* allocator = std::pmr::get_default_resource())" << endl;
 	out << tab << ": ";
 	if(opt.string_events && ! event_names.empty()) {
@@ -1278,18 +1288,25 @@ void cpp_output::gen_sc()
 		out << "}" << endl;
 		out << tab << ", ";
 	}
-	if (opt.cpp14) out << "model(user)" << endl;
+	if (opt.cpp14 || opt.bare_metal) out << "model(user)" << endl;
 	else out << "model(user, allocator)" << endl;
 
 	out << tab << "{" << endl;
 	if(sc.using_parallel) out << tab << tab << "model.cur_state.push_back(get_state<scxml>());" << endl;
 	else out << tab << tab << "model.cur_state = get_state<scxml>();" << endl;
-        out << tab << tab << "model.event_queue_ext.push_back(&state::initial);" << endl;
+   if(!opt.bare_metal) {
+      out << tab << tab << "model.event_queue_ext.push_back(&state::initial);" << endl;
+   }
 	out << tab << "}" << endl;
 
 	// init
 	out << endl;
-	out << tab << "void init() { dispatch_ext(); }" << endl;
+   if(opt.bare_metal) {
+      out << tab << "void init() { dispatch_int(&state::initial); }" << endl;
+   }
+   else {
+      out << tab << "void init() { dispatch_ext(); }" << endl;
+   }
 	out << endl;
 
 	//scxml base
@@ -1630,14 +1647,14 @@ void cpp_output::gen()
 	if(sc.using_log || opt.debug == "clog" || opt.debug == "scxmlgui" || opt.debug == "scxmleditor") {
 		out << "#include <iostream>" << endl;
 	}
-        if(!opt.cpp14) {
+        if(!opt.cpp14 && !opt.bare_metal) {
 		out << "#include <memory_resource>" << endl;
         }
 	out << endl;
 
 	if(! sc.sc().scripts.empty()) {
 		out << "// user initialisations" << endl;
-		for(const auto script : sc.sc().scripts) {
+		for(const auto& script : sc.sc().scripts) {
 			// this would work, but ugly indention:
 			// gen_action_part(*script);
 			out << script->attr["expr"] << endl;
