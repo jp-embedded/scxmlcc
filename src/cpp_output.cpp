@@ -399,27 +399,27 @@ void cpp_output::gen_state_composite_base()
 	out << tab << tab << "template<class T> void enter(data_model &m, ...) { P::template enter<T>(m, static_cast<T*>(nullptr));";
 	if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": enter \" << C::debug_name() << std::endl;";
 	else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"1 \" << C::debug_name() << std::endl;";
-	else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@2\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+	else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"2@\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
 	out << " state_actions<C>::enter(m);";
-	if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@1\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+	if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"1@\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
         out << " }" << endl;
 	out << tab << tab << "template<class T> void exit(data_model&, " << state_composite_t() << "*) {}" << endl;
 
 	out << tab << tab << "template<class T> void exit(data_model &m, ...) {";
 	if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << C::debug_name() << std::endl;";
 	else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"0 \" << C::debug_name() << std::endl;";
-	else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@4\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+	else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"4@\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
 	out << " state_actions<C>::exit(m); P::template exit<T>(m, static_cast<T*>(nullptr));";
-	if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@3\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+	if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"3@\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
         out << " }" << endl;
 
 	if(sc.using_compound) {
 		out << tab << tab << "virtual void exit_to_src(data_model &m, const void *sti) { if (C::id() == sti) return;";
 		if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << C::debug_name() << std::endl;";
 		else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"0 \" << C::debug_name() << std::endl;";
-                else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@4\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+                else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"4@\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
 		out << " state_actions<C>::exit(m); P::exit_to_src(m, sti);";
-                if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@3\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+                if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"3@\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
                 out << " }" << endl;
 	}
 	if(sc.using_parallel) {
@@ -443,9 +443,9 @@ void cpp_output::gen_state_final_base()
 		out << tab << tab << "virtual void exit_to_src(data_model &m, const void *sti) { if (C::id() == sti) return;";
 		if(opt.debug == "clog") out << " if (m.debug) std::clog << \"" << classname() << ": exit \" << C::debug_name() << std::endl;";
 		else if(opt.debug == "scxmlgui") out << " if (m.debug) std::clog << \"0 \" << C::debug_name() << std::endl;";
-                else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@4\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+                else if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"4@\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
 		out << " P::parallel_exit_final(m); state_actions<C>::exit(m); P::exit_to_src(m, sti);";
-                if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"@3\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
+                if(opt.debug == "scxmleditor") out << " if (m.debug) std::clog << \"3@\" << m._name << \'@\' << C::debug_name() << \'@\' << std::endl;";
                 out << " }" << endl;
 	}
 
@@ -1301,12 +1301,14 @@ void cpp_output::gen_sc()
 
 	// init
 	out << endl;
-   if(opt.bare_metal) {
-      out << tab << "void init() { dispatch_int(&state::initial); }" << endl;
-   }
-   else {
-      out << tab << "void init() { dispatch_ext(); }" << endl;
-   }
+  out << tab << "void init() {";
+	if(opt.debug == "scxmleditor") out << " if (model.debug) std::clog << \"@@@\" << std::endl;";
+  if(opt.bare_metal) {
+      out << tab << " dispatch_int(&state::initial); }" << endl;
+  }
+  else {
+      out << tab << " dispatch_ext(); }" << endl;
+  }
 	out << endl;
 
 	//scxml base
